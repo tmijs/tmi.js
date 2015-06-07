@@ -1,0 +1,20 @@
+{
+  "name": "twitch-tmi",
+  "version": "0.0.1",
+  "description": "Javascript library for Twitch.tv",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Schmoopiie",
+  "license": "MIT",
+  "dependencies": {
+    "irc-message": "^3.0.1",
+    "ws": "^0.7.2"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.8.0",
+    "grunt-contrib-jshint": "^0.11.2"
+  }
+}
