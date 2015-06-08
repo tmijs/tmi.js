@@ -5,6 +5,30 @@ var parse = require("irc-message").parse;
 var util = require("util");
 var webSocket = require("ws");
 
+function rawStream() {}
+
+// Custom formatting for logger..
+rawStream.prototype.write = function (rec) {
+    var message = rec.raw;
+
+    if(typeof rec.raw === "object" && rec.raw !== null) {
+        message = JSON.stringify(rec.raw);
+    }
+
+    var hours = rec.time.getHours();
+    var minutes = rec.time.getMinutes();
+    var ampm = hours >= 12 ? "pm" : "am";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    var time = hours + ":" + minutes + ampm;
+
+    console.log("[%s] %s: %s", time, bunyan.nameFromLevel[rec.level], message);
+};
+
 function client(opts) {
     var self = this;
 
@@ -16,30 +40,6 @@ function client(opts) {
 
     self.username = "";
     self.ws = null;
-
-    function rawStream() {}
-
-    // Custom formatting for logger..
-    rawStream.prototype.write = function (rec) {
-        var message = rec.raw;
-
-        if(typeof rec.raw === "object" && rec.raw !== null) {
-            message = JSON.stringify(rec.raw);
-        }
-
-        var hours = rec.time.getHours();
-        var minutes = rec.time.getMinutes();
-        var ampm = hours >= 12 ? "pm" : "am";
-
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        hours = hours < 10 ? "0" + hours : hours;
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-
-        var time = hours + ":" + minutes + ampm;
-
-        console.log("[%s] %s: %s", time, bunyan.nameFromLevel[rec.level], message);
-    };
 
     // Create the logger..
     self.log = bunyan.createLogger({
@@ -71,7 +71,6 @@ client.prototype.handleMessage = function handleMessage(message) {
             case "PING":
                 self.emit("ping");
                 self.ws.send("PONG");
-                self.ws.pong();
                 break;
 
             // Received PONG from server, return current latency
