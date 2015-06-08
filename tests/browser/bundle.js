@@ -5,9 +5,6 @@ var parse = require("irc-message").parse;
 var util = require("util");
 var webSocket = require("ws");
 
-// TODO: Do not make this var global for multi-clients support.
-var ws;
-
 function client(opts) {
     var self = this;
 
@@ -18,6 +15,7 @@ function client(opts) {
     self.opts.options = opts.options || {};
 
     self.username = "";
+    self.ws = null;
 
     function rawStream() {}
 
@@ -72,8 +70,8 @@ client.prototype.handleMessage = function handleMessage(message) {
             // Received PING from server..
             case "PING":
                 self.emit("ping");
-                ws.send("PONG");
-                ws.pong();
+                self.ws.send("PONG");
+                self.ws.pong();
                 break;
 
             // Received PONG from server, return current latency
@@ -107,10 +105,10 @@ client.prototype.handleMessage = function handleMessage(message) {
             case "372":
                 self.emit("connected");
 
-                ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
+                self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
 
                 loopIterate(self.opts.channels, function (element) {
-                    ws.send("JOIN " + element);
+                    self.ws.send("JOIN " + element);
                 }, 1000);
                 break;
 
@@ -182,10 +180,10 @@ client.prototype.connect = function connect() {
     var server = typeof self.opts.connection.server !== "undefined" ? self.opts.connection.server : "192.16.64.145";
     var port = typeof self.opts.connection.port !== "undefined" ? self.opts.connection.port : 443;
 
-    ws = new webSocket("ws://" + server + ":" + port + "/", "irc");
+    self.ws = new webSocket("ws://" + server + ":" + port + "/", "irc");
 
     // Socket is opened..
-    ws.onopen = function (event) {
+    self.ws.onopen = function (event) {
         // Emitting "connecting" event..
         self.emit("connecting", server, port);
 
@@ -201,31 +199,31 @@ client.prototype.connect = function connect() {
         self.emit("logon");
 
         // Authentication..
-        ws.send("PASS " + password);
-        ws.send("NICK " + username);
-        ws.send("USER " + username + " 8 * :" + username);
+        self.ws.send("PASS " + password);
+        self.ws.send("NICK " + username);
+        self.ws.send("USER " + username + " 8 * :" + username);
     };
 
     // Received message from server..
-    ws.onmessage = function(event) {
+    self.ws.onmessage = function(event) {
         self.handleMessage(parse(event.data.replace("\r\n", "")));
     };
 
     // An error occurred..
-    ws.onerror = function (event) {
-        self. log.error(event);
+    self.ws.onerror = function (event) {
+        self.log.error(event);
     };
 
     // Socket connection closed..
-    ws.onclose = function (event) {
+    self.ws.onclose = function (event) {
         self.log.info(event.reason);
     };
 };
 
 // Disconnect from server..
 client.prototype.disconnect = function disconnect() {
-    if (ws !== null && ws.readyState !== 3) {
-        ws.close();
+    if (self.ws !== null && self.ws.readyState !== 3) {
+        self.ws.close();
     }
 };
 
