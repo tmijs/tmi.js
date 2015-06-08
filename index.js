@@ -70,7 +70,6 @@ client.prototype.handleMessage = function handleMessage(message) {
             case "PING":
                 self.emit("ping");
                 self.ws.send("PONG");
-                self.ws.pong();
                 break;
 
             // Received PONG from server, return current latency
