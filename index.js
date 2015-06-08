@@ -23,9 +23,7 @@ rawStream.prototype.write = function (rec) {
     hours = hours < 10 ? "0" + hours : hours;
     minutes = minutes < 10 ? "0" + minutes : minutes;
 
-    var time = hours + ":" + minutes + ampm;
-
-    console.log("[%s] %s: %s", time, bunyan.nameFromLevel[rec.level], message);
+    console.log("[%s] %s: %s", hours + ":" + minutes + ampm, bunyan.nameFromLevel[rec.level], message);
 };
 
 function client(opts) {
