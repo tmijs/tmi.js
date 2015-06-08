@@ -9,6 +9,7 @@
   "author": "Schmoopiie",
   "license": "MIT",
   "dependencies": {
+    "bunyan": "^1.4.0",
     "irc-message": "^3.0.1",
     "ws": "^0.7.2"
   },

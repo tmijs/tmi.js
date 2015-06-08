@@ -1,4 +1,7 @@
 var options = {
+    options: {
+        debug: true
+    },
     connection: {
         server: "192.16.64.145",
         port: 443

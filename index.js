@@ -1,19 +1,60 @@
+var bunyan = require("bunyan");
 var eventEmitter = require("events").EventEmitter;
 var parse = require("irc-message").parse;
 var util = require("util");
 var webSocket = require("ws");
 
+// TODO: Do not make this var global for multi-clients support.
 var ws;
 
 function client(opts) {
     var self = this;
 
     self.opts = (typeof options !== "undefined") ? options : {};
+    self.opts.channels = opts.channels || [];
     self.opts.connection = opts.connection || {};
     self.opts.identity = opts.identity || {};
-    self.opts.channels = opts.channels || [];
+    self.opts.options = opts.options || {};
 
     self.username = "";
+
+    function rawStream() {}
+
+    // Custom formatting for logger..
+    rawStream.prototype.write = function (rec) {
+        var message = rec.raw;
+
+        if(typeof rec.raw === "object" && rec.raw !== null) {
+            message = JSON.stringify(rec.raw);
+        }
+
+        var hours = rec.time.getHours();
+        var minutes = rec.time.getMinutes();
+        var ampm = hours >= 12 ? "pm" : "am";
+
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        hours = hours < 10 ? "0" + hours : hours;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+
+        var time = hours + ":" + minutes + ampm;
+
+        console.log("[%s] %s: %s", time, bunyan.nameFromLevel[rec.level], message);
+    };
+
+    // Create the logger..
+    self.log = bunyan.createLogger({
+        name: "twitch-tmi",
+        streams: [
+            {
+                level: "error",
+                stream: new rawStream(),
+                type: "raw"
+            }
+        ]
+    });
+
+    if (typeof self.opts.options.debug !== "undefined" ? self.opts.options.debug : false) { self.log.level("info"); }
 
     eventEmitter.call(self);
 }
@@ -40,7 +81,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             default:
-                console.log(message);
+                self.log.info(message);
                 break;
         }
     }
@@ -105,11 +146,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             case "HOSTTARGET":
-                console.log(message);
+                self.log.info(message);
                 break;
 
             default:
-                console.log(message);
+                self.log.info(message);
                 break;
         }
     }
@@ -122,11 +163,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             case "JOIN":
-                console.log(message);
+                self.log.info(message);
                 break;
 
             default:
-                console.log(message);
+                self.log.info(message);
                 break;
         }
     }
@@ -171,12 +212,11 @@ client.prototype.connect = function connect() {
 
     // An error occurred..
     ws.onerror = function (event) {
-        console.log(event);
     };
 
     // Socket connection closed..
     ws.onclose = function (event) {
-        console.log(event.reason);
+        self.log.info(event.reason);
     };
 };
 
