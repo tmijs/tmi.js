@@ -212,6 +212,7 @@ client.prototype.connect = function connect() {
 
     // An error occurred..
     ws.onerror = function (event) {
+        self.log.error(event);
     };
 
     // Socket connection closed..
