@@ -26,6 +26,7 @@ rawStream.prototype.write = function (rec) {
     console.log("[%s] %s: %s", hours + ":" + minutes + ampm, bunyan.nameFromLevel[rec.level], message);
 };
 
+// Client instance..
 function client(opts) {
     var self = this;
 
@@ -50,6 +51,7 @@ function client(opts) {
         ]
     });
 
+    // Show debug messages ?
     if (typeof self.opts.options.debug !== "undefined" ? self.opts.options.debug : false) { self.log.level("info"); }
 
     eventEmitter.call(self);
@@ -181,6 +183,7 @@ client.prototype.connect = function connect() {
     // Socket is opened..
     self.ws.onopen = function (event) {
         // Emitting "connecting" event..
+        self.log.info("Connecting to %s on port %s..", server, port);
         self.emit("connecting", server, port);
 
         var username = typeof self.opts.identity.username !== "undefined" ? self.opts.identity.username : "justinfan" + Math.floor((Math.random() * 80000) + 1000);
