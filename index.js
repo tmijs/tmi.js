@@ -8,10 +8,10 @@ function rawStream() {}
 
 // Custom formatting for logger..
 rawStream.prototype.write = function (rec) {
-    var message = rec.raw;
+    var message = rec.msg || rec.raw;
 
-    if(typeof rec.raw === "object" && rec.raw !== null) {
-        message = JSON.stringify(rec.raw);
+    if(typeof message === "object" && message !== null) {
+        message = JSON.stringify(message);
     }
 
     var hours = rec.time.getHours();
