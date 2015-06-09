@@ -9,10 +9,10 @@ function rawStream() {}
 
 // Custom formatting for logger..
 rawStream.prototype.write = function (rec) {
-    var message = rec.raw;
+    var message = rec.msg || rec.raw;
 
-    if(typeof rec.raw === "object" && rec.raw !== null) {
-        message = JSON.stringify(rec.raw);
+    if(typeof message === "object" && message !== null) {
+        message = JSON.stringify(message);
     }
 
     var hours = rec.time.getHours();
@@ -24,11 +24,10 @@ rawStream.prototype.write = function (rec) {
     hours = hours < 10 ? "0" + hours : hours;
     minutes = minutes < 10 ? "0" + minutes : minutes;
 
-    var time = hours + ":" + minutes + ampm;
-
-    console.log("[%s] %s: %s", time, bunyan.nameFromLevel[rec.level], message);
+    console.log("[%s] %s: %s", hours + ":" + minutes + ampm, bunyan.nameFromLevel[rec.level], message);
 };
 
+// Client instance..
 function client(opts) {
     var self = this;
 
@@ -53,6 +52,7 @@ function client(opts) {
         ]
     });
 
+    // Show debug messages ?
     if (typeof self.opts.options.debug !== "undefined" ? self.opts.options.debug : false) { self.log.level("info"); }
 
     eventEmitter.call(self);
@@ -100,8 +100,9 @@ client.prototype.handleMessage = function handleMessage(message) {
                 self.username = message.params[0];
                 break;
 
-            // We are connected to the server..
+            // Connected to server..
             case "372":
+                self.log.info("Connected to server.");
                 self.emit("connected");
 
                 self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
@@ -176,47 +177,59 @@ client.prototype.connect = function connect() {
     var self = this;
 
     // TODO: Get a random ws/wss server from Twitch if undefined
-    var server = typeof self.opts.connection.server !== "undefined" ? self.opts.connection.server : "192.16.64.145";
-    var port = typeof self.opts.connection.port !== "undefined" ? self.opts.connection.port : 443;
+    self.server = typeof self.opts.connection.server !== "undefined" ? self.opts.connection.server : "192.16.64.145";
+    self.port = typeof self.opts.connection.port !== "undefined" ? self.opts.connection.port : 443;
 
-    self.ws = new webSocket("ws://" + server + ":" + port + "/", "irc");
+    self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
 
-    // Socket is opened..
-    self.ws.onopen = function (event) {
-        // Emitting "connecting" event..
-        self.emit("connecting", server, port);
+    self.ws.onmessage = self._onMessage.bind(this);
+    self.ws.onerror = self._onError.bind(this);
+    self.ws.onclose = self._onClose.bind(this);
+    self.ws.onopen = self._onOpen.bind(this);
+};
 
-        var username = typeof self.opts.identity.username !== "undefined" ? self.opts.identity.username : "justinfan" + Math.floor((Math.random() * 80000) + 1000);
-        var password = typeof self.opts.identity.password !== "undefined" ? self.opts.identity.password : "SCHMOOPIIE";
+// Socket is opened..
+client.prototype._onOpen = function _onOpen(event) {
+    var self = this;
 
-        // Make sure "oauth:" is included..
-        if (password !== "SCHMOOPIIE" && password.indexOf("oauth:") < 0) {
-            password = "oauth:" + password;
-        }
+    // Emitting "connecting" event..
+    self.log.info("Connecting to %s on port %s..", self.server, self.port);
+    self.emit("connecting", self.server, self.port);
 
-        // Emitting "logon" event..
-        self.emit("logon");
+    var username = typeof self.opts.identity.username !== "undefined" ? self.opts.identity.username : "justinfan" + Math.floor((Math.random() * 80000) + 1000);
+    var password = typeof self.opts.identity.password !== "undefined" ? self.opts.identity.password : "SCHMOOPIIE";
 
-        // Authentication..
-        self.ws.send("PASS " + password);
-        self.ws.send("NICK " + username);
-        self.ws.send("USER " + username + " 8 * :" + username);
-    };
+    // Make sure "oauth:" is included..
+    if (password !== "SCHMOOPIIE" && password.indexOf("oauth:") < 0) {
+        password = "oauth:" + password;
+    }
 
-    // Received message from server..
-    self.ws.onmessage = function(event) {
-        self.handleMessage(parse(event.data.replace("\r\n", "")));
-    };
+    // Emitting "logon" event..
+    self.log.info("Sending authentication to server..");
+    self.emit("logon");
 
-    // An error occurred..
-    self.ws.onerror = function (event) {
-        self.log.error(event);
-    };
+    // Authentication..
+    self.ws.send("PASS " + password);
+    self.ws.send("NICK " + username);
+    self.ws.send("USER " + username + " 8 * :" + username);
+};
 
-    // Socket connection closed..
-    self.ws.onclose = function (event) {
-        self.log.info(event.reason);
-    };
+// Received message from server..
+client.prototype._onMessage = function _onMessage(event) {
+    var self = this;
+    self.handleMessage(parse(event.data.replace("\r\n", "")));
+};
+
+// An error occurred..
+client.prototype._onError = function _onError(event) {
+    var self = this;
+    self.log.error(event);
+};
+
+// Socket connection closed..
+client.prototype._onClose = function _onClose(event) {
+    var self = this;
+    self.log.info(event.reason);
 };
 
 // Disconnect from server..
