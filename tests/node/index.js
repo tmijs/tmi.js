@@ -19,14 +19,54 @@ var twitch = new client(options);
 
 twitch.connect();
 
-twitch.on("connecting", function(){
-    console.log("CONNECTING EVENT");
+twitch.on("connecting", function(server, port){
+    //
 });
 
 twitch.on("logon", function(){
-    console.log("LOGON EVENT");
+    //
 });
 
-twitch.on("connected", function(){
-    console.log("CONNECTED EVENT");
+twitch.on("connected", function(server, port){
+    //
+});
+
+twitch.on("names", function(channel, names){
+    //
+});
+
+twitch.on("action", function(channel, user, message){
+    //
+});
+
+twitch.on("chat", function(channel, user, message){
+    //
+});
+
+twitch.on("timeout", function(channel, username){
+    //
+});
+
+twitch.on("clearchat", function(channel){
+    //
+});
+
+twitch.on("hosting", function(channel, target){
+    //
+});
+
+twitch.on("unhost", function(channel){
+    //
+});
+
+twitch.on("subscribers", function(channel, enabled){
+    //
+});
+
+twitch.on("slow", function(channel, enabled){
+    //
+});
+
+twitch.on("r9kmode", function(channel, enabled){
+    //
 });

@@ -37,6 +37,7 @@ function client(opts) {
     self.opts.options = opts.options || {};
 
     self.username = "";
+    self.userstate = {};
     self.ws = null;
 
     // Create the logger..
@@ -78,7 +79,8 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             default:
-                self.log.info(message);
+                self.log.warn("Could not parse message with no prefix: ");
+                self.log.warn(message);
                 break;
         }
     }
@@ -102,7 +104,7 @@ client.prototype.handleMessage = function handleMessage(message) {
             // Connected to server..
             case "372":
                 self.log.info("Connected to server.");
-                self.emit("connected");
+                self.emit("connected", self.server, self.port);
 
                 self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
 
@@ -116,39 +118,101 @@ client.prototype.handleMessage = function handleMessage(message) {
                 var msgid = message.tags["msg-id"] || null;
 
                 switch(msgid) {
+                    // This room is now in subscribers-only mode.
                     case "subs_on":
-                        // This room is now in subscribers-only mode..
+                        self.log.info("[" + message.params[0] + "] This room is now in subscribers-only mode.");
+                        self.emit("subscribers", message.params[0], true);
                         break;
+
+                    // This room is no longer in subscribers-only mode.
                     case "subs_off":
-                        // This room is no longer in subscribers-only mode..
+                        self.log.info("[" + message.params[0] + "] This room is no longer in subscribers-only mode.");
+                        self.emit("subscribers", message.params[0], false);
                         break;
+
+                    // This room is now in slow mode. You may send messages every slow_duration seconds.
                     case "slow_on":
-                        // This room is now in slow mode. You may send messages every slow_duration seconds..
+                        // TODO: Display seconds..
+                        self.log.info("[" + message.params[0] + "] This room is now in slow mode.");
+                        self.emit("slow", message.params[0], true);
                         break;
+
+                    // This room is no longer in slow mode.
                     case "slow_off":
-                        // This room is no longer in slow mode..
+                        self.log.info("[" + message.params[0] + "] This room is no longer in slow mode.");
+                        self.emit("slow", message.params[0], false);
                         break;
+
+                    // This room is now in r9k mode.
                     case "r9k_on":
-                        // This room is now in r9k mode..
+                        self.log.info("[" + message.params[0] + "] This room is now in r9k mode.");
+                        self.emit("r9kmode", message.params[0], true);
                         break;
+
+                    // This room is no longer in r9k mode.
                     case "r9k_off":
-                        // This room is no longer in r9k mode..
+                        self.log.info("[" + message.params[0] + "] This room is no longer in r9k mode.");
+                        self.emit("r9kmode", message.params[0], false);
                         break;
+
+                    // Now hosting target_channel.
                     case "host_on":
-                        // Now hosting target_channel..
+                        // TODO: Display channel being hosted and do not trigger if HOSTTARGET has been triggered..
+                        self.log.info("[" + message.params[0] + "] Now hosting another channel.");
+                        self.emit("hosting", message.params[0]);
                         break;
+
+                    // Exited host mode.
                     case "host_off":
-                        // Exited host mode..
+                        self.log.info("[" + message.params[0] + "] Exited host mode.");
+                        self.emit("unhost", message.params[0]);
                         break;
                 }
                 break;
 
             case "HOSTTARGET":
+                self.log.info("[" + message.params[0] + "] Now hosting " + message.params[1].split(" ")[0] + ".");
+                self.emit("hosting", message.params[0], message.params[1].split(" ")[0]);
+                break;
+
+            case "CLEARCHAT":
+                // User has been timed out by a moderator..
+                if (message.params.length > 1) {
+                    self.log.info("[" + message.params[0] + "] " + message.params[1] + " has been timed out.");
+                    self.emit("timeout", message.params[0], message.params[1]);
+                }
+                // Chat was cleared by a moderator..
+                else {
+                    self.log.info("[" + message.params[0] + "] Chat was cleared by a moderator.");
+                    self.emit("clearchat", message.params[0]);
+                }
+                break;
+
+            case "RECONNECT":
                 self.log.info(message);
                 break;
 
+            case "USERSTATE":
+                message.tags.username = self.username;
+                self.userstate[message.params[0].replace("#", "")] = message.tags;
+                break;
+
             default:
-                self.log.info(message);
+                self.log.warn("Could not parse message from tmi.twitch.tv: ");
+                self.log.warn(message);
+                break;
+        }
+    }
+
+    // Messages from jtv..
+    else if (message.prefix === "jtv") {
+        switch(message.command) {
+            case "MODE":
+                break;
+
+            default:
+                self.log.warn("Could not parse message from jtv: ");
+                self.log.warn(message);
                 break;
         }
     }
@@ -157,15 +221,45 @@ client.prototype.handleMessage = function handleMessage(message) {
     else {
         switch(message.command) {
             case "353":
+                self.emit("names", message.params[2], message.params[3].split(" "));
+                break;
+
             case "366":
                 break;
 
             case "JOIN":
-                self.log.info(message);
+                if (self.username === message.prefix.split("!")[0]) {
+                    self.log.info("Joined " + message.params[0]);
+                }
+                self.emit("join", message.params[0], message.prefix.split("!")[0]);
+                break;
+
+            case "PART":
+                if (self.username === message.prefix.split("!")[0]) {
+                    self.log.info("Left " + message.params[0]);
+                }
+                self.emit("part", message.params[0], message.prefix.split("!")[0]);
+                break;
+
+            case "PRIVMSG":
+                // Add username (lowercase) to the tags..
+                message.tags.username = message.prefix.split("!")[0];
+
+                // Message is an action..
+                if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
+                    self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].substr(message.params[1].indexOf(" ") + 1));
+                    self.emit("action", message.params[0], message.tags, message.params[1].substr(message.params[1].indexOf(" ") + 1));
+                }
+                // Message is a regular message..
+                else {
+                    self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
+                    self.emit("chat", message.params[0], message.tags, message.params[1]);
+                }
                 break;
 
             default:
-                self.log.info(message);
+                self.log.warn("Could not parse message: ");
+                self.log.warn(message);
                 break;
         }
     }
