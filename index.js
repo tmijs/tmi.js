@@ -170,11 +170,13 @@ client.prototype.handleMessage = function handleMessage(message) {
                 }
                 break;
 
+            // Channel is now hosting another channel..
             case "HOSTTARGET":
                 self.log.info("[" + message.params[0] + "] Now hosting " + message.params[1].split(" ")[0] + ".");
                 self.emit("hosting", message.params[0], message.params[1].split(" ")[0]);
                 break;
 
+            // Someone has been timed out or chat has been cleared by a moderator..
             case "CLEARCHAT":
                 // User has been timed out by a moderator..
                 if (message.params.length > 1) {
@@ -192,6 +194,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 self.log.info(message);
                 break;
 
+            // Received when joining a channel and every time you send a PRIVMSG to a channel.
             case "USERSTATE":
                 message.tags.username = self.username;
                 self.userstate[message.params[0]] = message.tags;
