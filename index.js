@@ -194,7 +194,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
             case "USERSTATE":
                 message.tags.username = self.username;
-                self.userstate[message.params[0].replace("#", "")] = message.tags;
+                self.userstate[message.params[0]] = message.tags;
                 break;
 
             default:
