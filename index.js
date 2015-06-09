@@ -195,8 +195,12 @@ client.prototype._onOpen = function _onOpen(event) {
     self.log.info("Connecting to %s on port %s..", self.server, self.port);
     self.emit("connecting", self.server, self.port);
 
+    self.username = typeof self.opts.identity.username !== "undefined" ? self.opts.identity.username : "justinfan" + Math.floor((Math.random() * 80000) + 1000);
+    self.password = typeof self.opts.identity.password !== "undefined" ? self.opts.identity.password : "SCHMOOPIIE";
 
     // Make sure "oauth:" is included..
+    if (self.password !== "SCHMOOPIIE" && self.password.indexOf("oauth:") < 0) {
+        self.password = "oauth:" + self.password;
     }
 
     // Emitting "logon" event..
@@ -204,6 +208,9 @@ client.prototype._onOpen = function _onOpen(event) {
     self.emit("logon");
 
     // Authentication..
+    self.ws.send("PASS " + self.password);
+    self.ws.send("NICK " + self.username);
+    self.ws.send("USER " + self.username + " 8 * :" + self.username);
 };
 
 // Received message from server..
