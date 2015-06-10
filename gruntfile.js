@@ -14,7 +14,14 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    "tests/browser/bundle.js": ["index.js"]
+                    "tests/browser/twitch-tmi.js": ["index.js"]
+                }
+            }
+        },
+        uglify: {
+            my_target: {
+                files: {
+                    "tests/browser/twitch-tmi.min.js": ["tests/browser/twitch-tmi.js"]
                 }
             }
         }
@@ -22,8 +29,9 @@ module.exports = function(grunt) {
 
     // Load the plugin that provides the tasks.
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks("grunt-browserify");
 
     // Default task(s).
-    grunt.registerTask("default", ["jshint", "browserify"]);
+    grunt.registerTask("default", ["jshint", "browserify", "uglify"]);
 };
