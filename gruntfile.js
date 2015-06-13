@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    "tests/browser/twitch-tmi.js": ["index.js"]
+                    "tests/browser/twitch-tmi.js": ["index.js", "/lib/*.js"]
                 }
             }
         },
