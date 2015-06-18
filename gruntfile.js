@@ -14,14 +14,14 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    "tests/browser/twitch-tmi.js": ["index.js", "/lib/*.js"]
+                    "tests/browser/tmi.js": ["index.js", "/lib/*.js"]
                 }
             }
         },
         uglify: {
             my_target: {
                 files: {
-                    "tests/browser/twitch-tmi.min.js": ["tests/browser/twitch-tmi.js"]
+                    "tests/browser/tmi.min.js": ["tests/browser/tmi.js"]
                 }
             }
         }

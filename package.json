@@ -1,7 +1,7 @@
 {
-  "name": "twitch-tmi",
+  "name": "tmi.js",
   "version": "0.0.1",
-  "description": "Javascript library for Twitch.tv",
+  "description": "Javascript library for the Twitch Messaging Interface.",
   "main": "index.js",
   "engines": {
     "node": ">=0.12.0"

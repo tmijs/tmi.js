@@ -1,8 +1,8 @@
-# twitch-tmi - WORK IN PROGRESS
-[![Build Status](https://secure.travis-ci.org/Schmoopiie/twitch-tmi.png?branch=master)](https://travis-ci.org/Schmoopiie/twitch-tmi) [![Downloads](http://img.shields.io/npm/dm/twitch-tmi.svg?style=flat)](https://www.npmjs.org/package/twitch-tmi) [![Npm Version](http://img.shields.io/npm/v/twitch-tmi.svg?style=flat)](https://www.npmjs.org/package/twitch-tmi) [![Node Version](https://img.shields.io/node/v/twitch-tmi.svg?style=flat)](https://www.npmjs.org/package/twitch-tmi) [![Issues](http://img.shields.io/github/issues/Schmoopiie/twitch-tmi.svg?style=flat)](https://github.com/Schmoopiie/twitch-tmi/tmi)
+# tmi.js - WORK IN PROGRESS
+[![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](http://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](http://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](http://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/tmi)
 
 ![](http://i.imgur.com/Fb1mUDJ.png)
-Twitch is a trademark or registered trademark of Twitch Interactive, Inc. in the U.S. and/or other countries. "twitch-tmi" is not operated by, sponsored by, or affiliated with Twitch Interactive, Inc. in any way.
+Twitch is a trademark or registered trademark of Twitch Interactive, Inc. in the U.S. and/or other countries. "tmi.js" is not operated by, sponsored by, or affiliated with Twitch Interactive, Inc. in any way.
 
 ## Get involved!
 

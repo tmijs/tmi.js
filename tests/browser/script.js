@@ -3,6 +3,8 @@ var options = {
         debug: true
     },
     connection: {
+        random: "chat",
+        reconnect: false,
         server: "192.16.64.145",
         port: 443
     },

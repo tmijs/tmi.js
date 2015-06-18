@@ -1,10 +1,12 @@
-var client = require('../../index.js');
+var irc = require('../../index.js');
 
 var options = {
     options: {
         debug: true
     },
     connection: {
+        random: "chat",
+        reconnect: false,
         server: "192.16.64.145",
         port: 443
     },
@@ -15,7 +17,7 @@ var options = {
     channels: ["#schmoopiie"]
 };
 
-var twitch = new client(options);
+var twitch = new irc.client(options);
 
 twitch.connect();
 
@@ -68,5 +70,13 @@ twitch.on("slow", function(channel, enabled){
 });
 
 twitch.on("r9kmode", function(channel, enabled){
+    //
+});
+
+twitch.on("join", function(channel, username){
+    //
+});
+
+twitch.on("part", function(channel, username){
     //
 });

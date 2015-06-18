@@ -1,10 +1,15 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports={client:require("./lib/client")};
+module.exports={
+	client:require("./lib/client")
+};
 },{"./lib/client":2}],2:[function(require,module,exports){
 var bunyan = require("bunyan");
 var eventEmitter = require("events").EventEmitter;
 var parse = require("irc-message").parse;
+var timer = require("./timer");
+var server = require("./server");
 var util = require("util");
+var utils = require("./utils");
 var webSocket = require("ws");
 
 function rawStream() {}
@@ -31,22 +36,21 @@ rawStream.prototype.write = function (rec) {
 
 // Client instance..
 function client(opts) {
-    var self = this;
+    this.opts = (typeof opts !== "undefined") ? opts : {};
+    this.opts.channels = opts.channels || [];
+    this.opts.connection = opts.connection || {};
+    this.opts.identity = opts.identity || {};
+    this.opts.options = opts.options || {};
 
-    self.opts = (typeof options !== "undefined") ? options : {};
-    self.opts.channels = opts.channels || [];
-    self.opts.connection = opts.connection || {};
-    self.opts.identity = opts.identity || {};
-    self.opts.options = opts.options || {};
-
-    self.username = "";
-    self.userstate = {};
-    self.wasCloseCalled = false;
-    self.ws = null;
+    this.usingWebSocket = true;
+    this.username = "";
+    this.userstate = {};
+    this.wasCloseCalled = false;
+    this.ws = null;
 
     // Create the logger..
-    self.log = bunyan.createLogger({
-        name: "twitch-tmi",
+    this.log = bunyan.createLogger({
+        name: "tmi.js",
         streams: [
             {
                 level: "error",
@@ -57,9 +61,9 @@ function client(opts) {
     });
 
     // Show debug messages ?
-    if (typeof self.opts.options.debug !== "undefined" ? self.opts.options.debug : false) { self.log.level("info"); }
+    if (typeof this.opts.options.debug !== "undefined" ? this.opts.options.debug : false) { this.log.level("info"); }
 
-    eventEmitter.call(self);
+    eventEmitter.call(this);
 }
 
 util.inherits(client, eventEmitter);
@@ -83,7 +87,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             default:
-                self.log.warn("Could not parse message with no prefix: ");
+                self.log.warn("Could not parse message with no prefix:");
                 self.log.warn(message);
                 break;
         }
@@ -112,9 +116,18 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
 
-                loopIterate(self.opts.channels, function (element) {
-                    self.ws.send("JOIN " + element);
-                }, 1000);
+                // Join all the channels from configuration every 2 seconds..
+                var joinQueue = new timer.queue(2000);
+
+                for (var i = 0; i < self.opts.channels.length; i++) {
+                    joinQueue.add(function(i) {
+                        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
+                            self.ws.send("JOIN " + utils.normalizeChannel(self.opts.channels[i]));
+                        }
+                    }.bind(this, i))
+                }
+
+                joinQueue.run();
                 break;
 
             // https://github.com/justintv/Twitch-API/blob/master/chat/capabilities.md#notice
@@ -159,31 +172,35 @@ client.prototype.handleMessage = function handleMessage(message) {
                         self.emit("r9kmode", message.params[0], false);
                         break;
 
-                    // Now hosting target_channel.
+                    // Ignore this because we are already listening to HOSTTARGET.
                     case "host_on":
-                        // TODO: Display channel being hosted and do not trigger if HOSTTARGET has been triggered..
-                        self.log.info("[" + message.params[0] + "] Now hosting another channel.");
-                        self.emit("hosting", message.params[0]);
-                        break;
-
-                    // Exited host mode.
                     case "host_off":
-                        self.log.info("[" + message.params[0] + "] Exited host mode.");
-                        self.emit("unhost", message.params[0]);
+                        //
                         break;
                 }
 
-                if (message.params[1] === "Login unsuccessful") {
+                if (message.params[1].indexOf("Login unsuccessful") >= 0) {
                     self.wasCloseCalled = true;
                     self.log.error("Login unsuccessful.");
                     self.ws.close();
                 }
                 break;
 
-            // Channel is now hosting another channel..
+            // Channel is now hosting another channel or exited host mode..
             case "HOSTTARGET":
-                self.log.info("[" + message.params[0] + "] Now hosting " + message.params[1].split(" ")[0] + ".");
-                self.emit("hosting", message.params[0], message.params[1].split(" ")[0]);
+                // Stopped hosting..
+                if (message.params[1].split(" ")[0] === "-") {
+                    self.log.info("[" + message.params[0] + "] Exited host mode.");
+                    self.emit("unhost", message.params[0], message.params[1].split(" ")[0]);
+                }
+                // Now hosting..
+                else {
+                    var viewers = message.params[1].split(" ")[1] || 0;
+                    if (!utils.isInteger(viewers)) { viewers = 0; }
+                    
+                    self.log.info("[" + message.params[0] + "] Now hosting " + message.params[1].split(" ")[0] + " for " + viewers + " viewer(s).");
+                    self.emit("hosting", message.params[0], message.params[1].split(" ")[0], viewers);
+                }
                 break;
 
             // Someone has been timed out or chat has been cleared by a moderator..
@@ -201,7 +218,10 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             case "RECONNECT":
-                self.log.info(message);
+                self.log.info("Received RECONNECT request from Twitch..");
+                self.log.info("Disconnecting and reconnecting in 10 seconds..");
+                self.disconnect();
+                setTimeout(function() { self.connect(); }, 10000);
                 break;
 
             // Received when joining a channel and every time you send a PRIVMSG to a channel.
@@ -209,9 +229,16 @@ client.prototype.handleMessage = function handleMessage(message) {
                 message.tags.username = self.username;
                 self.userstate[message.params[0]] = message.tags;
                 break;
+                
+            // Will be used in the future to describe non-channel-specific state information.
+            // Source: https://github.com/justintv/Twitch-API/blob/master/chat/capabilities.md#globaluserstate
+            case "GLOBALUSERSTATE":
+                self.log.warn("Could not parse message from tmi.twitch.tv:");
+                self.log.warn(message);
+                break;
 
             default:
-                self.log.warn("Could not parse message from tmi.twitch.tv: ");
+                self.log.warn("Could not parse message from tmi.twitch.tv:");
                 self.log.warn(message);
                 break;
         }
@@ -224,7 +251,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             default:
-                self.log.warn("Could not parse message from jtv: ");
+                self.log.warn("Could not parse message from jtv:");
                 self.log.warn(message);
                 break;
         }
@@ -260,8 +287,8 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 // Message is an action..
                 if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
-                    self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].substr(message.params[1].indexOf(" ") + 1));
-                    self.emit("action", message.params[0], message.tags, message.params[1].substr(message.params[1].indexOf(" ") + 1));
+                    self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                    self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                 }
                 // Message is a regular message..
                 else {
@@ -271,7 +298,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 break;
 
             default:
-                self.log.warn("Could not parse message: ");
+                self.log.warn("Could not parse message:");
                 self.log.warn(message);
                 break;
         }
@@ -279,101 +306,129 @@ client.prototype.handleMessage = function handleMessage(message) {
 };
 
 // Connect to server..
-client.prototype.connect = function connect() {
+client.prototype.connect = function connect(ignoreServer) {
     var self = this;
 
-    // TODO: Get a random ws/wss server from Twitch if undefined
-    self.server = typeof self.opts.connection.server !== "undefined" ? self.opts.connection.server : "192.16.64.145";
-    self.port = typeof self.opts.connection.port !== "undefined" ? self.opts.connection.port : 443;
+    this.reconnect = typeof this.opts.connection.reconnect !== "undefined" ? this.opts.connection.reconnect : false;
+    this.server = typeof this.opts.connection.server !== "undefined" ? this.opts.connection.server : "RANDOM";
+    this.port = typeof this.opts.connection.port !== "undefined" ? this.opts.connection.port : 443;
 
-    self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
+    // Connect to a random server..
+    if (this.server === "RANDOM" || typeof this.opts.connection.random !== "undefined") {
+        ignoreServer = typeof ignoreServer !== "undefined" ? ignoreServer : null;
 
-    self.ws.onmessage = self._onMessage.bind(this);
-    self.ws.onerror = self._onError.bind(this);
-    self.ws.onclose = self._onClose.bind(this);
-    self.ws.onopen = self._onOpen.bind(this);
+        // Default type is "chat" server..
+        server.getRandomServer(typeof self.opts.connection.random !== "undefined" ? self.opts.connection.random : "chat", ignoreServer, function (addr) {
+            self.server = addr.split(":")[0];
+            self.port = addr.split(":")[1];
+
+            self._openConnection();
+        });
+    }
+    // Connect to server from configuration..
+    else {
+        this._openConnection();
+    }
 };
 
-// Socket is opened..
-client.prototype._onOpen = function _onOpen(event) {
+// Open a connection..
+client.prototype._openConnection = function _openConnection() {
     var self = this;
 
-    // Emitting "connecting" event..
-    self.log.info("Connecting to %s on port %s..", self.server, self.port);
-    self.emit("connecting", self.server, self.port);
+    server.isWebSocket(self.server, self.port, function(accepts) {
+        // Server is accepting WebSocket connections..
+        if (accepts) {
+            self.usingWebSocket = true;
+            self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
 
-    self.username = typeof self.opts.identity.username !== "undefined" ? self.opts.identity.username : "justinfan" + Math.floor((Math.random() * 80000) + 1000);
-    self.password = typeof self.opts.identity.password !== "undefined" ? self.opts.identity.password : "SCHMOOPIIE";
+            self.ws.onmessage = self._onMessage.bind(self);
+            self.ws.onerror = self._onError.bind(self);
+            self.ws.onclose = self._onClose.bind(self);
+            self.ws.onopen = self._onOpen.bind(self);
+        }
+        // Server is not accepting WebSocket connections..
+        else {
+            if (self.reconnect) {
+                self.log.error("Server is not accepting WebSocket connections. Reconnecting in 10 seconds..");
+                setTimeout(function() { self.connect(self.server + ":" + self.port); }, 10000);
+            } else {
+                self.log.error("Server is not accepting WebSocket connections.");
+            }
+        }
+    });
+};
+
+// Called when the WebSocket connection's readyState changes to OPEN.
+// Indicates that the connection is ready to send and receive data..
+client.prototype._onOpen = function _onOpen() {
+    // Emitting "connecting" event..
+    this.log.info("Connecting to %s on port %s..", this.server, this.port);
+    this.emit("connecting", this.server, this.port);
+
+    this.username = typeof this.opts.identity.username !== "undefined" ? this.opts.identity.username : utils.generateJustinfan();
+    this.password = typeof this.opts.identity.password !== "undefined" ? this.opts.identity.password : "SCHMOOPIIE";
 
     // Make sure "oauth:" is included..
-    if (self.password !== "SCHMOOPIIE" && self.password.indexOf("oauth:") < 0) {
-        self.password = "oauth:" + self.password;
+    if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
+        this.password = "oauth:" + this.password;
     }
 
     // Emitting "logon" event..
-    self.log.info("Sending authentication to server..");
-    self.emit("logon");
+    this.log.info("Sending authentication to server..");
+    this.emit("logon");
 
     // Authentication..
-    self.ws.send("PASS " + self.password);
-    self.ws.send("NICK " + self.username);
-    self.ws.send("USER " + self.username + " 8 * :" + self.username);
+    this.ws.send("PASS " + this.password);
+    this.ws.send("NICK " + this.username);
+    this.ws.send("USER " + this.username + " 8 * :" + this.username);
 };
 
-// Received message from server..
+// Called when a message is received from the server..
 client.prototype._onMessage = function _onMessage(event) {
-    var self = this;
-    self.handleMessage(parse(event.data.replace("\r\n", "")));
+    this.handleMessage(parse(event.data.replace("\r\n", "")));
 };
 
-// An error occurred..
-client.prototype._onError = function _onError(event) {
-    var self = this;
-    if (self.ws !== null) {
-        self.log.error("Unable to connect.");
-        self.emit("disconnected", "Unable to connect.");
+// Called when an error occurs..
+client.prototype._onError = function _onError() {
+    if (this.ws !== null) {
+        this.log.error("Unable to connect.");
+        this.emit("disconnected", "Unable to connect.");
     } else {
-        self.log.error("Connection closed.");
-        self.emit("disconnected", "Connection closed.");
+        this.log.error("Connection closed.");
+        this.emit("disconnected", "Connection closed.");
     }
 };
 
-// Socket connection closed..
+// Called when the WebSocket connection's readyState changes to CLOSED..
 client.prototype._onClose = function _onClose() {
     var self = this;
-    if (self.wasCloseCalled) {
-        self.wasCloseCalled = false;
-        self.log.info("Connection closed.");
-        self.emit("disconnected", "Connection closed.");
-    } else {
-        self.log.error("Sorry, we were unable to connect to chat. Reconnecting in 10 seconds.");
-        self.emit("disconnected", "Unable to connect to chat.");
-        setTimeout(function() { self.connect(); }, 10000);
+    // User called .disconnect();
+    if (this.wasCloseCalled) {
+        this.wasCloseCalled = false;
+        this.log.info("Connection closed.");
+        this.emit("disconnected", "Connection closed.");
+    }
+    // Got disconnected from server..
+    else {
+        this.emit("disconnected", "Unable to connect to chat.");
+
+        if (self.reconnect) {
+            this.log.error("Sorry, we were unable to connect to chat. Reconnecting in 10 seconds..");
+            setTimeout(function() { self.connect(self.server + ":" + self.port); }, 10000);
+        } else {
+            this.log.error("Sorry, we were unable to connect to chat.");
+        }
     }
 };
 
 // Disconnect from server..
 client.prototype.disconnect = function disconnect() {
-    var self = this;
-    if (self.ws !== null && self.ws.readyState !== 3) {
-        self.wasCloseCalled = true;
-        self.log.info("Disconnecting from server..");
-        self.ws.close();
+    if (this.usingWebSocket && this.ws !== null && this.ws.readyState !== 3) {
+        this.wasCloseCalled = true;
+        this.log.info("Disconnecting from server..");
+        this.ws.close();
     }
 };
-
-// Loop through array..
-function loopIterate(array, callback, interval) {
-    var start = + new Date();
-    if (array.length > 0) { process(); }
-
-    function process() {
-        var element = array.shift();
-        callback(element, new Date() - start);
-
-        if (array.length > 0) { setTimeout(process, interval); }
-    }
-}
 
 // Expose everything, for browser and Node.js / io.js
 if (typeof window !== "undefined") {
@@ -382,7 +437,120 @@ if (typeof window !== "undefined") {
     module.exports = client;
 }
 
-},{"bunyan":3,"events":12,"irc-message":32,"util":31,"ws":46}],3:[function(require,module,exports){
+},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":35,"util":34,"ws":49}],3:[function(require,module,exports){
+var webSocket = require("ws");
+
+// TODO: Add more WebSocket servers..
+// Get a random server..
+function getRandomServer(type, ignore, callback) {
+    if (type === "event" || type === "events") {
+
+    }
+    else if (type === "group" || type === "groups") {
+
+    }
+    else {
+        var servers = [
+            "192.16.64.145:443",
+            "192.16.64.145:80"
+        ];
+        if (servers.indexOf(ignore) >=0) { servers.splice(servers.indexOf(ignore), 1); }
+
+        return callback(servers[Math.floor(Math.random()*servers.length)]);
+    }
+}
+
+// Detects if the server is accepting WebSocket connections..
+function isWebSocket(server, port, callback) {
+    try {
+        var ws = new webSocket("ws://" + server + ":" + port + "/", "irc");
+
+        ws.onerror = function () {
+            return callback(false);
+        };
+        ws.onopen = function () {
+            ws.close();
+            return callback(true);
+        };
+    } catch(e) {
+        return callback(false);
+    }
+}
+
+exports.getRandomServer = getRandomServer;
+exports.isWebSocket = isWebSocket;
+},{"ws":49}],4:[function(require,module,exports){
+// Initialize the queue with a specific delay..
+function queue(defaultDelay) {
+    this.queue = [];
+    this.index = 0;
+    this.defaultDelay = defaultDelay || 3000;
+}
+
+// Add a new function to the queue..
+queue.prototype.add = function add(fn, delay) {
+    this.queue.push({
+        fn: fn,
+        delay: delay
+    });
+};
+
+// Run the current queue..
+queue.prototype.run = function run(index) {
+    (index || index === 0) && (this.index = index);
+    this.next();
+};
+
+// Go to the next in queue..
+queue.prototype.next = function next() {
+    var self = this;
+
+    var i = this.index++;
+    var at = this.queue[i];
+    var next = this.queue[this.index];
+
+    if (!at) { return; }
+
+    at.fn();
+    next && setTimeout(function(){
+        self.next();
+    }, next.delay || this.defaultDelay);
+};
+
+// Reset the queue..
+queue.prototype.reset = function reset() {
+    this.index = 0;
+};
+
+// Clear the queue..
+queue.prototype.clear = function clear() {
+    this.index = 0;
+    this.queue = [];
+};
+
+exports.queue = queue;
+},{}],5:[function(require,module,exports){
+// Generate a random justinfan username..
+function generateJustinfan() {
+	return "justinfan" + Math.floor((Math.random() * 80000) + 1000);
+}
+
+// Value is an integer..
+function isInteger(value) {
+    var n = ~~Number(value);
+    return String(n) === value;
+}
+
+// Normalize channel name for Twitch..
+function normalizeChannel(name) {
+	if (name.indexOf("#") !== 0) { name = "#" + name; }
+	return name.toLowerCase();
+}
+
+exports.generateJustinfan = generateJustinfan;
+exports.isInteger = isInteger;
+exports.normalizeChannel = normalizeChannel;
+},{}],6:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Copyright (c) 2014 Trent Mick. All rights reserved.
@@ -1820,7 +1988,7 @@ module.exports.RotatingFileStream = RotatingFileStream;
 module.exports.safeCycles = safeCycles;
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":16,"assert":6,"buffer":8,"events":12,"fs":5,"os":15,"safe-json-stringify":4,"util":31}],4:[function(require,module,exports){
+},{"_process":19,"assert":9,"buffer":11,"events":15,"fs":8,"os":18,"safe-json-stringify":7,"util":34}],7:[function(require,module,exports){
 var hasProp = Object.prototype.hasOwnProperty;
 
 function throwsMessage(err) {
@@ -1881,9 +2049,9 @@ module.exports = function(data) {
 
 module.exports.ensureProperties = ensureProperties;
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -2244,9 +2412,9 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":31}],7:[function(require,module,exports){
-arguments[4][5][0].apply(exports,arguments)
-},{"dup":5}],8:[function(require,module,exports){
+},{"util/":34}],10:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],11:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -3662,7 +3830,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":9,"ieee754":10,"is-array":11}],9:[function(require,module,exports){
+},{"base64-js":12,"ieee754":13,"is-array":14}],12:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -3788,16 +3956,16 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      nBits = -7,
-      i = isLE ? (nBytes - 1) : 0,
-      d = isLE ? -1 : 1,
-      s = buffer[offset + i]
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
 
   i += d
 
@@ -3823,14 +3991,14 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
 }
 
 exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c,
-      eLen = nBytes * 8 - mLen - 1,
-      eMax = (1 << eLen) - 1,
-      eBias = eMax >> 1,
-      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
-      i = isLE ? 0 : (nBytes - 1),
-      d = isLE ? 1 : -1,
-      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
 
   value = Math.abs(value)
 
@@ -3874,7 +4042,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 /**
  * isArray
@@ -3909,7 +4077,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4212,7 +4380,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -4237,12 +4405,12 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -4289,7 +4457,7 @@ exports.tmpdir = exports.tmpDir = function () {
 
 exports.EOL = '\n';
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -4381,10 +4549,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":18}],18:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":21}],21:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4477,7 +4645,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":20,"./_stream_writable":22,"_process":16,"core-util-is":23,"inherits":13}],19:[function(require,module,exports){
+},{"./_stream_readable":23,"./_stream_writable":25,"_process":19,"core-util-is":26,"inherits":16}],22:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4525,7 +4693,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":21,"core-util-is":23,"inherits":13}],20:[function(require,module,exports){
+},{"./_stream_transform":24,"core-util-is":26,"inherits":16}],23:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5480,7 +5648,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":18,"_process":16,"buffer":8,"core-util-is":23,"events":12,"inherits":13,"isarray":14,"stream":28,"string_decoder/":29,"util":7}],21:[function(require,module,exports){
+},{"./_stream_duplex":21,"_process":19,"buffer":11,"core-util-is":26,"events":15,"inherits":16,"isarray":17,"stream":31,"string_decoder/":32,"util":10}],24:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5691,7 +5859,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":18,"core-util-is":23,"inherits":13}],22:[function(require,module,exports){
+},{"./_stream_duplex":21,"core-util-is":26,"inherits":16}],25:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6172,7 +6340,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":18,"_process":16,"buffer":8,"core-util-is":23,"inherits":13,"stream":28}],23:[function(require,module,exports){
+},{"./_stream_duplex":21,"_process":19,"buffer":11,"core-util-is":26,"inherits":16,"stream":31}],26:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6282,10 +6450,10 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":8}],24:[function(require,module,exports){
+},{"buffer":11}],27:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":19}],25:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":22}],28:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = require('stream');
 exports.Readable = exports;
@@ -6294,13 +6462,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":18,"./lib/_stream_passthrough.js":19,"./lib/_stream_readable.js":20,"./lib/_stream_transform.js":21,"./lib/_stream_writable.js":22,"stream":28}],26:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":21,"./lib/_stream_passthrough.js":22,"./lib/_stream_readable.js":23,"./lib/_stream_transform.js":24,"./lib/_stream_writable.js":25,"stream":31}],29:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":21}],27:[function(require,module,exports){
+},{"./lib/_stream_transform.js":24}],30:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":22}],28:[function(require,module,exports){
+},{"./lib/_stream_writable.js":25}],31:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6429,7 +6597,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":12,"inherits":13,"readable-stream/duplex.js":17,"readable-stream/passthrough.js":24,"readable-stream/readable.js":25,"readable-stream/transform.js":26,"readable-stream/writable.js":27}],29:[function(require,module,exports){
+},{"events":15,"inherits":16,"readable-stream/duplex.js":20,"readable-stream/passthrough.js":27,"readable-stream/readable.js":28,"readable-stream/transform.js":29,"readable-stream/writable.js":30}],32:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6652,14 +6820,14 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":8}],30:[function(require,module,exports){
+},{"buffer":11}],33:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -7249,7 +7417,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":30,"_process":16,"inherits":13}],32:[function(require,module,exports){
+},{"./support/isBuffer":33,"_process":19,"inherits":16}],35:[function(require,module,exports){
 var through = require('through2')
 var parsePrefix = require('irc-prefix-parser')
 var iso8601 = require('iso8601-convert')
@@ -7427,7 +7595,7 @@ module.exports = {
     createStream: createStream
 }
 
-},{"irc-prefix-parser":33,"iso8601-convert":34,"through2":45}],33:[function(require,module,exports){
+},{"irc-prefix-parser":36,"iso8601-convert":37,"through2":48}],36:[function(require,module,exports){
 // adapted from https://github.com/grawity/code/blob/master/lib/python/nullroute/irc.py#L24-L53
 
 module.exports = function parsePrefix(prefix) {
@@ -7471,7 +7639,7 @@ module.exports = function parsePrefix(prefix) {
     return result
 }
 
-},{}],34:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 function padInteger(num, length) {
     var r = '' + num
 
@@ -7556,9 +7724,9 @@ var fromDate = function(date) {
 exports.toDate = toDate
 exports.fromDate = fromDate
 
-},{}],35:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"./_stream_readable":36,"./_stream_writable":38,"_process":16,"core-util-is":39,"dup":18,"inherits":40}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./_stream_readable":39,"./_stream_writable":41,"_process":19,"core-util-is":42,"dup":21,"inherits":43}],39:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8544,7 +8712,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"_process":16,"buffer":8,"core-util-is":39,"events":12,"inherits":40,"isarray":41,"stream":28,"string_decoder/":42}],37:[function(require,module,exports){
+},{"_process":19,"buffer":11,"core-util-is":42,"events":15,"inherits":43,"isarray":44,"stream":31,"string_decoder/":45}],40:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8756,7 +8924,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":35,"core-util-is":39,"inherits":40}],38:[function(require,module,exports){
+},{"./_stream_duplex":38,"core-util-is":42,"inherits":43}],41:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -9146,17 +9314,17 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":35,"_process":16,"buffer":8,"core-util-is":39,"inherits":40,"stream":28}],39:[function(require,module,exports){
-arguments[4][23][0].apply(exports,arguments)
-},{"buffer":8,"dup":23}],40:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],41:[function(require,module,exports){
-arguments[4][14][0].apply(exports,arguments)
-},{"dup":14}],42:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"buffer":8,"dup":29}],43:[function(require,module,exports){
+},{"./_stream_duplex":38,"_process":19,"buffer":11,"core-util-is":42,"inherits":43,"stream":31}],42:[function(require,module,exports){
 arguments[4][26][0].apply(exports,arguments)
-},{"./lib/_stream_transform.js":37,"dup":26}],44:[function(require,module,exports){
+},{"buffer":11,"dup":26}],43:[function(require,module,exports){
+arguments[4][16][0].apply(exports,arguments)
+},{"dup":16}],44:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"dup":17}],45:[function(require,module,exports){
+arguments[4][32][0].apply(exports,arguments)
+},{"buffer":11,"dup":32}],46:[function(require,module,exports){
+arguments[4][29][0].apply(exports,arguments)
+},{"./lib/_stream_transform.js":40,"dup":29}],47:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -9175,7 +9343,7 @@ function extend() {
     return target
 }
 
-},{}],45:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (process){
 var Transform = require('readable-stream/transform')
   , inherits  = require('util').inherits
@@ -9275,7 +9443,7 @@ module.exports.obj = through2(function (options, transform, flush) {
 })
 
 }).call(this,require('_process'))
-},{"_process":16,"readable-stream/transform":43,"util":31,"xtend":44}],46:[function(require,module,exports){
+},{"_process":19,"readable-stream/transform":46,"util":34,"xtend":47}],49:[function(require,module,exports){
 
 /**
  * Module dependencies.
