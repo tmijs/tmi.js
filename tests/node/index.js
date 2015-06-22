@@ -104,3 +104,19 @@ client.on("mod", function(channel, username) {
 client.on("unmod", function(channel, username) {
     //
 });
+
+client.on("subscription", function(channel, username) {
+    //
+});
+
+client.on("subanniversary", function(channel, username, length) {
+    //
+});
+
+client.on("mods", function(channel, mods) {
+    //
+});
+
+client.on("hosted", function(channel, username) {
+    //
+});
