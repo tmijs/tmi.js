@@ -35,7 +35,7 @@ rawStream.prototype.write = function (rec) {
 };
 
 // Client instance..
-function client(opts) {
+var client = function client(opts) {
     this.opts = (typeof opts !== "undefined") ? opts : {};
     this.opts.channels = opts.channels || [];
     this.opts.connection = opts.connection || {};
@@ -138,12 +138,14 @@ client.prototype.handleMessage = function handleMessage(message) {
                     // This room is now in subscribers-only mode.
                     case "subs_on":
                         self.log.info("[" + message.params[0] + "] This room is now in subscribers-only mode.");
+                        self.emit("subscriber", message.params[0], true);
                         self.emit("subscribers", message.params[0], true);
                         break;
 
                     // This room is no longer in subscribers-only mode.
                     case "subs_off":
                         self.log.info("[" + message.params[0] + "] This room is no longer in subscribers-only mode.");
+                        self.emit("subscriber", message.params[0], false);
                         self.emit("subscribers", message.params[0], false);
                         break;
 
@@ -152,12 +154,14 @@ client.prototype.handleMessage = function handleMessage(message) {
                         // TODO: Display seconds..
                         self.log.info("[" + message.params[0] + "] This room is now in slow mode.");
                         self.emit("slow", message.params[0], true);
+                        self.emit("slowmode", message.params[0], true);
                         break;
 
                     // This room is no longer in slow mode.
                     case "slow_off":
                         self.log.info("[" + message.params[0] + "] This room is no longer in slow mode.");
                         self.emit("slow", message.params[0], false);
+                        self.emit("slowmode", message.params[0], false);
                         break;
 
                     // This room is now in r9k mode.
@@ -170,6 +174,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     case "r9k_off":
                         self.log.info("[" + message.params[0] + "] This room is no longer in r9k mode.");
                         self.emit("r9kmode", message.params[0], false);
+                        self.emit("r9kbeta", message.params[0], false);
                         break;
 
                     // Ignore this because we are already listening to HOSTTARGET.
@@ -236,6 +241,10 @@ client.prototype.handleMessage = function handleMessage(message) {
                 self.log.warn("Could not parse message from tmi.twitch.tv:");
                 self.log.warn(message);
                 break;
+                
+            case "ROOMSTATE":
+                self.emit("roomstate", message.params[0], message.tags);
+                break;
 
             default:
                 self.log.warn("Could not parse message from tmi.twitch.tv:");
@@ -248,6 +257,12 @@ client.prototype.handleMessage = function handleMessage(message) {
     else if (message.prefix === "jtv") {
         switch(message.command) {
             case "MODE":
+                if (message.params[1] === "+o") {
+                    self.emit("mod", message.params[0], message.params[2]);
+                }
+                else if (message.params[1] === "-o") {
+                    self.emit("unmod", message.params[0], message.params[2]);
+                }
                 break;
 
             default:
@@ -308,7 +323,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 // Connect to server..
 client.prototype.connect = function connect(ignoreServer) {
     var self = this;
-
+    
     this.reconnect = typeof this.opts.connection.reconnect !== "undefined" ? this.opts.connection.reconnect : false;
     this.server = typeof this.opts.connection.server !== "undefined" ? this.opts.connection.server : "RANDOM";
     this.port = typeof this.opts.connection.port !== "undefined" ? this.opts.connection.port : 443;
@@ -350,6 +365,7 @@ client.prototype._openConnection = function _openConnection() {
         else {
             if (self.reconnect) {
                 self.log.error("Server is not accepting WebSocket connections. Reconnecting in 10 seconds..");
+                self.emit("reconnect");
                 setTimeout(function() { self.connect(self.server + ":" + self.port); }, 10000);
             } else {
                 self.log.error("Server is not accepting WebSocket connections.");
@@ -414,11 +430,17 @@ client.prototype._onClose = function _onClose() {
 
         if (self.reconnect) {
             this.log.error("Sorry, we were unable to connect to chat. Reconnecting in 10 seconds..");
+            self.emit("reconnect");
             setTimeout(function() { self.connect(self.server + ":" + self.port); }, 10000);
         } else {
             this.log.error("Sorry, we were unable to connect to chat.");
         }
     }
+};
+
+// Get current username..
+client.prototype.getUsername = function getUsername() {
+    return this.username;
 };
 
 // Disconnect from server..
@@ -432,7 +454,8 @@ client.prototype.disconnect = function disconnect() {
 
 // Expose everything, for browser and Node.js / io.js
 if (typeof window !== "undefined") {
-    window.client = client;
+    window.irc = {};
+    window.irc.client = client;
 } else {
     module.exports = client;
 }

@@ -17,66 +17,90 @@ var options = {
     channels: ["#schmoopiie"]
 };
 
-var twitch = new irc.client(options);
+var client = new irc.client(options);
 
-twitch.connect();
+client.connect();
 
-twitch.on("connecting", function(server, port){
+client.on("connecting", function(server, port) {
     //
 });
 
-twitch.on("logon", function(){
+client.on("logon", function() {
     //
 });
 
-twitch.on("connected", function(server, port){
+client.on("connected", function(server, port) {
     //
 });
 
-twitch.on("names", function(channel, names){
+client.on("disconnected", function(reason) {
     //
 });
 
-twitch.on("action", function(channel, user, message){
+client.on("names", function(channel, names) {
     //
 });
 
-twitch.on("chat", function(channel, user, message){
+client.on("action", function(channel, user, message) {
     //
 });
 
-twitch.on("timeout", function(channel, username){
+client.on("chat", function(channel, user, message) {
     //
 });
 
-twitch.on("clearchat", function(channel){
+client.on("timeout", function(channel, username) {
     //
 });
 
-twitch.on("hosting", function(channel, target){
+client.on("clearchat", function(channel) {
     //
 });
 
-twitch.on("unhost", function(channel){
+client.on("hosting", function(channel, target, viewers) {
     //
 });
 
-twitch.on("subscribers", function(channel, enabled){
+client.on("unhost", function(channel) {
     //
 });
 
-twitch.on("slow", function(channel, enabled){
+client.on("subscribers", function(channel, enabled) {
     //
 });
 
-twitch.on("r9kmode", function(channel, enabled){
+client.on("slow", function(channel, enabled) {
     //
 });
 
-twitch.on("join", function(channel, username){
+client.on("r9kmode", function(channel, enabled) {
     //
 });
 
-twitch.on("part", function(channel, username){
+client.on("join", function(channel, username) {
+    //
+});
+
+client.on("part", function(channel, username) {
+    //
+});
+
+client.on("roomstate", function(channel, state) {
+    //
+});
+
+client.on("ping", function() {
+    //
+});
+
+client.on("reconnect", function() {
+    //
+});
+
+client.on("mod", function(channel, username) {
+    //
+});
+
+client.on("unmod", function(channel, username) {
     //
 });
