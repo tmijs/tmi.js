@@ -3,9 +3,10 @@ module.exports={
 	client:require("./lib/client")
 };
 },{"./lib/client":2}],2:[function(require,module,exports){
+(function (global){
 var bunyan = require("bunyan");
 var eventEmitter = require("events").EventEmitter;
-var irc = require("irc");
+var irc = (typeof window !== "undefined" ? window.irc : typeof global !== "undefined" ? global.irc : null);
 var parse = require("irc-message").parse;
 var timer = require("./timer");
 var server = require("./server");
@@ -734,7 +735,8 @@ if (typeof window !== "undefined") {
     module.exports = client;
 }
 
-},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc":undefined,"irc-message":35,"util":34,"vow":49,"ws":50}],3:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":35,"util":34,"vow":49,"ws":50}],3:[function(require,module,exports){
 var webSocket = require("ws");
 
 // TODO: Add more WebSocket servers..
