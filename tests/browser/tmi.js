@@ -45,6 +45,8 @@ var client = function client(opts) {
     this.opts.identity = opts.identity || {};
     this.opts.options = opts.options || {};
 
+    this.lastJoined = "";
+    this.moderators = {};
     this.usingWebSocket = true;
     this.username = "";
     this.userstate = {};
@@ -257,6 +259,12 @@ client.prototype.handleMessage = function handleMessage(message) {
             case "USERSTATE":
                 message.tags.username = self.username;
                 self.userstate[message.params[0]] = message.tags;
+                
+                // Add the client to the moderators of this room..
+                if (message.tags["user-type"] !== null) {
+                    if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
+                    if (self.moderators[self.lastJoined].indexOf(self.username) < 0) { self.moderators[self.lastJoined].push(self.username); }
+                }
                 break;
                 
             // Will be used in the future to describe non-channel-specific state information.
@@ -282,9 +290,17 @@ client.prototype.handleMessage = function handleMessage(message) {
         switch(message.command) {
             case "MODE":
                 if (message.params[1] === "+o") {
+                    // Add username to the moderators..
+                    if (!self.moderators[message.params[0]]) { self.moderators[message.params[0]] = []; }
+                    if (self.moderators[message.params[0]].indexOf(message.params[2]) < 0) { self.moderators[message.params[0]].push(message.params[2]); }
+                    
                     self.emit("mod", message.params[0], message.params[2]);
                 }
                 else if (message.params[1] === "-o") {
+                    // Remove username from the moderators..
+                    if (!self.moderators[message.params[0]]) { self.moderators[message.params[0]] = []; }
+                    self.moderators[message.params[0]].filter(function(value) { return value != message.params[2]; });
+                    
                     self.emit("unmod", message.params[0], message.params[2]);
                 }
                 break;
@@ -308,6 +324,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
             case "JOIN":
                 if (self.username === message.prefix.split("!")[0]) {
+                    self.lastJoined = message.params[0];
                     self.log.info("Joined " + message.params[0]);
                 }
                 self.emit("join", message.params[0], message.prefix.split("!")[0]);
@@ -474,6 +491,8 @@ client.prototype._onMessage = function _onMessage(event) {
 
 // Called when an error occurs..
 client.prototype._onError = function _onError() {
+    this.moderators = {};
+    
     if (this.ws !== null) {
         this.log.error("Unable to connect.");
         this.emit("disconnected", "Unable to connect.");
@@ -486,6 +505,8 @@ client.prototype._onError = function _onError() {
 // Called when the WebSocket connection's readyState changes to CLOSED..
 client.prototype._onClose = function _onClose() {
     var self = this;
+    
+    this.moderators = {};
     
     // User called .disconnect();
     if (this.wasCloseCalled) {
@@ -519,6 +540,11 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                 case ".mods":
                     self.log.info("Executing command: " + command);
                     self.once("modspromises", function (channel, mods) {
+                        // Add the username to the moderators of this room..
+                        mods.forEach(function(username) {
+                            if (!self.moderators[channel]) { self.moderators[channel] = []; }
+                            if (self.moderators[channel].indexOf(username) < 0) { self.moderators[channel].push(username); }
+                        });
                         resolve(mods);
                     });
                     self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
@@ -571,6 +597,14 @@ client.prototype.getUsername = function getUsername() {
 // Get current options..
 client.prototype.getOptions = function getOptions() {
     return this.opts;
+};
+
+// Check if username is a moderator on a channel..
+client.prototype.isMod = function isMod(channel, username) {
+    if (this.moderators[utils.normalizeChannel(channel)].indexOf(utils.normalizeUsername(username)) >= 0) {
+        return true;
+    }
+    return false;
 };
 
 // Disconnect from server..
