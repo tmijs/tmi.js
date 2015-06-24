@@ -15,6 +15,9 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     "tests/browser/tmi.js": ["index.js", "/lib/*.js"]
+                },
+                options: {
+                    exclude: ["irc"]
                 }
             }
         },

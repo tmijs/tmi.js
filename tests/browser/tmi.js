@@ -5,6 +5,7 @@ module.exports={
 },{"./lib/client":2}],2:[function(require,module,exports){
 var bunyan = require("bunyan");
 var eventEmitter = require("events").EventEmitter;
+var irc = require("irc");
 var parse = require("irc-message").parse;
 var timer = require("./timer");
 var server = require("./server");
@@ -352,6 +353,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     self.emit("chat", message.params[0], message.tags, message.params[1]);
                 }
                 
+                // Message from TwitchNotify..
                 if (message.tags.username === "twitchnotify") {
                     // Someone subscribed to a hosted channel. Who cares.
                     if (message.params[1].indexOf("subscribed to") >= 0) {
@@ -370,6 +372,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     }
                 }
                 
+                // Message from JTV..
                 else if (message.tags.username === "jtv") {
                     // Client sent /mods command to channel..
                     if (message.params[1].indexOf("moderators of this room are") >= 0) {
@@ -731,7 +734,7 @@ if (typeof window !== "undefined") {
     module.exports = client;
 }
 
-},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":35,"util":34,"vow":49,"ws":50}],3:[function(require,module,exports){
+},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc":undefined,"irc-message":35,"util":34,"vow":49,"ws":50}],3:[function(require,module,exports){
 var webSocket = require("ws");
 
 // TODO: Add more WebSocket servers..
