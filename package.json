@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.4.0",
+    "cron": "^1.0.9",
     "irc": "^0.3.12",
     "irc-message": "^3.0.1",
     "vow": "^0.4.10",
@@ -29,6 +30,7 @@
     ]
   },
   "browserify-shim": {
-    "irc": "global:irc"
+    "irc": "global:irc",
+    "cron": "global:cron"
   }
 }

@@ -5,6 +5,7 @@ module.exports={
 },{"./lib/client":2}],2:[function(require,module,exports){
 (function (global){
 var bunyan = require("bunyan");
+var cron = (typeof window !== "undefined" ? window.cron : typeof global !== "undefined" ? global.cron : null);
 var eventEmitter = require("events").EventEmitter;
 var irc = (typeof window !== "undefined" ? window.irc : typeof global !== "undefined" ? global.irc : null);
 var parse = require("irc-message").parse;
@@ -548,6 +549,10 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 }
                 self.emit("part", message.args[0], message.prefix.split("!")[0]);
                 break;
+            case "WHISPER":
+                self.log.info("[WHISPER] <" + message.prefix.split("!")[0] + ">: " + message.args[1]);
+                self.emit("whisper", message.prefix.split("!")[0], message.args[1]);
+                break;
             case "PRIVMSG":
                 message.tags = {};
                 message.tags.username = message.prefix.split("!")[0];
@@ -1018,8 +1023,17 @@ client.prototype.whisper = function whisper(username, message) {
     return this._sendMessage("#jtv", "/w " + utils.normalizeUsername(username) + " " + message);
 };
 
+client.prototype.utils = {
+    cronjobs: function cronjobs(time, fn) {
+        return new cron.CronJob(time, function () {
+            fn();
+        }, null, false);
+    }
+};
+
 // Expose everything, for browser and Node.js / io.js
 if (typeof window !== "undefined") {
+    window.ignore = null;
     window.irc = {};
     window.irc.client = client;
 } else {
