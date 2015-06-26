@@ -888,6 +888,7 @@ client.prototype.getOptions = function getOptions() {
 
 // Check if username is a moderator on a channel..
 client.prototype.isMod = function isMod(channel, username) {
+    if (!this.moderators[utils.normalizeChannel(channel)]) { this.moderators[utils.normalizeChannel(channel)] = []; }
     if (this.moderators[utils.normalizeChannel(channel)].indexOf(utils.normalizeUsername(username)) >= 0) {
         return true;
     }
@@ -1273,7 +1274,8 @@ function updateServers(callback) {
     http.get({
         host: "www.tmijs.org",
         path: "/api/servers/",
-        withCredentials: false
+        withCredentials: false,
+        protocol:"http:"
     }, function(res) {
         var body = "";
         res.on('data', function(buffer) {
