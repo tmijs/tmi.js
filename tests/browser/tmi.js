@@ -269,7 +269,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 self.userstate[message.params[0]] = message.tags;
                 
                 // Add the client to the moderators of this room..
-                if (message.tags["user-type"] !== null) {
+                if (message.tags["user-type"] === "mod") {
                     if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
                     if (self.moderators[self.lastJoined].indexOf(self.username) < 0) { self.moderators[self.lastJoined].push(self.username); }
                 }
@@ -353,12 +353,12 @@ client.prototype.handleMessage = function handleMessage(message) {
                 // Message is an action..
                 if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                     self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                    self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                    self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], message.tags.username === self.username);
                 }
                 // Message is a regular message..
                 else {
                     self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
-                    self.emit("chat", message.params[0], message.tags, message.params[1]);
+                    self.emit("chat", message.params[0], message.tags, message.params[1], message.tags.username === self.username);
                 }
                 
                 // Message from TwitchNotify..
@@ -485,7 +485,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 
             // Received when joining a channel and every time you send a PRIVMSG to a channel.
             case "USERSTATE":
-                self.userstate[message.args[0]] = {username: self.username};
+                self.userstate[message.args[0]] = {"username": self.username};
                 break;
                 
             // Received when joining a channel..
@@ -564,12 +564,12 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 // Message is an action..
                 if (message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                     self.log.info("[" + message.args[0] + "] *<" + message.tags.username + ">: " + message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                    self.emit("action", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                    self.emit("action", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], message.tags.username === self.username);
                 }
                 // Message is a regular message..
                 else {
                     self.log.info("[" + message.args[0] + "] <" + message.tags.username + ">: " + message.args[1]);
-                    self.emit("chat", message.args[0], message.tags, message.args[1]);
+                    self.emit("chat", message.args[0], message.tags, message.args[1], message.tags.username === self.username);
                 }
                 break;
             default:
@@ -803,10 +803,10 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
             } else {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
-                self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message);
+                self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
             }
             resolve();
         } else {
@@ -864,10 +864,10 @@ client.prototype._sendMessageIRC = function _sendMessageIRC(channel, message) {
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
             } else {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
-                self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message);
+                self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
             }
             resolve();
         } else {
