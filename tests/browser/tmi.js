@@ -8,6 +8,7 @@ var bunyan = require("bunyan");
 var cron = (typeof window !== "undefined" ? window.cron : typeof global !== "undefined" ? global.cron : null);
 var eventEmitter = require("events").EventEmitter;
 var irc = (typeof window !== "undefined" ? window.irc : typeof global !== "undefined" ? global.irc : null);
+var locallydb = (typeof window !== "undefined" ? window.locallydb : typeof global !== "undefined" ? global.locallydb : null);
 var parse = require("irc-message").parse;
 var timer = require("./timer");
 var server = require("./server");
@@ -1161,6 +1162,68 @@ client.prototype.utils = {
         return 0;
     }
 };
+
+client.prototype.nosql = {
+    path: function path(database) {
+        this.database = new locallydb(database);
+    },
+    insert: function insert(collection, elements) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).insert(elements));
+        });
+    },
+    where: function where(collection, query) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).where(query));
+        });
+    },
+    get: function get(collection, cid) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).get(cid) || null);
+        });
+    },
+    list: function list(collection) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).items);
+        });
+    },
+    update: function update(collection, cid, object) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).update(cid, object));
+        });
+    },
+    replace: function replace(collection, cid, object) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).replace(cid, object));
+        });
+    },
+    remove: function remove(collection, cid) {
+        var self = this;
+        if (typeof this.database === "undefined") { this.path("./database"); }
+        
+        return new vow.Promise(function(resolve) {
+            resolve(self.database.collection(collection).remove(cid));
+        });
+    }
+}
 
 // Expose everything, for browser and Node.js / io.js
 if (typeof window !== "undefined") {

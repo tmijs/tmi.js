@@ -13,6 +13,7 @@
     "cron": "^1.0.9",
     "irc": "^0.3.12",
     "irc-message": "^3.0.1",
+    "locallydb": "0.0.9",
     "vow": "^0.4.10",
     "ws": "^0.7.2"
   },
@@ -31,6 +32,7 @@
   },
   "browserify-shim": {
     "irc": "global:irc",
-    "cron": "global:cron"
+    "cron": "global:cron",
+    "locallydb": "global:locallydb"
   }
 }
