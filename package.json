@@ -15,7 +15,8 @@
     "irc-message": "^3.0.1",
     "locallydb": "0.0.9",
     "vow": "^0.4.10",
-    "ws": "^0.7.2"
+    "ws": "^0.7.2",
+    "underscore.string": "^3.1.1"
   },
   "devDependencies": {
     "browserify": "^10.2.4",
