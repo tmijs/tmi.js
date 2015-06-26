@@ -1164,6 +1164,9 @@ client.prototype.utils = {
 };
 
 client.prototype.nosql = {
+    database: function database() {
+        return this.database;
+    },
     path: function path(database) {
         this.database = new locallydb(database);
     },
@@ -1223,7 +1226,7 @@ client.prototype.nosql = {
             resolve(self.database.collection(collection).remove(cid));
         });
     }
-}
+};
 
 // Expose everything, for browser and Node.js / io.js
 if (typeof window !== "undefined") {
