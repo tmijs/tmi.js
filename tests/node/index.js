@@ -11,8 +11,8 @@ var options = {
         port: 443
     },
     identity: {
-        username: "Schmoopiie",
-        password: "oauth:dek9qz62yx2zjxn8v24nxj9ekjxrna"
+        username: "justinfan432543",
+        password: "SCHMOOPIIE"
     },
     channels: ["#schmoopiie"]
 };
@@ -50,12 +50,7 @@ client.on("chat", function(channel, user, message, self) {
 });
 
 client.on("message", function(channel, user, message, self) {
-    if (message === "!test" && user["message-type"] === "action") {
-        client.say(channel, "this is a test.");
-    }
-    if (message === "!test2" && user["message-type"] === "chat") {
-        client.whisper(user.username, "this is a test.");
-    }
+    //
 });
 
 client.on("timeout", function(channel, username) {
@@ -127,5 +122,9 @@ client.on("mods", function(channel, mods) {
 });
 
 client.on("hosted", function(channel, username) {
+    //
+});
+
+client.on("whisper", function(username, message) {
     //
 });

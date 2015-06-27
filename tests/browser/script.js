@@ -12,7 +12,7 @@ var options = {
         username: "justinfan432543",
         password: "SCHMOOPIIE"
     },
-    channels: ["#schmoopiie", "#lirik"]
+    channels: ["#schmoopiie"]
 };
 
 var client = new irc.client(options);
@@ -39,11 +39,15 @@ client.on("names", function(channel, names) {
     //
 });
 
-client.on("action", function(channel, user, message) {
+client.on("action", function(channel, user, message, self) {
     //
 });
 
-client.on("chat", function(channel, user, message) {
+client.on("chat", function(channel, user, message, self) {
+    //
+});
+
+client.on("message", function(channel, user, message, self) {
     //
 });
 
@@ -116,5 +120,9 @@ client.on("mods", function(channel, mods) {
 });
 
 client.on("hosted", function(channel, username) {
+    //
+});
+
+client.on("whisper", function(username, message) {
     //
 });
