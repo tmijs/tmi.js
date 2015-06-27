@@ -146,10 +146,10 @@ client.prototype.handleMessage = function handleMessage(message) {
             // Connected to server..
             case "372":
                 self.log.info("Connected to server.");
+                self.userstate["#jtv"] = {};
                 self.emit("connected", self.server, self.port);
 
                 self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
-                self.userstate["#jtv"] = {};
 
                 // Join all the channels from configuration every 2 seconds..
                 var joinQueue = new timer.queue(2000);
@@ -216,6 +216,10 @@ client.prototype.handleMessage = function handleMessage(message) {
                     case "host_on":
                     case "host_off":
                         //
+                        break;
+                    default:
+                        self.log.warn("Could not parse NOTICE from tmi.twitch.tv:");
+                        self.log.warn(message);
                         break;
                 }
 
@@ -458,10 +462,10 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 break;
             case "372":
                 self.log.info("Connected to server.");
+                self.userstate["#jtv"] = {};
                 self.emit("connected", self.server, self.port);
 
                 self.irc.send("CAP REQ", ":twitch.tv/tags twitch.tv/commands twitch.tv/membership");
-                self.userstate["#jtv"] = {};
 
                 // Join all the channels from configuration every 2 seconds..
                 var joinQueue = new timer.queue(2000);
@@ -569,7 +573,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     username: message.prefix.split("!")[0],
                     "message-type": "whisper"
                 }
-                self.emit("message", null, whisperTags, message.params[1], false);
+                self.emit("message", null, whisperTags, message.args[1], false);
                 break;
             case "PRIVMSG":
                 message.tags = {};
