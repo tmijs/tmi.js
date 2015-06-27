@@ -581,7 +581,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     self.emit("action", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
                     
                     message.tags["message-type"]["message-type"] = "action";
-                    self.emit("message", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
+                    self.emit("message", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
                 }
                 // Message is a regular message..
                 else {
@@ -589,7 +589,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     self.emit("chat", message.args[0], message.tags, message.args[1], false);
                     
                     message.tags["message-type"] = "chat";
-                    self.emit("message", message.params[0], message.tags, message.params[1], false);
+                    self.emit("message", message.args[0], message.tags, message.args[1], false);
                 }
                 break;
             default:
@@ -1420,12 +1420,12 @@ function isInteger(value) {
 
 // Normalize channel name by including the hash
 function normalizeChannel(name) {
-    return "#" + ltrim(name, "#");
+    return "#" + ltrim(name.toLowerCase(), "#");
 }
 
 // Normalize username by removing the hash
 function normalizeUsername(username) {
-    return ltrim(username, "#");
+    return ltrim(username.toLowerCase(), "#");
 }
 
 exports.generateJustinfan = generateJustinfan;
