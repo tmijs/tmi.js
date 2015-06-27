@@ -44,7 +44,7 @@ rawStream.prototype.write = function (rec) {
 var client = function client(opts) {
     this.setMaxListeners(0);
     
-    this.opts = !underscore.isUndefined(opts) ? opts : {};
+    this.opts = underscore.isUndefined(opts) ? {} : opts;
     this.opts.channels = opts.channels || [];
     this.opts.connection = opts.connection || {};
     this.opts.identity = opts.identity || {};
@@ -73,7 +73,7 @@ var client = function client(opts) {
     });
 
     // Show debug messages ?
-    if (!underscore.isUndefined(this.opts.options.debug) ? this.opts.options.debug : false) { this.log.level("info"); }
+    if (underscore.isUndefined(this.opts.options.debug) ? false : this.opts.options.debug) { this.log.level("info"); }
 
     eventEmitter.call(this);
 }
@@ -610,14 +610,14 @@ client.prototype.connect = function connect() {
     var self = this;
     var deferred = vow.defer();
     
-    this.reconnect =!underscore.isUndefined(this.opts.connection.reconnect) ? this.opts.connection.reconnect : false;
-    this.server = !underscore.isUndefined(this.opts.connection.server) ? this.opts.connection.server : "RANDOM";
-    this.port = !underscore.isUndefined(this.opts.connection.port) ? this.opts.connection.port : 443;
+    this.reconnect = underscore.isUndefined(this.opts.connection.reconnect) ? false : this.opts.connection.reconnect;
+    this.server = underscore.isUndefined(this.opts.connection.server) ? "RANDOM" : this.opts.connection.server;
+    this.port = underscore.isUndefined(this.opts.connection.port) ? 443 : this.opts.connection.port;
 
     // Connect to a random server..
     if (this.server === "RANDOM" || !underscore.isUndefined(this.opts.connection.random)) {
         // Default type is "chat" server..
-        server.getRandomServer(!underscore.isUndefined(self.opts.connection.random) ? self.opts.connection.random : "chat", function (addr, protocol) {
+        server.getRandomServer(underscore.isUndefined(self.opts.connection.random) ? "chat" : self.opts.connection.random, function (addr, protocol) {
             self.server = addr.split(":")[0];
             self.port = addr.split(":")[1];
             self.protocol = protocol;
@@ -684,8 +684,8 @@ client.prototype._openIRCConnection = function _openIRCConnection() {
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = !underscore.isUndefined(this.opts.identity.username) ? this.opts.identity.username : utils.generateJustinfan();
-    this.password = !underscore.isUndefined(this.opts.identity.password) ? this.opts.identity.password : "SCHMOOPIIE";
+    this.username = underscore.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE" : this.opts.identity.password;
 
     // Make sure "oauth:" is included..
     if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
@@ -709,8 +709,8 @@ client.prototype._onOpen = function _onOpen() {
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = !underscore.isUndefined(this.opts.identity.username) ? this.opts.identity.username : utils.generateJustinfan();
-    this.password = !underscore.isUndefined(this.opts.identity.password) ? this.opts.identity.password : "SCHMOOPIIE";
+    this.username = underscore.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE": this.opts.identity.password;
 
     // Make sure "oauth:" is included..
     if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
@@ -980,7 +980,7 @@ client.prototype.color = function color(channel, color) {
 };
 
 client.prototype.commercial = function commercial(channel, seconds) {
-    seconds = !underscore.isUndefined(seconds) ? seconds : 30;
+    seconds = underscore.isUndefined(seconds) ? 30 : seconds;
     return this._sendCommand(channel, "/commercial " + seconds);
 };
 
@@ -1031,7 +1031,7 @@ client.prototype.say = function say(channel, message) {
 };
 
 client.prototype.slow = client.prototype.slowmode = function slow(channel, seconds) {
-    seconds = !underscore.isUndefined(seconds) ? seconds : 300;
+    seconds = underscore.isUndefined(seconds) ? 300 : seconds;
     
     return this._sendCommand(channel, "/seconds " + seconds);
 };
@@ -1049,8 +1049,8 @@ client.prototype.subscribersoff = function subscribersoff(channel) {
 };
 
 client.prototype.timeout = function timeout(channel, username, seconds) {
-    seconds = !underscore.isUndefined(seconds) ? seconds : 300;
-    username = !underscore.isUndefined(username) ? username : "Kappa";
+    seconds = underscore.isUndefined(seconds) ? 300 : seconds;
+    username = underscore.isUndefined(username) ? "Kappa" : username;
     
     return this._sendCommand(channel, "/timeout " + username + " " + seconds);
 };
@@ -1081,7 +1081,7 @@ client.prototype.utils = {
         var cost_ins = 1;
         var cost_rep = 1;
         var cost_del = 1;
-        caseSensitive = !underscore.isUndefined(caseSensitive) ? caseSensitive : false;
+        caseSensitive = underscore.isUndefined(caseSensitive) ? false : caseSensitive;
 
         if (!caseSensitive) {
             s1 = s1.toLowerCase();
@@ -1276,11 +1276,11 @@ client.prototype.nosql = {
 };
 
 // Expose everything, for browser and Node.js / io.js
-if (!underscore.isUndefined(window)) {
+if (underscore.isUndefined(window)) {
+    module.exports = client;
+} else {
     window.irc = {};
     window.irc.client = client;
-} else {
-    module.exports = client;
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
