@@ -7,12 +7,12 @@ var options = {
     connection: {
         random: "chat",
         reconnect: false,
-        server: "192.16.64.145",
+        server: "199.9.253.119",
         port: 443
     },
     identity: {
-        username: "justinfan432543",
-        password: "SCHMOOPIIE"
+        username: "Schmoopiie",
+        password: "oauth:dek9qz62yx2zjxn8v24nxj9ekjxrna"
     },
     channels: ["#schmoopiie"]
 };
@@ -41,12 +41,21 @@ client.on("names", function(channel, names) {
     //
 });
 
-client.on("action", function(channel, user, message) {
+client.on("action", function(channel, user, message, self) {
     //
 });
 
-client.on("chat", function(channel, user, message) {
+client.on("chat", function(channel, user, message, self) {
     //
+});
+
+client.on("message", function(channel, user, message, self) {
+    if (message === "!test" && user["message-type"] === "action") {
+        client.say(channel, "this is a test.");
+    }
+    if (message === "!test2" && user["message-type"] === "chat") {
+        client.whisper(user.username, "this is a test.");
+    }
 });
 
 client.on("timeout", function(channel, username) {

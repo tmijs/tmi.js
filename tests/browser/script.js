@@ -12,7 +12,7 @@ var options = {
         username: "justinfan432543",
         password: "SCHMOOPIIE"
     },
-    channels: ["#schmoopiie"]
+    channels: ["#schmoopiie", "#lirik"]
 };
 
 var client = new irc.client(options);

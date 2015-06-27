@@ -1279,7 +1279,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":44,"util":43,"vow":58,"ws":59}],3:[function(require,module,exports){
+},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":44,"util":43,"vow":64,"ws":65}],3:[function(require,module,exports){
 var http = require("http");
 var webSocket = require("ws");
 
@@ -1352,7 +1352,7 @@ function isWebSocket(server, port, callback) {
 
 exports.getRandomServer = getRandomServer;
 exports.isWebSocket = isWebSocket;
-},{"http":16,"ws":59}],4:[function(require,module,exports){
+},{"http":16,"ws":65}],4:[function(require,module,exports){
 // Initialize the queue with a specific delay..
 function queue(defaultDelay) {
     this.queue = [];
@@ -1403,33 +1403,36 @@ queue.prototype.clear = function clear() {
 
 exports.queue = queue;
 },{}],5:[function(require,module,exports){
-// Generate a random justinfan username..
+var toNumber = require("underscore.string/toNumber"),
+    ltrim = require("underscore.string/ltrim");
+
+// Generate a random justinfan username
 function generateJustinfan() {
 	return "justinfan" + Math.floor((Math.random() * 80000) + 1000);
 }
 
-// Value is an integer..
+// Determine if value is a valid integer
 function isInteger(value) {
-    var n = ~~Number(value);
-    return String(n) === value;
+    //0 decimal places
+    var maybeNumber = toNumber(value, 0);
+    return isNaN(maybeNumber);
 }
 
-// Normalize channel name..
+// Normalize channel name by including the hash
 function normalizeChannel(name) {
-	if (name.indexOf("#") !== 0) { name = "#" + name; }
-	return name.toLowerCase();
+    return "#" + ltrim(name, "#");
 }
 
-// Normalize username..
+// Normalize username by removing the hash
 function normalizeUsername(username) {
-	return username.replace("#", "").toLowerCase();
+    return ltrim(username, "#");
 }
 
 exports.generateJustinfan = generateJustinfan;
 exports.isInteger = isInteger;
 exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
-},{}],6:[function(require,module,exports){
+},{"underscore.string/ltrim":61,"underscore.string/toNumber":62}],6:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Copyright (c) 2014 Trent Mick. All rights reserved.
@@ -12286,6 +12289,67 @@ module.exports.obj = through2(function (options, transform, flush) {
 
 }).call(this,require('_process'))
 },{"_process":23,"readable-stream/transform":55,"util":43,"xtend":56}],58:[function(require,module,exports){
+var escapeRegExp = require('./escapeRegExp');
+
+module.exports = function defaultToWhiteSpace(characters) {
+  if (characters == null)
+    return '\\s';
+  else if (characters.source)
+    return characters.source;
+  else
+    return '[' + escapeRegExp(characters) + ']';
+};
+
+},{"./escapeRegExp":59}],59:[function(require,module,exports){
+var makeString = require('./makeString');
+
+module.exports = function escapeRegExp(str) {
+  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+};
+
+},{"./makeString":60}],60:[function(require,module,exports){
+/**
+ * Ensure some object is a coerced to a string
+ **/
+module.exports = function makeString(object) {
+  if (object == null) return '';
+  return '' + object;
+};
+
+},{}],61:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
+var nativeTrimLeft = String.prototype.trimLeft;
+
+module.exports = function ltrim(str, characters) {
+  str = makeString(str);
+  if (!characters && nativeTrimLeft) return nativeTrimLeft.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+'), '');
+};
+
+},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],62:[function(require,module,exports){
+var trim = require('./trim');
+
+module.exports = function toNumber(num, precision) {
+  if (num == null) return 0;
+  var factor = Math.pow(10, isFinite(precision) ? precision : 0);
+  return Math.round(num * factor) / factor;
+};
+
+},{"./trim":63}],63:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
+var nativeTrim = String.prototype.trim;
+
+module.exports = function trim(str, characters) {
+  str = makeString(str);
+  if (!characters && nativeTrim) return nativeTrim.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
+};
+
+},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],64:[function(require,module,exports){
 (function (process){
 /**
  * @module vow
@@ -13617,7 +13681,7 @@ defineAsGlobal && (global.vow = vow);
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":23}],59:[function(require,module,exports){
+},{"_process":23}],65:[function(require,module,exports){
 
 /**
  * Module dependencies.
