@@ -688,8 +688,8 @@ client.prototype._openIRCConnection = function _openIRCConnection() {
     this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE" : this.opts.identity.password;
 
     // Make sure "oauth:" is included..
-    if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
-        this.password = "oauth:" + this.password;
+    if (this.password !== "SCHMOOPIIE") {
+        this.password = utils.normalizePassword(this.password);
     }
     
     this.irc = new irc.Client(self.server, self.username, {
@@ -713,8 +713,8 @@ client.prototype._onOpen = function _onOpen() {
     this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE": this.opts.identity.password;
 
     // Make sure "oauth:" is included..
-    if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
-        this.password = "oauth:" + this.password;
+    if (this.password !== "SCHMOOPIIE") {
+        this.password = utils.normalizePassword(this.password);
     }
 
     // Emitting "logon" event..
@@ -1408,8 +1408,8 @@ queue.prototype.clear = function clear() {
 
 exports.queue = queue;
 },{}],5:[function(require,module,exports){
-var toNumber = require("underscore.string/toNumber"),
-    ltrim = require("underscore.string/ltrim");
+var toNumber = require("underscore.string/toNumber");
+var ltrim = require("underscore.string/ltrim");
 
 // Generate a random justinfan username
 function generateJustinfan() {
@@ -1433,10 +1433,16 @@ function normalizeUsername(username) {
     return ltrim(username.toLowerCase(), "#");
 }
 
+// Normalize password by including oauth:
+function normalizePassword(password) {
+    return "oauth:" + ltrim(username.toLowerCase(), "oauth:");
+}
+
 exports.generateJustinfan = generateJustinfan;
 exports.isInteger = isInteger;
 exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
+exports.normalizePassword = normalizePassword;
 },{"underscore.string/ltrim":61,"underscore.string/toNumber":62}],6:[function(require,module,exports){
 (function (process,Buffer){
 /**
