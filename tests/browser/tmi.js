@@ -26,7 +26,7 @@ function rawStream() {}
 rawStream.prototype.write = function (rec) {
     var message = rec.msg || rec.raw;
 
-    if(_.isObject(message) && message !== null) {
+    if(_.isObject(message) && !_.isNull(message)) {
         message = JSON.stringify(message);
     }
 
@@ -110,7 +110,7 @@ client.prototype.handleMessage = function handleMessage(message) {
     }
     
     // Messages with no prefix..
-    if (message.prefix === null) {
+    if (_.isNull(message.prefix)) {
         switch(message.command) {
             // Received PING from server..
             case "PING":
@@ -159,7 +159,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 for (var i = 0; i < self.opts.channels.length; i++) {
                     joinQueue.add(function(i) {
-                        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
+                        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
                             self.ws.send("JOIN " + utils.normalizeChannel(self.opts.channels[i]));
                         }
                     }.bind(this, i))
@@ -475,7 +475,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
 
                 for (var i = 0; i < self.opts.channels.length; i++) {
                     joinQueue.add(function(i) {
-                        if (self.irc !== null && self.protocol === "irc") {
+                        if (!_.isNull(self.irc) && self.protocol === "irc") {
                             self.irc.join(utils.normalizeChannel(self.opts.channels[i]));
                         }
                     }.bind(this, i));
@@ -738,7 +738,7 @@ client.prototype._onMessage = function _onMessage(event) {
 client.prototype._onError = function _onError() {
     this.moderators = {};
     
-    if (this.ws !== null) {
+    if (!_.isNull(this.ws)) {
         this.log.error("Unable to connect.");
         this.emit("disconnected", "Unable to connect.");
     } else {
@@ -783,7 +783,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -799,7 +799,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                     self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
                     break;
                 default:
-                    if (channel !== null) {
+                    if (!_.isNull(channel)) {
                         self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
                         self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
                     } else {
@@ -825,7 +825,7 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
@@ -854,7 +854,7 @@ client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.irc !== null && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -870,7 +870,7 @@ client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
                     self.irc.say(utils.normalizeChannel(channel), command);
                     break;
                 default:
-                    if (channel !== null) {
+                    if (!_.isNull(channel)) {
                         self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
                         self.irc.say(utils.normalizeChannel(channel), command);
                     } else {
@@ -892,7 +892,7 @@ client.prototype._sendMessageIRC = function _sendMessageIRC(channel, message) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.irc !== null && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
             self.irc.say(utils.normalizeChannel(channel), message);
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
@@ -939,7 +939,7 @@ client.prototype.disconnect = function disconnect() {
     var deferred = vow.defer();
     
     if (this.protocol === "websocket") {
-        if (this.usingWebSocket && this.ws !== null && this.ws.readyState !== 3) {
+        if (this.usingWebSocket && !_.isNull(this.ws) && this.ws.readyState !== 3) {
             this.wasCloseCalled = true;
             this.log.info("Disconnecting from server..");
             this.ws.close();
@@ -950,7 +950,7 @@ client.prototype.disconnect = function disconnect() {
         }
     }
     else if (this.protocol === "irc") {
-        if (this.irc !== null) {
+        if (!_.isNull(this.irc)) {
             this.wasCloseCalled = true;
             this.log.info("Disconnecting from server..");
             this.irc.disconnect();
@@ -1205,7 +1205,7 @@ client.prototype.utils = {
     uppercase: function uppercase(line) {
         var chars = line.length;
         var u_let = line.match(/[A-Z]/g);
-        if (u_let !== null) {
+        if (!_.isNull(u_let)) {
             return (u_let.length / chars);
         }
         return 0;
