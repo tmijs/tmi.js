@@ -16,6 +16,7 @@
     "locallydb": "0.0.9",
     "vow": "^0.4.10",
     "ws": "^0.7.2",
+    "underscore": "^1.8.3",
     "underscore.string": "^3.1.1"
   },
   "devDependencies": {
