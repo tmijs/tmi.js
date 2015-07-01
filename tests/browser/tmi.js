@@ -45,8 +45,8 @@ rawStream.prototype.write = function (rec) {
 // Client instance..
 var client = function client(opts) {
     this.setMaxListeners(0);
-    
-    this.opts = _.isUndefined(opts) ? {} : opts;
+
+    this.opts = typeof opts === "undefined" ? {} : opts;
     this.opts.channels = opts.channels || [];
     this.opts.connection = opts.connection || {};
     this.opts.identity = opts.identity || {};
@@ -75,7 +75,7 @@ var client = function client(opts) {
     });
 
     // Show debug messages ?
-    if (_.isUndefined(this.opts.options.debug) ? false : this.opts.options.debug) { this.log.level("info"); }
+    if (typeof this.opts.options.debug === "undefined" ? false : this.opts.options.debug) { this.log.level("info"); }
 
     eventEmitter.call(this);
 }
@@ -99,7 +99,7 @@ client.prototype.handleMessage = function handleMessage(message) {
         message.tags["emotes"] = emotes;
     }
     if (_.isBoolean(message.tags["emotes"])) { message.tags["emotes-raw"] = null; }
-    
+
     // Transform the IRCv3 tags..
     if (message.tags) {
         for(var key in message.tags) {
@@ -108,7 +108,7 @@ client.prototype.handleMessage = function handleMessage(message) {
            else if (message.tags[key] === "0") { message.tags[key] = false; }
         }
     }
-    
+
     // Messages with no prefix..
     if (_.isNull(message.prefix)) {
         switch(message.command) {
@@ -244,7 +244,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 else {
                     var viewers = message.params[1].split(" ")[1] || 0;
                     if (!utils.isInteger(viewers)) { viewers = 0; }
-                    
+
                     self.log.info("[" + message.params[0] + "] Now hosting " + message.params[1].split(" ")[0] + " for " + viewers + " viewer(s).");
                     self.emit("hosting", message.params[0], message.params[1].split(" ")[0], viewers);
                 }
@@ -275,21 +275,21 @@ client.prototype.handleMessage = function handleMessage(message) {
             case "USERSTATE":
                 message.tags.username = self.username;
                 self.userstate[message.params[0]] = message.tags;
-                
+
                 // Add the client to the moderators of this room..
                 if (message.tags["user-type"] === "mod") {
                     if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
                     if (self.moderators[self.lastJoined].indexOf(self.username) < 0) { self.moderators[self.lastJoined].push(self.username); }
                 }
                 break;
-                
+
             // Will be used in the future to describe non-channel-specific state information.
             // Source: https://github.com/justintv/Twitch-API/blob/master/chat/capabilities.md#globaluserstate
             case "GLOBALUSERSTATE":
                 self.log.warn("Could not parse message from tmi.twitch.tv:");
                 self.log.warn(message);
                 break;
-                
+
             case "ROOMSTATE":
                 message.tags.channel = self.lastJoined;
                 self.emit("roomstate", message.params[0], message.tags);
@@ -310,14 +310,14 @@ client.prototype.handleMessage = function handleMessage(message) {
                     // Add username to the moderators..
                     if (!self.moderators[message.params[0]]) { self.moderators[message.params[0]] = []; }
                     if (self.moderators[message.params[0]].indexOf(message.params[2]) < 0) { self.moderators[message.params[0]].push(message.params[2]); }
-                    
+
                     self.emit("mod", message.params[0], message.params[2]);
                 }
                 else if (message.params[1] === "-o") {
                     // Remove username from the moderators..
                     if (!self.moderators[message.params[0]]) { self.moderators[message.params[0]] = []; }
                     self.moderators[message.params[0]].filter(function(value) { return value != message.params[2]; });
-                    
+
                     self.emit("unmod", message.params[0], message.params[2]);
                 }
                 break;
@@ -362,7 +362,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                     self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                     self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-                    
+
                     message.tags["message-type"] = "action";
                     self.emit("message", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
                 }
@@ -370,11 +370,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                 else {
                     self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
                     self.emit("chat", message.params[0], message.tags, message.params[1], false);
-                    
+
                     message.tags["message-type"] = "chat";
                     self.emit("message", message.params[0], message.tags, message.params[1], false);
                 }
-                
+
                 // Message from TwitchNotify..
                 if (message.tags.username === "twitchnotify") {
                     // Someone subscribed to a hosted channel. Who cares.
@@ -389,11 +389,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                     else if (contains(message.params[1], "subscribed") && contains(message.params[1], "in a row")) {
                         var splitted = message.params[1].split(' ');
                         var length = splitted[splitted.length - 5];
-                        
+
                         self.emit('subanniversary', message.params[0], splitted[0], length);
                     }
                 }
-                
+
                 // Message from JTV..
                 else if (message.tags.username === "jtv") {
                     // Client sent /mods command to channel..
@@ -406,7 +406,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                                 mods.splice(i, 1);
                             }
                         }
-                        
+
                         self.emit('mods', message.params[0], mods);
                         self.emit('modspromises', message.params[0], mods);
                     }
@@ -428,9 +428,9 @@ client.prototype.handleMessage = function handleMessage(message) {
 // Handle parsed group server messages.. (IRC PROTOCOL)
 client.prototype.handleGroupMessage = function handleGroupMessage(message) {
     var self = this;
-    
+
     // Messages with no prefix..
-    if (_.isUndefined(message.prefix)) {
+    if (typeof message.prefix === "undefined") {
         switch(message.rawCommand) {
             // Received PING from server..
             case "PING":
@@ -449,7 +449,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 break;
         }
     }
-    
+
     // Messages with "tmi.twitch.tv" as a prefix..
     else if (message.prefix === "tmi.twitch.tv") {
         switch(message.rawCommand) {
@@ -483,7 +483,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
 
                 joinQueue.run();
                 break;
-                
+
             // Someone has been timed out or chat has been cleared by a moderator..
             case "CLEARCHAT":
                 // User has been timed out by a moderator..
@@ -497,17 +497,17 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     self.emit("clearchat", message.args[0]);
                 }
                 break;
-                
+
             // Received when joining a channel and every time you send a PRIVMSG to a channel.
             case "USERSTATE":
                 self.userstate[message.args[0]] = {"username": self.username};
                 break;
-                
+
             // Received when joining a channel..
             case "ROOMSTATE":
                 // Our tests returned nothing very important with this message, so we will ignore it for now.
                 break;
-                
+
             case "NOTICE":
                 // Client sent /mods command to channel..
                 if (contains(message.args[1], "moderators of this room are")) {
@@ -519,7 +519,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                             mods.splice(i, 1);
                         }
                     }
-                    
+
                     self.emit('mods', message.args[0], mods);
                     self.emit('modspromises', message.args[0], mods);
                 }
@@ -540,7 +540,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 break;
         }
     }
-    
+
     // Anything else..
     else {
         switch(message.rawCommand) {
@@ -553,7 +553,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 if (self.username === message.prefix.split("!")[0]) {
                     self.lastJoined = message.args[0];
                     if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
-                    
+
                     self.log.info("Joined " + message.args[0]);
                 }
                 self.emit("join", message.args[0], message.prefix.split("!")[0]);
@@ -563,7 +563,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     // Remove username from the moderators..
                     if (!self.moderators[message.args[0]]) { self.moderators[message.args[0]] = []; }
                     self.moderators[message.args[0]].filter(function(value) { return value != self.username; });
-                    
+
                     self.log.info("Left " + message.args[0]);
                 }
                 self.emit("part", message.args[0], message.prefix.split("!")[0]);
@@ -571,7 +571,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
             case "WHISPER":
                 self.log.info("[WHISPER] <" + message.prefix.split("!")[0] + ">: " + message.args[1]);
                 self.emit("whisper", message.prefix.split("!")[0], message.args[1]);
-                
+
                 var whisperTags = {
                     username: message.prefix.split("!")[0],
                     "message-type": "whisper"
@@ -581,12 +581,12 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
             case "PRIVMSG":
                 message.tags = {};
                 message.tags.username = message.prefix.split("!")[0];
-                
+
                 // Message is an action..
                 if (message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                     self.log.info("[" + message.args[0] + "] *<" + message.tags.username + ">: " + message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                     self.emit("action", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-                    
+
                     message.tags["message-type"]["message-type"] = "action";
                     self.emit("message", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
                 }
@@ -594,7 +594,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 else {
                     self.log.info("[" + message.args[0] + "] <" + message.tags.username + ">: " + message.args[1]);
                     self.emit("chat", message.args[0], message.tags, message.args[1], false);
-                    
+
                     message.tags["message-type"] = "chat";
                     self.emit("message", message.args[0], message.tags, message.args[1], false);
                 }
@@ -611,15 +611,15 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
 client.prototype.connect = function connect() {
     var self = this;
     var deferred = vow.defer();
-    
-    this.reconnect = _.isUndefined(this.opts.connection.reconnect) ? false : this.opts.connection.reconnect;
-    this.server = _.isUndefined(this.opts.connection.server) ? "RANDOM" : this.opts.connection.server;
-    this.port = _.isUndefined(this.opts.connection.port) ? 443 : this.opts.connection.port;
+
+    this.reconnect = typeof this.opts.connection.reconnect === "undefined" ? false : this.opts.connection.reconnect;
+    this.server = typeof this.opts.connection.server === "undefined" ? "RANDOM" : this.opts.connection.server;
+    this.port = typeof this.opts.connection.port === "undefined" ? 443 : this.opts.connection.port;
 
     // Connect to a random server..
-    if (this.server === "RANDOM" || !_.isUndefined(this.opts.connection.random)) {
+    if (this.server === "RANDOM" || typeof this.opts.connection.random !== "undefined") {
         // Default type is "chat" server..
-        server.getRandomServer(_.isUndefined(self.opts.connection.random) ? "chat" : self.opts.connection.random, function (addr, protocol) {
+        server.getRandomServer(typeof self.opts.connection.random === "undefined" ? "chat" : self.opts.connection.random, function (addr, protocol) {
             self.server = addr.split(":")[0];
             self.port = addr.split(":")[1];
             self.protocol = protocol;
@@ -633,7 +633,7 @@ client.prototype.connect = function connect() {
         this._openConnection(self.protocol);
         deferred.resolve();
     }
-    
+
     return deferred.promise();
 };
 
@@ -643,7 +643,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
 
     // Shall we try an IRC connection ?
     if (protocol === "irc") {
-        if (_.isUndefined(window)) { self._openIRCConnection(); }
+        if (typeof window === "undefined" || typeof window === "undefined") { self._openIRCConnection(); }
         else { self.log.error("Server is not accepting WebSocket connections."); }
     }
     else {
@@ -652,7 +652,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
             if (accepts) {
                 self.usingWebSocket = true;
                 self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
-    
+
                 self.ws.onmessage = self._onMessage.bind(self);
                 self.ws.onerror = self._onError.bind(self);
                 self.ws.onclose = self._onClose.bind(self);
@@ -661,7 +661,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
             // Server is not accepting WebSocket connections..
             else {
                 // Perhaps we should try using IRC protocol instead..
-                if (self.protocol === "websocket" && _.isUndefined(window)) {
+                if (self.protocol === "websocket" && (typeof window === "undefined" || typeof window === "object")) {
                     self.protocol = "irc";
                     self.log.error("Server is not accepting WebSocket connections. Reconnecting using IRC protocol..");
                     self.emit("reconnect");
@@ -681,24 +681,24 @@ client.prototype._openConnection = function _openConnection(protocol) {
 
 client.prototype._openIRCConnection = function _openIRCConnection() {
     var self = this;
-    
+
     // Emitting "connecting" event..
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = _.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
-    this.password = _.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE" : this.opts.identity.password;
+    this.username = typeof this.opts.identity.username === "undefined" ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = typeof this.opts.identity.password === "undefined" ? "SCHMOOPIIE" : this.opts.identity.password;
 
     // Make sure "oauth:" is included..
     if (this.password !== "SCHMOOPIIE") {
         this.password = utils.normalizePassword(this.password);
     }
-    
+
     this.irc = new irc.Client(self.server, self.username, {
         password: self.password,
         port: self.port
     });
-    
+
     this.irc.on('raw', function (message) {
         self.handleGroupMessage(message);
     });
@@ -711,8 +711,8 @@ client.prototype._onOpen = function _onOpen() {
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = _.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
-    this.password = _.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE": this.opts.identity.password;
+    this.username = typeof this.opts.identity.username === "undefined" ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = typeof this.opts.identity.password === "undefined" ? "SCHMOOPIIE": this.opts.identity.password;
 
     // Make sure "oauth:" is included..
     if (this.password !== "SCHMOOPIIE") {
@@ -737,7 +737,7 @@ client.prototype._onMessage = function _onMessage(event) {
 // Called when an error occurs..
 client.prototype._onError = function _onError() {
     this.moderators = {};
-    
+
     if (!_.isNull(this.ws)) {
         this.log.error("Unable to connect.");
         this.emit("disconnected", "Unable to connect.");
@@ -750,9 +750,9 @@ client.prototype._onError = function _onError() {
 // Called when the WebSocket connection's readyState changes to CLOSED..
 client.prototype._onClose = function _onClose() {
     var self = this;
-    
+
     this.moderators = {};
-    
+
     // User called .disconnect();
     if (this.wasCloseCalled) {
         this.wasCloseCalled = false;
@@ -776,11 +776,11 @@ client.prototype._onClose = function _onClose() {
 // Send a command to the server..
 client.prototype._sendCommand = function _sendCommand(channel, command) {
     var self = this;
-    
+
     if (this.protocol === "irc") {
         return this._sendCommandIRC(channel, command);
     }
-    
+
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
         if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
@@ -818,26 +818,26 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
 // Send a message to the server..
 client.prototype._sendMessage = function _sendMessage(channel, message) {
     var self = this;
-    
+
     if (this.protocol === "irc") {
         return this._sendMessageIRC(channel, message);
     }
-    
+
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
         if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
-            
+
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                 self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-                
+
                 self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
             } else {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
                 self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
-                
+
                 self.userstate[utils.normalizeChannel(channel)]["message-type"] = "chat";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
             }
@@ -851,7 +851,7 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
 // Send a command to the IRC server..
 client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
     var self = this;
-    
+
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
         if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
@@ -889,22 +889,22 @@ client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
 // Send a message to the IRC server..
 client.prototype._sendMessageIRC = function _sendMessageIRC(channel, message) {
     var self = this;
-    
+
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
         if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
             self.irc.say(utils.normalizeChannel(channel), message);
-            
+
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                 self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-                
+
                 self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
             } else {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
                 self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
-                
+
                 self.userstate[utils.normalizeChannel(channel)]["message-type"] = "chat";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
             }
@@ -937,7 +937,7 @@ client.prototype.isMod = function isMod(channel, username) {
 // Disconnect from server..
 client.prototype.disconnect = function disconnect() {
     var deferred = vow.defer();
-    
+
     if (this.protocol === "websocket") {
         if (this.usingWebSocket && !_.isNull(this.ws) && this.ws.readyState !== 3) {
             this.wasCloseCalled = true;
@@ -960,7 +960,7 @@ client.prototype.disconnect = function disconnect() {
             deferred.reject();
         }
     }
-    
+
     return deferred.promise();
 };
 
@@ -982,7 +982,7 @@ client.prototype.color = function color(channel, color) {
 };
 
 client.prototype.commercial = function commercial(channel, seconds) {
-    seconds = _.isUndefined(seconds) ? 30 : seconds;
+    seconds = typeof seconds === "undefined" ? 30 : seconds;
     return this._sendCommand(channel, "/commercial " + seconds);
 };
 
@@ -1033,8 +1033,8 @@ client.prototype.say = function say(channel, message) {
 };
 
 client.prototype.slow = client.prototype.slowmode = function slow(channel, seconds) {
-    seconds = _.isUndefined(seconds) ? 300 : seconds;
-    
+    seconds = typeof seconds === "undefined" ? 300 : seconds;
+
     return this._sendCommand(channel, "/seconds " + seconds);
 };
 
@@ -1051,9 +1051,9 @@ client.prototype.subscribersoff = function subscribersoff(channel) {
 };
 
 client.prototype.timeout = function timeout(channel, username, seconds) {
-    seconds = _.isUndefined(seconds) ? 300 : seconds;
-    username = _.isUndefined(username) ? "Kappa" : username;
-    
+    seconds = typeof seconds === "undefined" ? 300 : seconds;
+    username = typeof username === "undefined" ? "Kappa" : username;
+
     return this._sendCommand(channel, "/timeout " + username + " " + seconds);
 };
 
@@ -1083,7 +1083,7 @@ client.prototype.utils = {
         var cost_ins = 1;
         var cost_rep = 1;
         var cost_del = 1;
-        caseSensitive = _.isUndefined(caseSensitive) ? false : caseSensitive;
+        caseSensitive = typeof caseSensitive === "undefined" ? false : caseSensitive;
 
         if (!caseSensitive) {
             s1 = s1.toLowerCase();
@@ -1213,64 +1213,61 @@ client.prototype.utils = {
 };
 
 client.prototype.nosql = {
-    database: function database() {
-        return this.database;
-    },
     path: function path(database) {
         this.database = new locallydb(database);
     },
     insert: function insert(collection, elements) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).insert(elements));
         });
     },
     where: function where(collection, query) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).where(query));
         });
     },
     get: function get(collection, cid) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).get(cid) || null);
         });
     },
     list: function list(collection) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).items);
         });
     },
     update: function update(collection, cid, object) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).update(cid, object));
         });
     },
     replace: function replace(collection, cid, object) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).replace(cid, object));
         });
     },
     remove: function remove(collection, cid) {
         var self = this;
-        if (_.isUndefined(this.database)) { this.path("./database"); }
-        
+        if (typeof this.database === "undefined") { this.path("./database"); }
+
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).remove(cid));
         });
@@ -1278,7 +1275,7 @@ client.prototype.nosql = {
 };
 
 // Expose everything, for browser and Node.js / io.js
-if (_.isUndefined(window)) {
+if (typeof window === "undefined" || typeof window === "object") {
     module.exports = client;
 } else {
     window.irc = {};
