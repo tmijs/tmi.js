@@ -1288,8 +1288,8 @@ var http = require("http");
 var webSocket = require("ws");
 
 // Hardcoded server list just in case our API request fails..
-var chat_servers = ["192.16.64.145:80", "192.16.64.145:443"]
-var event_servers = ["192.16.64.143:80"]
+var chat_servers = ["192.16.64.145:443", "192.16.64.145:80", "192.16.70.169:80", "192.16.64.144:80", "192.16.64.51:80", "192.16.64.152:80", "192.16.64.146:80", "192.16.64.45:80", "192.16.64.155:80", "192.16.64.11:80", "199.9.248.236:80", "199.9.251.168:80", "192.16.64.37:80"]
+var event_servers = ["192.16.70.170:80", "199.9.252.54:80", "192.16.64.143:80", "192.16.70.154:80", "192.16.64.150:80"]
 var group_servers = ["199.9.253.119:443", "199.9.253.119:6667", "199.9.253.119:80", "199.9.253.120:443", "199.9.253.120:6667", "199.9.253.120:80"] // IRC
 
 // Get a random server..
@@ -1356,6 +1356,7 @@ function isWebSocket(server, port, callback) {
 
 exports.getRandomServer = getRandomServer;
 exports.isWebSocket = isWebSocket;
+
 },{"http":16,"ws":69}],4:[function(require,module,exports){
 // Initialize the queue with a specific delay..
 function queue(defaultDelay) {
@@ -1434,7 +1435,7 @@ function normalizeUsername(username) {
 
 // Normalize password by including oauth:
 function normalizePassword(password) {
-    return "oauth:" + ltrim(username.toLowerCase(), "oauth:");
+    return "oauth:" + ltrim(password.toLowerCase(), "oauth:");
 }
 
 exports.generateJustinfan = generateJustinfan;
@@ -1442,6 +1443,7 @@ exports.isInteger = isInteger;
 exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
 exports.normalizePassword = normalizePassword;
+
 },{"underscore.string/ltrim":63,"underscore.string/toNumber":65}],6:[function(require,module,exports){
 (function (process,Buffer){
 /**
