@@ -16,7 +16,9 @@ var util = require("util");
 var utils = require("./utils");
 var vow = require("vow");
 var webSocket = require("ws");
-var underscore = require("underscore");
+var _ = require("underscore");
+var contains = require("underscore.string/include");
+var startsWith = require("underscore.string/startsWith");
 
 function rawStream() {}
 
@@ -24,7 +26,7 @@ function rawStream() {}
 rawStream.prototype.write = function (rec) {
     var message = rec.msg || rec.raw;
 
-    if(underscore.isObject(message) && message !== null) {
+    if(_.isObject(message) && !_.isNull(message)) {
         message = JSON.stringify(message);
     }
 
@@ -44,7 +46,7 @@ rawStream.prototype.write = function (rec) {
 var client = function client(opts) {
     this.setMaxListeners(0);
     
-    this.opts = underscore.isUndefined(opts) ? {} : opts;
+    this.opts = _.isUndefined(opts) ? {} : opts;
     this.opts.channels = opts.channels || [];
     this.opts.connection = opts.connection || {};
     this.opts.identity = opts.identity || {};
@@ -73,7 +75,7 @@ var client = function client(opts) {
     });
 
     // Show debug messages ?
-    if (underscore.isUndefined(this.opts.options.debug) ? false : this.opts.options.debug) { this.log.level("info"); }
+    if (_.isUndefined(this.opts.options.debug) ? false : this.opts.options.debug) { this.log.level("info"); }
 
     eventEmitter.call(this);
 }
@@ -85,7 +87,7 @@ client.prototype.handleMessage = function handleMessage(message) {
     var self = this;
 
     // Parse emotes..
-    if (underscore.isString(message.tags["emotes"])) {
+    if (_.isString(message.tags["emotes"])) {
         var emoticons = message.tags["emotes"].split("/");
         var emotes = {};
 
@@ -96,19 +98,19 @@ client.prototype.handleMessage = function handleMessage(message) {
         message.tags["emotes-raw"] = message.tags["emotes"];
         message.tags["emotes"] = emotes;
     }
-    if (underscore.isBoolean(message.tags["emotes"])) { message.tags["emotes-raw"] = null; }
+    if (_.isBoolean(message.tags["emotes"])) { message.tags["emotes-raw"] = null; }
     
     // Transform the IRCv3 tags..
     if (message.tags) {
         for(var key in message.tags) {
-            if (underscore.isBoolean(message.tags[key])) { message.tags[key] = null; }
+            if (_.isBoolean(message.tags[key])) { message.tags[key] = null; }
            else if (message.tags[key] === "1") { message.tags[key] = true; }
            else if (message.tags[key] === "0") { message.tags[key] = false; }
         }
     }
     
     // Messages with no prefix..
-    if (message.prefix === null) {
+    if (_.isNull(message.prefix)) {
         switch(message.command) {
             // Received PING from server..
             case "PING":
@@ -157,7 +159,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 for (var i = 0; i < self.opts.channels.length; i++) {
                     joinQueue.add(function(i) {
-                        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
+                        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
                             self.ws.send("JOIN " + utils.normalizeChannel(self.opts.channels[i]));
                         }
                     }.bind(this, i))
@@ -224,7 +226,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                         break;
                 }
 
-                if (message.params[1].indexOf("Login unsuccessful") >= 0) {
+                if (contains(message.params[1], "Login unsuccessful")) {
                     self.wasCloseCalled = true;
                     self.log.error("Login unsuccessful.");
                     self.ws.close();
@@ -376,15 +378,15 @@ client.prototype.handleMessage = function handleMessage(message) {
                 // Message from TwitchNotify..
                 if (message.tags.username === "twitchnotify") {
                     // Someone subscribed to a hosted channel. Who cares.
-                    if (message.params[1].indexOf("subscribed to") >= 0) {
+                    if (contains(message.params[1], "subscribed to")) {
                         //
                     }
                     // New subscriber..
-                    else if (message.params[1].indexOf("just subscribed") >= 0) {
+                    else if (contains(message.params[1], "just subscribed")) {
                         self.emit('subscription', message.params[0], message.params[1].split(' ')[0]);
                     }
                     // Subanniversary..
-                    else if (message.params[1].indexOf("subscribed") >= 0 && message.params[1].indexOf("in a row") >= 0) {
+                    else if (contains(message.params[1], "subscribed") && contains(message.params[1], "in a row")) {
                         var splitted = message.params[1].split(' ');
                         var length = splitted[splitted.length - 5];
                         
@@ -395,7 +397,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 // Message from JTV..
                 else if (message.tags.username === "jtv") {
                     // Client sent /mods command to channel..
-                    if (message.params[1].indexOf("moderators of this room are") >= 0) {
+                    if (contains(message.params[1], "moderators of this room are")) {
                         var splitted = message.params[1].split(':');
                         var mods = splitted[1].replace(/,/g, '').split(':').toString().toLowerCase().split(' ');
 
@@ -409,7 +411,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                         self.emit('modspromises', message.params[0], mods);
                     }
                     // Someone is hosting my channel..
-                    else if (message.params[1].indexOf("is now hosting you") >= 0) {
+                    else if (contains(message.params[1], "is now hosting you")) {
                         self.emit('hosted', message.params[0], utils.normalizeUsername(message.params[1].split(' ')[0]));
                     }
                 }
@@ -428,7 +430,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
     var self = this;
     
     // Messages with no prefix..
-    if (underscore.isUndefined(message.prefix)) {
+    if (_.isUndefined(message.prefix)) {
         switch(message.rawCommand) {
             // Received PING from server..
             case "PING":
@@ -473,7 +475,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
 
                 for (var i = 0; i < self.opts.channels.length; i++) {
                     joinQueue.add(function(i) {
-                        if (self.irc !== null && self.protocol === "irc") {
+                        if (!_.isNull(self.irc) && self.protocol === "irc") {
                             self.irc.join(utils.normalizeChannel(self.opts.channels[i]));
                         }
                     }.bind(this, i));
@@ -508,7 +510,7 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                 
             case "NOTICE":
                 // Client sent /mods command to channel..
-                if (message.args[1].indexOf("moderators of this room are") >= 0) {
+                if (contains(message.args[1], "moderators of this room are")) {
                     var splitted = message.args[1].split(':');
                     var mods = splitted[1].replace(/,/g, '').split(':').toString().toLowerCase().split(' ');
 
@@ -521,10 +523,10 @@ client.prototype.handleGroupMessage = function handleGroupMessage(message) {
                     self.emit('mods', message.args[0], mods);
                     self.emit('modspromises', message.args[0], mods);
                 }
-                else if (message.args[1].indexOf("cannot whisper to yourself") >= 0) {
+                else if (contains(message.args[1], "cannot whisper to yourself")) {
                     self.log.error(message.args[1]);
                 }
-                else if (message.args[1].indexOf("sending whispers too fast") >= 0) {
+                else if (contains(message.args[1], "sending whispers too fast")) {
                     self.log.error(message.args[1]);
                 }
                 else {
@@ -610,14 +612,14 @@ client.prototype.connect = function connect() {
     var self = this;
     var deferred = vow.defer();
     
-    this.reconnect = underscore.isUndefined(this.opts.connection.reconnect) ? false : this.opts.connection.reconnect;
-    this.server = underscore.isUndefined(this.opts.connection.server) ? "RANDOM" : this.opts.connection.server;
-    this.port = underscore.isUndefined(this.opts.connection.port) ? 443 : this.opts.connection.port;
+    this.reconnect = _.isUndefined(this.opts.connection.reconnect) ? false : this.opts.connection.reconnect;
+    this.server = _.isUndefined(this.opts.connection.server) ? "RANDOM" : this.opts.connection.server;
+    this.port = _.isUndefined(this.opts.connection.port) ? 443 : this.opts.connection.port;
 
     // Connect to a random server..
-    if (this.server === "RANDOM" || !underscore.isUndefined(this.opts.connection.random)) {
+    if (this.server === "RANDOM" || !_.isUndefined(this.opts.connection.random)) {
         // Default type is "chat" server..
-        server.getRandomServer(underscore.isUndefined(self.opts.connection.random) ? "chat" : self.opts.connection.random, function (addr, protocol) {
+        server.getRandomServer(_.isUndefined(self.opts.connection.random) ? "chat" : self.opts.connection.random, function (addr, protocol) {
             self.server = addr.split(":")[0];
             self.port = addr.split(":")[1];
             self.protocol = protocol;
@@ -641,7 +643,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
 
     // Shall we try an IRC connection ?
     if (protocol === "irc") {
-        if (underscore.isUndefined(window)) { self._openIRCConnection(); }
+        if (_.isUndefined(window)) { self._openIRCConnection(); }
         else { self.log.error("Server is not accepting WebSocket connections."); }
     }
     else {
@@ -659,7 +661,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
             // Server is not accepting WebSocket connections..
             else {
                 // Perhaps we should try using IRC protocol instead..
-                if (self.protocol === "websocket" && underscore.isUndefined(window)) {
+                if (self.protocol === "websocket" && _.isUndefined(window)) {
                     self.protocol = "irc";
                     self.log.error("Server is not accepting WebSocket connections. Reconnecting using IRC protocol..");
                     self.emit("reconnect");
@@ -684,12 +686,12 @@ client.prototype._openIRCConnection = function _openIRCConnection() {
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = underscore.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
-    this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE" : this.opts.identity.password;
+    this.username = _.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = _.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE" : this.opts.identity.password;
 
     // Make sure "oauth:" is included..
-    if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
-        this.password = "oauth:" + this.password;
+    if (this.password !== "SCHMOOPIIE") {
+        this.password = utils.normalizePassword(this.password);
     }
     
     this.irc = new irc.Client(self.server, self.username, {
@@ -709,12 +711,12 @@ client.prototype._onOpen = function _onOpen() {
     this.log.info("Connecting to %s on port %s..", this.server, this.port);
     this.emit("connecting", this.server, this.port);
 
-    this.username = underscore.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
-    this.password = underscore.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE": this.opts.identity.password;
+    this.username = _.isUndefined(this.opts.identity.username) ? utils.generateJustinfan() : this.opts.identity.username;
+    this.password = _.isUndefined(this.opts.identity.password) ? "SCHMOOPIIE": this.opts.identity.password;
 
     // Make sure "oauth:" is included..
-    if (this.password !== "SCHMOOPIIE" && this.password.indexOf("oauth:") < 0) {
-        this.password = "oauth:" + this.password;
+    if (this.password !== "SCHMOOPIIE") {
+        this.password = utils.normalizePassword(this.password);
     }
 
     // Emitting "logon" event..
@@ -736,7 +738,7 @@ client.prototype._onMessage = function _onMessage(event) {
 client.prototype._onError = function _onError() {
     this.moderators = {};
     
-    if (this.ws !== null) {
+    if (!_.isNull(this.ws)) {
         this.log.error("Unable to connect.");
         this.emit("disconnected", "Unable to connect.");
     } else {
@@ -781,7 +783,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3 && self.getUsername().indexOf("justinfan") < 0) {
+        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -797,7 +799,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                     self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
                     break;
                 default:
-                    if (channel !== null) {
+                    if (!_.isNull(channel)) {
                         self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
                         self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
                     } else {
@@ -823,7 +825,7 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && self.ws !== null && self.ws.readyState !== 2 && self.ws.readyState !== 3 && self.getUsername().indexOf("justinfan") < 0) {
+        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
@@ -852,7 +854,7 @@ client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.irc !== null && self.protocol === "irc" && self.getUsername().indexOf("justinfan") < 0) {
+        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -868,7 +870,7 @@ client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
                     self.irc.say(utils.normalizeChannel(channel), command);
                     break;
                 default:
-                    if (channel !== null) {
+                    if (!_.isNull(channel)) {
                         self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
                         self.irc.say(utils.normalizeChannel(channel), command);
                     } else {
@@ -890,7 +892,7 @@ client.prototype._sendMessageIRC = function _sendMessageIRC(channel, message) {
     
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.irc !== null && self.protocol === "irc" && self.getUsername().indexOf("justinfan") < 0) {
+        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
             self.irc.say(utils.normalizeChannel(channel), message);
             
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
@@ -937,7 +939,7 @@ client.prototype.disconnect = function disconnect() {
     var deferred = vow.defer();
     
     if (this.protocol === "websocket") {
-        if (this.usingWebSocket && this.ws !== null && this.ws.readyState !== 3) {
+        if (this.usingWebSocket && !_.isNull(this.ws) && this.ws.readyState !== 3) {
             this.wasCloseCalled = true;
             this.log.info("Disconnecting from server..");
             this.ws.close();
@@ -948,7 +950,7 @@ client.prototype.disconnect = function disconnect() {
         }
     }
     else if (this.protocol === "irc") {
-        if (this.irc !== null) {
+        if (!_.isNull(this.irc)) {
             this.wasCloseCalled = true;
             this.log.info("Disconnecting from server..");
             this.irc.disconnect();
@@ -980,7 +982,7 @@ client.prototype.color = function color(channel, color) {
 };
 
 client.prototype.commercial = function commercial(channel, seconds) {
-    seconds = underscore.isUndefined(seconds) ? 30 : seconds;
+    seconds = _.isUndefined(seconds) ? 30 : seconds;
     return this._sendCommand(channel, "/commercial " + seconds);
 };
 
@@ -1021,17 +1023,17 @@ client.prototype.raw = function raw(message) {
 };
 
 client.prototype.say = function say(channel, message) {
-    if (message.toLowerCase().indexOf("/me ") >= 0) {
+    if (startsWith(message.toLowerCase(), "/me ") || startsWith(message.toLowerCase(), "\\me ")) {
         return this.action(channel, message.substr(4));
     }
-    else if (message.charAt(0) === "." || message.charAt(0) === "/") {
+    else if (startsWith(message, ".") || startsWith(message, "/") || startsWith(message, "\\")) {
         return this._sendCommand(channel, message);
     }
     return this._sendMessage(channel, message);
 };
 
 client.prototype.slow = client.prototype.slowmode = function slow(channel, seconds) {
-    seconds = underscore.isUndefined(seconds) ? 300 : seconds;
+    seconds = _.isUndefined(seconds) ? 300 : seconds;
     
     return this._sendCommand(channel, "/seconds " + seconds);
 };
@@ -1049,8 +1051,8 @@ client.prototype.subscribersoff = function subscribersoff(channel) {
 };
 
 client.prototype.timeout = function timeout(channel, username, seconds) {
-    seconds = underscore.isUndefined(seconds) ? 300 : seconds;
-    username = underscore.isUndefined(username) ? "Kappa" : username;
+    seconds = _.isUndefined(seconds) ? 300 : seconds;
+    username = _.isUndefined(username) ? "Kappa" : username;
     
     return this._sendCommand(channel, "/timeout " + username + " " + seconds);
 };
@@ -1081,7 +1083,7 @@ client.prototype.utils = {
         var cost_ins = 1;
         var cost_rep = 1;
         var cost_del = 1;
-        caseSensitive = underscore.isUndefined(caseSensitive) ? false : caseSensitive;
+        caseSensitive = _.isUndefined(caseSensitive) ? false : caseSensitive;
 
         if (!caseSensitive) {
             s1 = s1.toLowerCase();
@@ -1203,7 +1205,7 @@ client.prototype.utils = {
     uppercase: function uppercase(line) {
         var chars = line.length;
         var u_let = line.match(/[A-Z]/g);
-        if (u_let !== null) {
+        if (!_.isNull(u_let)) {
             return (u_let.length / chars);
         }
         return 0;
@@ -1219,7 +1221,7 @@ client.prototype.nosql = {
     },
     insert: function insert(collection, elements) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).insert(elements));
@@ -1227,7 +1229,7 @@ client.prototype.nosql = {
     },
     where: function where(collection, query) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).where(query));
@@ -1235,7 +1237,7 @@ client.prototype.nosql = {
     },
     get: function get(collection, cid) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).get(cid) || null);
@@ -1243,7 +1245,7 @@ client.prototype.nosql = {
     },
     list: function list(collection) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).items);
@@ -1251,7 +1253,7 @@ client.prototype.nosql = {
     },
     update: function update(collection, cid, object) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).update(cid, object));
@@ -1259,7 +1261,7 @@ client.prototype.nosql = {
     },
     replace: function replace(collection, cid, object) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).replace(cid, object));
@@ -1267,7 +1269,7 @@ client.prototype.nosql = {
     },
     remove: function remove(collection, cid) {
         var self = this;
-        if (underscore.isUndefined(this.database)) { this.path("./database"); }
+        if (_.isUndefined(this.database)) { this.path("./database"); }
         
         return new vow.Promise(function(resolve) {
             resolve(self.database.collection(collection).remove(cid));
@@ -1276,7 +1278,7 @@ client.prototype.nosql = {
 };
 
 // Expose everything, for browser and Node.js / io.js
-if (underscore.isUndefined(window)) {
+if (_.isUndefined(window)) {
     module.exports = client;
 } else {
     window.irc = {};
@@ -1284,7 +1286,7 @@ if (underscore.isUndefined(window)) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":44,"underscore":64,"util":43,"vow":65,"ws":66}],3:[function(require,module,exports){
+},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":44,"underscore":67,"underscore.string/include":62,"underscore.string/startsWith":64,"util":43,"vow":68,"ws":69}],3:[function(require,module,exports){
 var http = require("http");
 var webSocket = require("ws");
 
@@ -1357,7 +1359,7 @@ function isWebSocket(server, port, callback) {
 
 exports.getRandomServer = getRandomServer;
 exports.isWebSocket = isWebSocket;
-},{"http":16,"ws":66}],4:[function(require,module,exports){
+},{"http":16,"ws":69}],4:[function(require,module,exports){
 // Initialize the queue with a specific delay..
 function queue(defaultDelay) {
     this.queue = [];
@@ -1408,8 +1410,8 @@ queue.prototype.clear = function clear() {
 
 exports.queue = queue;
 },{}],5:[function(require,module,exports){
-var toNumber = require("underscore.string/toNumber"),
-    ltrim = require("underscore.string/ltrim");
+var toNumber = require("underscore.string/toNumber");
+var ltrim = require("underscore.string/ltrim");
 
 // Generate a random justinfan username
 function generateJustinfan() {
@@ -1433,11 +1435,17 @@ function normalizeUsername(username) {
     return ltrim(username.toLowerCase(), "#");
 }
 
+// Normalize password by including oauth:
+function normalizePassword(password) {
+    return "oauth:" + ltrim(username.toLowerCase(), "oauth:");
+}
+
 exports.generateJustinfan = generateJustinfan;
 exports.isInteger = isInteger;
 exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
-},{"underscore.string/ltrim":61,"underscore.string/toNumber":62}],6:[function(require,module,exports){
+exports.normalizePassword = normalizePassword;
+},{"underscore.string/ltrim":63,"underscore.string/toNumber":65}],6:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Copyright (c) 2014 Trent Mick. All rights reserved.
@@ -12322,6 +12330,19 @@ module.exports = function makeString(object) {
 };
 
 },{}],61:[function(require,module,exports){
+module.exports = function toPositive(number) {
+  return number < 0 ? 0 : (+number || 0);
+};
+
+},{}],62:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+
+module.exports = function include(str, needle) {
+  if (needle === '') return true;
+  return makeString(str).indexOf(needle) !== -1;
+};
+
+},{"./helper/makeString":60}],63:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimLeft = String.prototype.trimLeft;
@@ -12333,7 +12354,18 @@ module.exports = function ltrim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],62:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],64:[function(require,module,exports){
+var makeString = require('./helper/makeString');
+var toPositive = require('./helper/toPositive');
+
+module.exports = function startsWith(str, starts, position) {
+  str = makeString(str);
+  starts = '' + starts;
+  position = position == null ? 0 : Math.min(toPositive(position), str.length);
+  return str.lastIndexOf(starts, position) === position;
+};
+
+},{"./helper/makeString":60,"./helper/toPositive":61}],65:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function toNumber(num, precision) {
@@ -12342,7 +12374,7 @@ module.exports = function toNumber(num, precision) {
   return Math.round(num * factor) / factor;
 };
 
-},{"./trim":63}],63:[function(require,module,exports){
+},{"./trim":66}],66:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrim = String.prototype.trim;
@@ -12354,7 +12386,7 @@ module.exports = function trim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],64:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],67:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -13904,7 +13936,7 @@ module.exports = function trim(str, characters) {
   }
 }.call(this));
 
-},{}],65:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 (function (process){
 /**
  * @module vow
@@ -15236,7 +15268,7 @@ defineAsGlobal && (global.vow = vow);
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":23}],66:[function(require,module,exports){
+},{"_process":23}],69:[function(require,module,exports){
 
 /**
  * Module dependencies.

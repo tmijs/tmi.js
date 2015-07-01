@@ -12,6 +12,7 @@ Help us make the greatest javascript library for Twitch.tv! Follow the [contribu
 ## Contributors
 
 - Schmoopiie - https://github.com/Schmoopiie
+- celluj34 - https://github.com/celluj34
 
 ## Contributing Guidelines
 
