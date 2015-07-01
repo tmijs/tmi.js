@@ -643,7 +643,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
 
     // Shall we try an IRC connection ?
     if (protocol === "irc") {
-        if (typeof window === "undefined" || typeof window === "undefined") { self._openIRCConnection(); }
+        if (typeof window === "undefined" && module.exports) { self._openIRCConnection(); }
         else { self.log.error("Server is not accepting WebSocket connections."); }
     }
     else {
@@ -661,7 +661,7 @@ client.prototype._openConnection = function _openConnection(protocol) {
             // Server is not accepting WebSocket connections..
             else {
                 // Perhaps we should try using IRC protocol instead..
-                if (self.protocol === "websocket" && (typeof window === "undefined" || typeof window === "object")) {
+                if (self.protocol === "websocket" && (typeof window === "undefined" && module.exports)) {
                     self.protocol = "irc";
                     self.log.error("Server is not accepting WebSocket connections. Reconnecting using IRC protocol..");
                     self.emit("reconnect");
@@ -1275,7 +1275,7 @@ client.prototype.nosql = {
 };
 
 // Expose everything, for browser and Node.js / io.js
-if (typeof window === "undefined" || typeof window === "object") {
+if (typeof window === "undefined" && module.exports) {
     module.exports = client;
 } else {
     window.irc = {};
