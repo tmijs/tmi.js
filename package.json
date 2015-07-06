@@ -1,16 +1,18 @@
 {
   "name": "tmi.js",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Javascript library for the Twitch Messaging Interface.",
   "main": "index.js",
   "engines": {
     "node": ">=0.12.0"
   },
   "author": "Schmoopiie",
-  "contributors" : [{
-    "name": "celluj34",
-    "email": "celluj34@gmail.com"
-  }],
+  "contributors": [
+    {
+      "name": "celluj34",
+      "email": "celluj34@gmail.com"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.4.0",

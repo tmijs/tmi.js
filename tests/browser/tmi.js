@@ -4,11 +4,12 @@ module.exports={
 };
 },{"./lib/client":2}],2:[function(require,module,exports){
 (function (global){
-var bunyan = require("bunyan");
+var commands = require("./commands");
 var cron = (typeof window !== "undefined" ? window.cron : typeof global !== "undefined" ? global.cron : null);
 var eventEmitter = require("events").EventEmitter;
 var irc = (typeof window !== "undefined" ? window.irc : typeof global !== "undefined" ? global.irc : null);
 var locallydb = (typeof window !== "undefined" ? window.locallydb : typeof global !== "undefined" ? global.locallydb : null);
+var logger = require("./logger");
 var parse = require("irc-message").parse;
 var timer = require("./timer");
 var server = require("./server");
@@ -19,28 +20,6 @@ var webSocket = require("ws");
 var _ = require("underscore");
 var contains = require("underscore.string/include");
 var startsWith = require("underscore.string/startsWith");
-
-function rawStream() {}
-
-// Custom formatting for logger..
-rawStream.prototype.write = function (rec) {
-    var message = rec.msg || rec.raw;
-
-    if(_.isObject(message) && !_.isNull(message)) {
-        message = JSON.stringify(message);
-    }
-
-    var hours = rec.time.getHours();
-    var minutes = rec.time.getMinutes();
-    var ampm = hours >= 12 ? "pm" : "am";
-
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-
-    console.log("[%s] %s: %s", hours + ":" + minutes + ampm, bunyan.nameFromLevel[rec.level], message);
-};
 
 // Client instance..
 var client = function client(opts) {
@@ -55,24 +34,13 @@ var client = function client(opts) {
     this.irc = null;
     this.lastJoined = "";
     this.moderators = {};
-    this.protocol = "websocket";
-    this.usingWebSocket = true;
     this.username = "";
     this.userstate = {};
     this.wasCloseCalled = false;
     this.ws = null;
 
     // Create the logger..
-    this.log = bunyan.createLogger({
-        name: "tmi.js",
-        streams: [
-            {
-                level: "error",
-                stream: new rawStream(),
-                type: "raw"
-            }
-        ]
-    });
+    this.log = logger.createLogger("tmi.js", "error", "raw");
 
     // Show debug messages ?
     if (typeof this.opts.options.debug === "undefined" ? false : this.opts.options.debug) { this.log.level("info"); }
@@ -81,6 +49,11 @@ var client = function client(opts) {
 }
 
 util.inherits(client, eventEmitter);
+
+// Put all commands in prototype..
+for(var methodName in commands) {
+    client.prototype[methodName] = commands[methodName];
+}
 
 // Handle parsed chat server message..
 client.prototype.handleMessage = function handleMessage(message) {
@@ -159,7 +132,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 for (var i = 0; i < self.opts.channels.length; i++) {
                     joinQueue.add(function(i) {
-                        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
+                        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
                             self.ws.send("JOIN " + utils.normalizeChannel(self.opts.channels[i]));
                         }
                     }.bind(this, i))
@@ -213,6 +186,46 @@ client.prototype.handleMessage = function handleMessage(message) {
                         self.log.info("[" + message.params[0] + "] This room is no longer in r9k mode.");
                         self.emit("r9kmode", message.params[0], false);
                         self.emit("r9kbeta", message.params[0], false);
+                        break;
+
+                    // The moderators of this room are [...]
+                    case "room_mods":
+                        var splitted = message.params[1].split(':');
+                        var mods = splitted[1].replace(/,/g, '').split(':').toString().toLowerCase().split(' ');
+
+                        for(var i = mods.length - 1; i >= 0; i--) {
+                            if(mods[i] === '') {
+                                mods.splice(i, 1);
+                            }
+                        }
+
+                        self.emit('mods', message.params[0], mods);
+                        self.emit('modspromises', message.params[0], mods);
+                        break;
+
+                    // Implement this later.
+                    case "whisper_invalid_self":
+                        // @msg-id=whisper_invalid_self :tmi.twitch.tv NOTICE #jtv :You cannot whisper to yourself.
+                        break;
+
+                    // Implement this later.
+                    case "whisper_limit_per_sec":
+                        // @msg-id=whisper_limit_per_sec :tmi.twitch.tv NOTICE #jtv :You are sending whispers too fast. Try again in a second.
+                        break;
+
+                    // Implement this later.
+                    case "usage_color":
+                        // @msg-id=usage_color :tmi.twitch.tv NOTICE #schmoopiie :Usage: "/color <color>" - Change your username color. Color must be in hex (#000000) or one of the following: Blue, BlueViolet, CadetBlue, Chocolate, Coral, DodgerBlue, Firebrick, GoldenRod, Green, HotPink, OrangeRed, Red, SeaGreen, SpringGreen, YellowGreen.
+                        break;
+
+                    // Implement this later.
+                    case "color_changed":
+                        // :tmi.twitch.tv NOTICE #schmoopiie :Your color has been changed.
+                        break;
+
+                    // Implement this later.
+                    case "no_permission":
+                        // @msg-id=no_permission :tmi.twitch.tv NOTICE #schmoopiie :You don't have permission to perform that action.
                         break;
 
                     // Ignore this because we are already listening to HOSTTARGET.
@@ -354,6 +367,17 @@ client.prototype.handleMessage = function handleMessage(message) {
                 self.emit("part", message.params[0], message.prefix.split("!")[0]);
                 break;
 
+            case "WHISPER":
+                self.log.info("[WHISPER] <" + message.prefix.split("!")[0] + ">: " + message.params[1]);
+                self.emit("whisper", message.prefix.split("!")[0], message.params[1]);
+
+                var whisperTags = {
+                    username: message.prefix.split("!")[0],
+                    "message-type": "whisper"
+                }
+                self.emit("message", null, whisperTags, message.params[1], false);
+                break;
+
             case "PRIVMSG":
                 // Add username (lowercase) to the tags..
                 message.tags.username = message.prefix.split("!")[0];
@@ -396,22 +420,8 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 // Message from JTV..
                 else if (message.tags.username === "jtv") {
-                    // Client sent /mods command to channel..
-                    if (contains(message.params[1], "moderators of this room are")) {
-                        var splitted = message.params[1].split(':');
-                        var mods = splitted[1].replace(/,/g, '').split(':').toString().toLowerCase().split(' ');
-
-                        for(var i = mods.length - 1; i >= 0; i--) {
-                            if(mods[i] === '') {
-                                mods.splice(i, 1);
-                            }
-                        }
-
-                        self.emit('mods', message.params[0], mods);
-                        self.emit('modspromises', message.params[0], mods);
-                    }
                     // Someone is hosting my channel..
-                    else if (contains(message.params[1], "is now hosting you")) {
+                    if (contains(message.params[1], "is now hosting you")) {
                         self.emit('hosted', message.params[0], utils.normalizeUsername(message.params[1].split(' ')[0]));
                     }
                 }
@@ -425,188 +435,6 @@ client.prototype.handleMessage = function handleMessage(message) {
     }
 };
 
-// Handle parsed group server messages.. (IRC PROTOCOL)
-client.prototype.handleGroupMessage = function handleGroupMessage(message) {
-    var self = this;
-
-    // Messages with no prefix..
-    if (typeof message.prefix === "undefined") {
-        switch(message.rawCommand) {
-            // Received PING from server..
-            case "PING":
-                self.emit("ping");
-                self.irc.send("PONG");
-                break;
-
-            // Received PONG from server, return current latency
-            case "PONG":
-                self.emit("pong");
-                break;
-
-            default:
-                self.log.warn("Could not parse message with no prefix:");
-                self.log.warn(JSON.stringify(message));
-                break;
-        }
-    }
-
-    // Messages with "tmi.twitch.tv" as a prefix..
-    else if (message.prefix === "tmi.twitch.tv") {
-        switch(message.rawCommand) {
-            case "001":
-                self.username = message.args[0];
-                break;
-            case "002":
-            case "003":
-            case "004":
-            case "375":
-            case "376":
-            case "CAP":
-                break;
-            case "372":
-                self.log.info("Connected to server.");
-                self.userstate["#jtv"] = {};
-                self.emit("connected", self.server, self.port);
-
-                self.irc.send("CAP REQ", ":twitch.tv/tags twitch.tv/commands twitch.tv/membership");
-
-                // Join all the channels from configuration every 2 seconds..
-                var joinQueue = new timer.queue(2000);
-
-                for (var i = 0; i < self.opts.channels.length; i++) {
-                    joinQueue.add(function(i) {
-                        if (!_.isNull(self.irc) && self.protocol === "irc") {
-                            self.irc.join(utils.normalizeChannel(self.opts.channels[i]));
-                        }
-                    }.bind(this, i));
-                }
-
-                joinQueue.run();
-                break;
-
-            // Someone has been timed out or chat has been cleared by a moderator..
-            case "CLEARCHAT":
-                // User has been timed out by a moderator..
-                if (message.args.length > 1) {
-                    self.log.info("[" + message.args[0] + "] " + message.args[1] + " has been timed out.");
-                    self.emit("timeout", message.args[0], message.args[1]);
-                }
-                // Chat was cleared by a moderator..
-                else {
-                    self.log.info("[" + message.args[0] + "] Chat was cleared by a moderator.");
-                    self.emit("clearchat", message.args[0]);
-                }
-                break;
-
-            // Received when joining a channel and every time you send a PRIVMSG to a channel.
-            case "USERSTATE":
-                self.userstate[message.args[0]] = {"username": self.username};
-                break;
-
-            // Received when joining a channel..
-            case "ROOMSTATE":
-                // Our tests returned nothing very important with this message, so we will ignore it for now.
-                break;
-
-            case "NOTICE":
-                // Client sent /mods command to channel..
-                if (contains(message.args[1], "moderators of this room are")) {
-                    var splitted = message.args[1].split(':');
-                    var mods = splitted[1].replace(/,/g, '').split(':').toString().toLowerCase().split(' ');
-
-                    for(var i = mods.length - 1; i >= 0; i--) {
-                        if(mods[i] === '') {
-                            mods.splice(i, 1);
-                        }
-                    }
-
-                    self.emit('mods', message.args[0], mods);
-                    self.emit('modspromises', message.args[0], mods);
-                }
-                else if (contains(message.args[1], "cannot whisper to yourself")) {
-                    self.log.error(message.args[1]);
-                }
-                else if (contains(message.args[1], "sending whispers too fast")) {
-                    self.log.error(message.args[1]);
-                }
-                else {
-                    self.log.warn("Could not parse message from tmi.twitch.tv:");
-                    self.log.warn(JSON.stringify(message));
-                }
-                break;
-            default:
-                self.log.warn("Could not parse message from tmi.twitch.tv:");
-                self.log.warn(JSON.stringify(message));
-                break;
-        }
-    }
-
-    // Anything else..
-    else {
-        switch(message.rawCommand) {
-            case "353":
-                self.emit("names", message.args[2], message.args[3].split(" "));
-                break;
-            case "366":
-                break;
-            case "JOIN":
-                if (self.username === message.prefix.split("!")[0]) {
-                    self.lastJoined = message.args[0];
-                    if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
-
-                    self.log.info("Joined " + message.args[0]);
-                }
-                self.emit("join", message.args[0], message.prefix.split("!")[0]);
-                break;
-            case "PART":
-                if (self.username === message.prefix.split("!")[0]) {
-                    // Remove username from the moderators..
-                    if (!self.moderators[message.args[0]]) { self.moderators[message.args[0]] = []; }
-                    self.moderators[message.args[0]].filter(function(value) { return value != self.username; });
-
-                    self.log.info("Left " + message.args[0]);
-                }
-                self.emit("part", message.args[0], message.prefix.split("!")[0]);
-                break;
-            case "WHISPER":
-                self.log.info("[WHISPER] <" + message.prefix.split("!")[0] + ">: " + message.args[1]);
-                self.emit("whisper", message.prefix.split("!")[0], message.args[1]);
-
-                var whisperTags = {
-                    username: message.prefix.split("!")[0],
-                    "message-type": "whisper"
-                }
-                self.emit("message", null, whisperTags, message.args[1], false);
-                break;
-            case "PRIVMSG":
-                message.tags = {};
-                message.tags.username = message.prefix.split("!")[0];
-
-                // Message is an action..
-                if (message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
-                    self.log.info("[" + message.args[0] + "] *<" + message.tags.username + ">: " + message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                    self.emit("action", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-
-                    message.tags["message-type"]["message-type"] = "action";
-                    self.emit("message", message.args[0], message.tags, message.args[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-                }
-                // Message is a regular message..
-                else {
-                    self.log.info("[" + message.args[0] + "] <" + message.tags.username + ">: " + message.args[1]);
-                    self.emit("chat", message.args[0], message.tags, message.args[1], false);
-
-                    message.tags["message-type"] = "chat";
-                    self.emit("message", message.args[0], message.tags, message.args[1], false);
-                }
-                break;
-            default:
-                self.log.warn("Could not parse message:");
-                self.log.warn(JSON.stringify(message));
-                break;
-        }
-    }
-}
-
 // Connect to server..
 client.prototype.connect = function connect() {
     var self = this;
@@ -619,18 +447,17 @@ client.prototype.connect = function connect() {
     // Connect to a random server..
     if (this.server === "RANDOM" || typeof this.opts.connection.random !== "undefined") {
         // Default type is "chat" server..
-        server.getRandomServer(typeof self.opts.connection.random === "undefined" ? "chat" : self.opts.connection.random, function (addr, protocol) {
+        server.getRandomServer(typeof self.opts.connection.random === "undefined" ? "chat" : self.opts.connection.random, function (addr) {
             self.server = addr.split(":")[0];
             self.port = addr.split(":")[1];
-            self.protocol = protocol;
 
-            self._openConnection(self.protocol);
+            self._openConnection();
             deferred.resolve();
         });
     }
     // Connect to server from configuration..
     else {
-        this._openConnection(self.protocol);
+        this._openConnection();
         deferred.resolve();
     }
 
@@ -638,71 +465,25 @@ client.prototype.connect = function connect() {
 };
 
 // Open a connection..
-client.prototype._openConnection = function _openConnection(protocol) {
+client.prototype._openConnection = function _openConnection() {
     var self = this;
 
-    // Shall we try an IRC connection ?
-    if (protocol === "irc") {
-        if (typeof window === "undefined" && module.exports) { self._openIRCConnection(); }
-        else { self.log.error("Server is not accepting WebSocket connections."); }
-    }
-    else {
-        server.isWebSocket(self.server, self.port, function(accepts) {
-            // Server is accepting WebSocket connections..
-            if (accepts) {
-                self.usingWebSocket = true;
-                self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
+    server.isWebSocket(self.server, self.port, function(accepts) {
+        // Server is accepting WebSocket connections..
+        if (accepts) {
+            self.ws = new webSocket("ws://" + self.server + ":" + self.port + "/", "irc");
 
-                self.ws.onmessage = self._onMessage.bind(self);
-                self.ws.onerror = self._onError.bind(self);
-                self.ws.onclose = self._onClose.bind(self);
-                self.ws.onopen = self._onOpen.bind(self);
-            }
-            // Server is not accepting WebSocket connections..
-            else {
-                // Perhaps we should try using IRC protocol instead..
-                if (self.protocol === "websocket" && (typeof window === "undefined" && module.exports)) {
-                    self.protocol = "irc";
-                    self.log.error("Server is not accepting WebSocket connections. Reconnecting using IRC protocol..");
-                    self.emit("reconnect");
-                    setTimeout(function() { self.connect(); }, 3000);
-                }
-                else if (self.reconnect) {
-                    self.log.error("Server is not accepting WebSocket connections. Reconnecting in 10 seconds..");
-                    self.emit("reconnect");
-                    setTimeout(function() { self.connect(); }, 10000);
-                } else {
-                    self.log.error("Server is not accepting WebSocket connections.");
-                }
-            }
-        });
-    }
+            self.ws.onmessage = self._onMessage.bind(self);
+            self.ws.onerror = self._onError.bind(self);
+            self.ws.onclose = self._onClose.bind(self);
+            self.ws.onopen = self._onOpen.bind(self);
+        }
+        // Server is not accepting WebSocket connections..
+        else {
+            self.log.error("Server is not accepting WebSocket connections.");
+        }
+    });
 };
-
-client.prototype._openIRCConnection = function _openIRCConnection() {
-    var self = this;
-
-    // Emitting "connecting" event..
-    this.log.info("Connecting to %s on port %s..", this.server, this.port);
-    this.emit("connecting", this.server, this.port);
-
-    this.username = typeof this.opts.identity.username === "undefined" ? utils.generateJustinfan() : this.opts.identity.username;
-    this.password = typeof this.opts.identity.password === "undefined" ? "SCHMOOPIIE" : this.opts.identity.password;
-
-    // Make sure "oauth:" is included..
-    if (this.password !== "SCHMOOPIIE") {
-        this.password = utils.normalizePassword(this.password);
-    }
-
-    this.irc = new irc.Client(self.server, self.username, {
-        password: self.password,
-        port: self.port
-    });
-
-    this.irc.on('raw', function (message) {
-        self.handleGroupMessage(message);
-    });
-}
 
 // Called when the WebSocket connection's readyState changes to OPEN.
 // Indicates that the connection is ready to send and receive data..
@@ -777,13 +558,9 @@ client.prototype._onClose = function _onClose() {
 client.prototype._sendCommand = function _sendCommand(channel, command) {
     var self = this;
 
-    if (this.protocol === "irc") {
-        return this._sendCommandIRC(channel, command);
-    }
-
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -819,81 +596,10 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
 client.prototype._sendMessage = function _sendMessage(channel, message) {
     var self = this;
 
-    if (this.protocol === "irc") {
-        return this._sendMessageIRC(channel, message);
-    }
-
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (self.usingWebSocket && !_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
-
-            if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
-                self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-
-                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
-                self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-            } else {
-                self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
-                self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
-
-                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "chat";
-                self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
-            }
-            resolve();
-        } else {
-            reject();
-        }
-    });
-};
-
-// Send a command to the IRC server..
-client.prototype._sendCommandIRC = function _sendCommandIRC(channel, command) {
-    var self = this;
-
-    // Promise a result..
-    return new vow.Promise(function(resolve, reject, notify) {
-        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
-            switch (command.toLowerCase()) {
-                case "/mods":
-                case ".mods":
-                    self.log.info("Executing command: " + command);
-                    self.once("modspromises", function (channel, mods) {
-                        // Add the username to the moderators of this room..
-                        mods.forEach(function(username) {
-                            if (!self.moderators[channel]) { self.moderators[channel] = []; }
-                            if (self.moderators[channel].indexOf(username) < 0) { self.moderators[channel].push(username); }
-                        });
-                        resolve(mods);
-                    });
-                    self.irc.say(utils.normalizeChannel(channel), command);
-                    break;
-                default:
-                    if (!_.isNull(channel)) {
-                        self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
-                        self.irc.say(utils.normalizeChannel(channel), command);
-                    } else {
-                        self.log.info("Executing command: " + command);
-                        self.irc.send(command);
-                    }
-                    resolve();
-                    break;
-            }
-        } else {
-            reject();
-        }
-    });
-};
-
-// Send a message to the IRC server..
-client.prototype._sendMessageIRC = function _sendMessageIRC(channel, message) {
-    var self = this;
-
-    // Promise a result..
-    return new vow.Promise(function(resolve, reject, notify) {
-        if (!_.isNull(self.irc) && self.protocol === "irc" && !contains(self.getUsername(), "justinfan")) {
-            self.irc.say(utils.normalizeChannel(channel), message);
 
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
@@ -938,139 +644,17 @@ client.prototype.isMod = function isMod(channel, username) {
 client.prototype.disconnect = function disconnect() {
     var deferred = vow.defer();
 
-    if (this.protocol === "websocket") {
-        if (this.usingWebSocket && !_.isNull(this.ws) && this.ws.readyState !== 3) {
-            this.wasCloseCalled = true;
-            this.log.info("Disconnecting from server..");
-            this.ws.close();
-            deferred.resolve();
-        } else {
-            this.log.error("Cannot disconnect from server. Socket is not opened or connection is already closing.");
-            deferred.reject();
-        }
-    }
-    else if (this.protocol === "irc") {
-        if (!_.isNull(this.irc)) {
-            this.wasCloseCalled = true;
-            this.log.info("Disconnecting from server..");
-            this.irc.disconnect();
-            deferred.resolve();
-        } else {
-            this.log.error("Cannot disconnect from server. Connection is not opened.");
-            deferred.reject();
-        }
+    if (!_.isNull(this.ws) && this.ws.readyState !== 3) {
+        this.wasCloseCalled = true;
+        this.log.info("Disconnecting from server..");
+        this.ws.close();
+        deferred.resolve();
+    } else {
+        this.log.error("Cannot disconnect from server. Socket is not opened or connection is already closing.");
+        deferred.reject();
     }
 
     return deferred.promise();
-};
-
-client.prototype.action = function action(channel, message) {
-    message = "\u0001ACTION " + message + "\u0001";
-    return this._sendMessage(channel, message);
-};
-
-client.prototype.ban = function ban(channel, username) {
-    return this._sendCommand(channel, "/ban " + utils.normalizeUsername(username));
-};
-
-client.prototype.clear = function clear(channel) {
-    return this._sendCommand(channel, "/clear");
-};
-
-client.prototype.color = function color(channel, color) {
-    return this._sendCommand(channel, "/color " + color);
-};
-
-client.prototype.commercial = function commercial(channel, seconds) {
-    seconds = typeof seconds === "undefined" ? 30 : seconds;
-    return this._sendCommand(channel, "/commercial " + seconds);
-};
-
-client.prototype.host = function host(channel, target) {
-    return this._sendCommand(channel, "/host " + utils.normalizeUsername(target));
-};
-
-client.prototype.join = function join(channel) {
-    return this._sendCommand(null, "JOIN " + utils.normalizeChannel(channel));
-};
-
-client.prototype.mod = function mod(channel, username) {
-    return this._sendCommand(channel, "/mod " + utils.normalizeUsername(username));
-};
-
-client.prototype.mods = function mods(channel) {
-    return this._sendCommand(channel, "/mods");
-};
-
-client.prototype.part = client.prototype.leave = function part(channel) {
-    return this._sendCommand(null, "PART " + utils.normalizeChannel(channel));
-};
-
-client.prototype.ping = function ping() {
-    return this._sendCommand(null, "PING");
-};
-
-client.prototype.r9kbeta = client.prototype.r9kmode = function r9kbeta(channel) {
-    return this._sendCommand(channel, "/r9kbeta");
-};
-
-client.prototype.r9kbetaoff = client.prototype.r9kmodeoff = function r9kbetaoff(channel) {
-    return this._sendCommand(channel, "/r9kbetaoff");
-};
-
-client.prototype.raw = function raw(message) {
-    return this._sendCommand(null, message);
-};
-
-client.prototype.say = function say(channel, message) {
-    if (startsWith(message.toLowerCase(), "/me ") || startsWith(message.toLowerCase(), "\\me ")) {
-        return this.action(channel, message.substr(4));
-    }
-    else if (startsWith(message, ".") || startsWith(message, "/") || startsWith(message, "\\")) {
-        return this._sendCommand(channel, message);
-    }
-    return this._sendMessage(channel, message);
-};
-
-client.prototype.slow = client.prototype.slowmode = function slow(channel, seconds) {
-    seconds = typeof seconds === "undefined" ? 300 : seconds;
-
-    return this._sendCommand(channel, "/seconds " + seconds);
-};
-
-client.prototype.slowoff = client.prototype.slowmodeoff = function slowoff(channel) {
-    return this._sendCommand(channel, "/slowoff");
-};
-
-client.prototype.subscribers = function subscribers(channel) {
-    return this._sendCommand(channel, "/subscribers");
-};
-
-client.prototype.subscribersoff = function subscribersoff(channel) {
-    return this._sendCommand(channel, "/subscribersoff");
-};
-
-client.prototype.timeout = function timeout(channel, username, seconds) {
-    seconds = typeof seconds === "undefined" ? 300 : seconds;
-    username = typeof username === "undefined" ? "Kappa" : username;
-
-    return this._sendCommand(channel, "/timeout " + username + " " + seconds);
-};
-
-client.prototype.unban = function unban(channel, username) {
-    return this._sendCommand(channel, "/unban " + utils.normalizeUsername(username));
-};
-
-client.prototype.unhost = function unhost(channel) {
-    return this._sendCommand(channel, "/unhost");
-};
-
-client.prototype.unmod = function unmod(channel, username) {
-    return this._sendCommand(channel, "/unmod " + utils.normalizeUsername(username));
-};
-
-client.prototype.whisper = function whisper(username, message) {
-    return this._sendMessage("#jtv", "/w " + utils.normalizeUsername(username) + " " + message);
 };
 
 client.prototype.utils = {
@@ -1283,14 +867,166 @@ if (typeof window === "undefined" && module.exports) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./server":3,"./timer":4,"./utils":5,"bunyan":6,"events":15,"irc-message":44,"underscore":67,"underscore.string/include":62,"underscore.string/startsWith":64,"util":43,"vow":68,"ws":69}],3:[function(require,module,exports){
+},{"./commands":3,"./logger":4,"./server":5,"./timer":6,"./utils":7,"events":17,"irc-message":46,"underscore":69,"underscore.string/include":64,"underscore.string/startsWith":66,"util":45,"vow":70,"ws":71}],3:[function(require,module,exports){
+var _ = require("underscore");
+var contains = require("underscore.string/include");
+var startsWith = require("underscore.string/startsWith");
+var utils = require("./utils");
+
+module.exports = {
+    action: function action(channel, message) {
+        message = "\u0001ACTION " + message + "\u0001";
+        return this._sendMessage(channel, message);
+    },
+    ban: function ban(channel, username) {
+        return this._sendCommand(channel, "/ban " + utils.normalizeUsername(username));
+    },
+    clear: function clear(channel) {
+        return this._sendCommand(channel, "/clear");
+    },
+    color: function color(channel, color) {
+        return this._sendCommand(channel, "/color " + color);
+    },
+    commercial: function commercial(channel, seconds) {
+        seconds = typeof seconds === "undefined" ? 30 : seconds;
+        return this._sendCommand(channel, "/commercial " + seconds);
+    },
+    host: function host(channel, target) {
+        return this._sendCommand(channel, "/host " + utils.normalizeUsername(target));
+    },
+    join: function join(channel) {
+        return this._sendCommand(null, "JOIN " + utils.normalizeChannel(channel));
+    },
+    mod: function mod(channel, username) {
+        return this._sendCommand(channel, "/mod " + utils.normalizeUsername(username));
+    },
+    mods: function mods(channel) {
+        return this._sendCommand(channel, "/mods");
+    },
+    part: function part(channel) {
+        return this._sendCommand(null, "PART " + utils.normalizeChannel(channel));
+    },
+    leave: function leave(channel) {
+        return this._sendCommand(null, "PART " + utils.normalizeChannel(channel));
+    },
+    ping: function ping() {
+        return this._sendCommand(null, "PING");
+    },
+    r9kbeta: function r9kbeta(channel) {
+        return this._sendCommand(channel, "/r9kbeta");
+    },
+    r9kmode: function r9kmode(channel) {
+        return this._sendCommand(channel, "/r9kbeta");
+    },
+    r9kbetaoff: function r9kbetaoff(channel) {
+        return this._sendCommand(channel, "/r9kbetaoff");
+    },
+    r9kmodeoff: function r9kmodeoff(channel) {
+        return this._sendCommand(channel, "/r9kbetaoff");
+    },
+    raw: function raw(message) {
+        return this._sendCommand(null, message);
+    },
+    say: function say(channel, message) {
+        if (startsWith(message.toLowerCase(), "/me ") || startsWith(message.toLowerCase(), "\\me ")) {
+            return this.action(channel, message.substr(4));
+        }
+        else if (startsWith(message, ".") || startsWith(message, "/") || startsWith(message, "\\")) {
+            return this._sendCommand(channel, message);
+        }
+        return this._sendMessage(channel, message);
+    },
+    slow: function slow(channel, seconds) {
+        seconds = typeof seconds === "undefined" ? 300 : seconds;
+
+        return this._sendCommand(channel, "/seconds " + seconds);
+    },
+    slowmode: function slowmode(channel, seconds) {
+        seconds = typeof seconds === "undefined" ? 300 : seconds;
+
+        return this._sendCommand(channel, "/seconds " + seconds);
+    },
+    slowoff: function slowoff(channel) {
+        return this._sendCommand(channel, "/slowoff");
+    },
+    slowmodeoff: function slowoff(channel) {
+        return this._sendCommand(channel, "/slowoff");
+    },
+    subscribers: function subscribers(channel) {
+        return this._sendCommand(channel, "/subscribers");
+    },
+    subscribersoff: function subscribersoff(channel) {
+        return this._sendCommand(channel, "/subscribersoff");
+    },
+    timeout: function timeout(channel, username, seconds) {
+        seconds = typeof seconds === "undefined" ? 300 : seconds;
+        username = typeof username === "undefined" ? "Kappa" : username;
+
+        return this._sendCommand(channel, "/timeout " + username + " " + seconds);
+    },
+    unban: function unban(channel, username) {
+        return this._sendCommand(channel, "/unban " + utils.normalizeUsername(username));
+    },
+    unhost: function unhost(channel) {
+        return this._sendCommand(channel, "/unhost");
+    },
+    unmod: function unmod(channel, username) {
+        return this._sendCommand(channel, "/unmod " + utils.normalizeUsername(username));
+    },
+    whisper: function whisper(username, message) {
+        return this._sendCommand("#jtv", "/w " + utils.normalizeUsername(username) + " " + message);
+    }
+}
+
+},{"./utils":7,"underscore":69,"underscore.string/include":64,"underscore.string/startsWith":66}],4:[function(require,module,exports){
+var bunyan = require("bunyan");
+var _ = require("underscore");
+
+function rawStream() {}
+
+// Custom formatting for logger..
+rawStream.prototype.write = function (rec) {
+    var message = rec.msg || rec.raw;
+
+    if(_.isObject(message) && !_.isNull(message)) {
+        message = JSON.stringify(message);
+    }
+
+    var hours = rec.time.getHours();
+    var minutes = rec.time.getMinutes();
+    var ampm = hours >= 12 ? "pm" : "am";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    console.log("[%s] %s: %s", hours + ":" + minutes + ampm, bunyan.nameFromLevel[rec.level], message);
+};
+
+var createLogger = function createLogger(name, level, type) {
+    return bunyan.createLogger({
+        name: name,
+        streams: [
+            {
+                level: level,
+                stream: new rawStream(),
+                type: type
+            }
+        ]
+    });
+}
+
+exports.createLogger = createLogger;
+
+},{"bunyan":8,"underscore":69}],5:[function(require,module,exports){
 var http = require("http");
 var webSocket = require("ws");
 
 // Hardcoded server list just in case our API request fails..
 var chat_servers = ["192.16.64.145:443", "192.16.64.145:80", "192.16.70.169:80", "192.16.64.144:80", "192.16.64.51:80", "192.16.64.152:80", "192.16.64.146:80", "192.16.64.45:80", "192.16.64.155:80", "192.16.64.11:80", "199.9.248.236:80", "199.9.251.168:80", "192.16.64.37:80"]
 var event_servers = ["192.16.70.170:80", "199.9.252.54:80", "192.16.64.143:80", "192.16.70.154:80", "192.16.64.150:80"]
-var group_servers = ["199.9.253.119:443", "199.9.253.119:6667", "199.9.253.119:80", "199.9.253.120:443", "199.9.253.120:6667", "199.9.253.120:80"] // IRC
+var group_servers = ["199.9.253.119:80", "199.9.253.120:80"]
 
 // Get a random server..
 function getRandomServer(serverType, callback) {
@@ -1298,14 +1034,14 @@ function getRandomServer(serverType, callback) {
         switch(serverType) {
             case "event":
             case "events":
-                callback(event_servers[Math.floor(Math.random()*event_servers.length)], "websocket");
+                callback(event_servers[Math.floor(Math.random()*event_servers.length)]);
                 break;
             case "group":
             case "groups":
-                callback(group_servers[Math.floor(Math.random()*group_servers.length)], "irc");
+                callback(group_servers[Math.floor(Math.random()*group_servers.length)]);
                 break;
             default:
-                callback(chat_servers[Math.floor(Math.random()*chat_servers.length)], "websocket");
+                callback(chat_servers[Math.floor(Math.random()*chat_servers.length)]);
                 break;
         }
     });
@@ -1357,7 +1093,7 @@ function isWebSocket(server, port, callback) {
 exports.getRandomServer = getRandomServer;
 exports.isWebSocket = isWebSocket;
 
-},{"http":16,"ws":69}],4:[function(require,module,exports){
+},{"http":18,"ws":71}],6:[function(require,module,exports){
 // Initialize the queue with a specific delay..
 function queue(defaultDelay) {
     this.queue = [];
@@ -1407,7 +1143,7 @@ queue.prototype.clear = function clear() {
 };
 
 exports.queue = queue;
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var toNumber = require("underscore.string/toNumber");
 var ltrim = require("underscore.string/ltrim");
 
@@ -1420,7 +1156,7 @@ function generateJustinfan() {
 function isInteger(value) {
     //0 decimal places
     var maybeNumber = toNumber(value, 0);
-    return isNaN(maybeNumber);
+    return !isNaN(maybeNumber);
 }
 
 // Normalize channel name by including the hash
@@ -1444,7 +1180,7 @@ exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
 exports.normalizePassword = normalizePassword;
 
-},{"underscore.string/ltrim":63,"underscore.string/toNumber":65}],6:[function(require,module,exports){
+},{"underscore.string/ltrim":65,"underscore.string/toNumber":67}],8:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Copyright (c) 2014 Trent Mick. All rights reserved.
@@ -2882,7 +2618,7 @@ module.exports.RotatingFileStream = RotatingFileStream;
 module.exports.safeCycles = safeCycles;
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":23,"assert":9,"buffer":11,"events":15,"fs":8,"os":22,"safe-json-stringify":7,"util":43}],7:[function(require,module,exports){
+},{"_process":25,"assert":11,"buffer":13,"events":17,"fs":10,"os":24,"safe-json-stringify":9,"util":45}],9:[function(require,module,exports){
 var hasProp = Object.prototype.hasOwnProperty;
 
 function throwsMessage(err) {
@@ -2943,9 +2679,9 @@ module.exports = function(data) {
 
 module.exports.ensureProperties = ensureProperties;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -3306,9 +3042,9 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":43}],10:[function(require,module,exports){
-arguments[4][8][0].apply(exports,arguments)
-},{"dup":8}],11:[function(require,module,exports){
+},{"util/":45}],12:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],13:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -4724,7 +4460,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":12,"ieee754":13,"is-array":14}],12:[function(require,module,exports){
+},{"base64-js":14,"ieee754":15,"is-array":16}],14:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -4850,7 +4586,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -4936,7 +4672,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 
 /**
  * isArray
@@ -4971,7 +4707,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5274,7 +5010,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var http = module.exports;
 var EventEmitter = require('events').EventEmitter;
 var Request = require('./lib/request');
@@ -5420,7 +5156,7 @@ http.STATUS_CODES = {
     510 : 'Not Extended',               // RFC 2774
     511 : 'Network Authentication Required' // RFC 6585
 };
-},{"./lib/request":17,"events":15,"url":41}],17:[function(require,module,exports){
+},{"./lib/request":19,"events":17,"url":43}],19:[function(require,module,exports){
 var Stream = require('stream');
 var Response = require('./response');
 var Base64 = require('Base64');
@@ -5631,7 +5367,7 @@ var isXHR2Compatible = function (obj) {
     if (typeof FormData !== 'undefined' && obj instanceof FormData) return true;
 };
 
-},{"./response":18,"Base64":19,"inherits":20,"stream":39}],18:[function(require,module,exports){
+},{"./response":20,"Base64":21,"inherits":22,"stream":41}],20:[function(require,module,exports){
 var Stream = require('stream');
 var util = require('util');
 
@@ -5753,7 +5489,7 @@ var isArray = Array.isArray || function (xs) {
     return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{"stream":39,"util":43}],19:[function(require,module,exports){
+},{"stream":41,"util":45}],21:[function(require,module,exports){
 ;(function () {
 
   var object = typeof exports != 'undefined' ? exports : this; // #8: web workers
@@ -5815,7 +5551,7 @@ var isArray = Array.isArray || function (xs) {
 
 }());
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -5840,12 +5576,12 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -5892,7 +5628,7 @@ exports.tmpdir = exports.tmpDir = function () {
 
 exports.EOL = '\n';
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5984,7 +5720,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.3.2 by @mathias */
 ;(function(root) {
@@ -6518,7 +6254,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6604,7 +6340,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6691,16 +6427,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":25,"./encode":26}],28:[function(require,module,exports){
+},{"./decode":27,"./encode":28}],30:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":29}],29:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":31}],31:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6793,7 +6529,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":31,"./_stream_writable":33,"_process":23,"core-util-is":34,"inherits":20}],30:[function(require,module,exports){
+},{"./_stream_readable":33,"./_stream_writable":35,"_process":25,"core-util-is":36,"inherits":22}],32:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6841,7 +6577,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":32,"core-util-is":34,"inherits":20}],31:[function(require,module,exports){
+},{"./_stream_transform":34,"core-util-is":36,"inherits":22}],33:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -7796,7 +7532,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":29,"_process":23,"buffer":11,"core-util-is":34,"events":15,"inherits":20,"isarray":21,"stream":39,"string_decoder/":40,"util":10}],32:[function(require,module,exports){
+},{"./_stream_duplex":31,"_process":25,"buffer":13,"core-util-is":36,"events":17,"inherits":22,"isarray":23,"stream":41,"string_decoder/":42,"util":12}],34:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8007,7 +7743,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":29,"core-util-is":34,"inherits":20}],33:[function(require,module,exports){
+},{"./_stream_duplex":31,"core-util-is":36,"inherits":22}],35:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8488,7 +8224,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":29,"_process":23,"buffer":11,"core-util-is":34,"inherits":20,"stream":39}],34:[function(require,module,exports){
+},{"./_stream_duplex":31,"_process":25,"buffer":13,"core-util-is":36,"inherits":22,"stream":41}],36:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8598,10 +8334,10 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":11}],35:[function(require,module,exports){
+},{"buffer":13}],37:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":30}],36:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":32}],38:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = require('stream');
 exports.Readable = exports;
@@ -8610,13 +8346,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":29,"./lib/_stream_passthrough.js":30,"./lib/_stream_readable.js":31,"./lib/_stream_transform.js":32,"./lib/_stream_writable.js":33,"stream":39}],37:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":31,"./lib/_stream_passthrough.js":32,"./lib/_stream_readable.js":33,"./lib/_stream_transform.js":34,"./lib/_stream_writable.js":35,"stream":41}],39:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":32}],38:[function(require,module,exports){
+},{"./lib/_stream_transform.js":34}],40:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":33}],39:[function(require,module,exports){
+},{"./lib/_stream_writable.js":35}],41:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8745,7 +8481,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":15,"inherits":20,"readable-stream/duplex.js":28,"readable-stream/passthrough.js":35,"readable-stream/readable.js":36,"readable-stream/transform.js":37,"readable-stream/writable.js":38}],40:[function(require,module,exports){
+},{"events":17,"inherits":22,"readable-stream/duplex.js":30,"readable-stream/passthrough.js":37,"readable-stream/readable.js":38,"readable-stream/transform.js":39,"readable-stream/writable.js":40}],42:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8968,7 +8704,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":11}],41:[function(require,module,exports){
+},{"buffer":13}],43:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9677,14 +9413,14 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":24,"querystring":27}],42:[function(require,module,exports){
+},{"punycode":26,"querystring":29}],44:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -10274,7 +10010,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":42,"_process":23,"inherits":20}],44:[function(require,module,exports){
+},{"./support/isBuffer":44,"_process":25,"inherits":22}],46:[function(require,module,exports){
 var through = require('through2')
 var parsePrefix = require('irc-prefix-parser')
 var iso8601 = require('iso8601-convert')
@@ -10452,7 +10188,7 @@ module.exports = {
     createStream: createStream
 }
 
-},{"irc-prefix-parser":45,"iso8601-convert":46,"through2":57}],45:[function(require,module,exports){
+},{"irc-prefix-parser":47,"iso8601-convert":48,"through2":59}],47:[function(require,module,exports){
 // adapted from https://github.com/grawity/code/blob/master/lib/python/nullroute/irc.py#L24-L53
 
 module.exports = function parsePrefix(prefix) {
@@ -10496,7 +10232,7 @@ module.exports = function parsePrefix(prefix) {
     return result
 }
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 function padInteger(num, length) {
     var r = '' + num
 
@@ -10581,9 +10317,9 @@ var fromDate = function(date) {
 exports.toDate = toDate
 exports.fromDate = fromDate
 
-},{}],47:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./_stream_readable":48,"./_stream_writable":50,"_process":23,"core-util-is":51,"dup":29,"inherits":52}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
+arguments[4][31][0].apply(exports,arguments)
+},{"./_stream_readable":50,"./_stream_writable":52,"_process":25,"core-util-is":53,"dup":31,"inherits":54}],50:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11569,7 +11305,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"_process":23,"buffer":11,"core-util-is":51,"events":15,"inherits":52,"isarray":53,"stream":39,"string_decoder/":54}],49:[function(require,module,exports){
+},{"_process":25,"buffer":13,"core-util-is":53,"events":17,"inherits":54,"isarray":55,"stream":41,"string_decoder/":56}],51:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -11781,7 +11517,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":47,"core-util-is":51,"inherits":52}],50:[function(require,module,exports){
+},{"./_stream_duplex":49,"core-util-is":53,"inherits":54}],52:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -12171,17 +11907,17 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":47,"_process":23,"buffer":11,"core-util-is":51,"inherits":52,"stream":39}],51:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"buffer":11,"dup":34}],52:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],53:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"dup":21}],54:[function(require,module,exports){
-arguments[4][40][0].apply(exports,arguments)
-},{"buffer":11,"dup":40}],55:[function(require,module,exports){
-arguments[4][37][0].apply(exports,arguments)
-},{"./lib/_stream_transform.js":49,"dup":37}],56:[function(require,module,exports){
+},{"./_stream_duplex":49,"_process":25,"buffer":13,"core-util-is":53,"inherits":54,"stream":41}],53:[function(require,module,exports){
+arguments[4][36][0].apply(exports,arguments)
+},{"buffer":13,"dup":36}],54:[function(require,module,exports){
+arguments[4][22][0].apply(exports,arguments)
+},{"dup":22}],55:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23}],56:[function(require,module,exports){
+arguments[4][42][0].apply(exports,arguments)
+},{"buffer":13,"dup":42}],57:[function(require,module,exports){
+arguments[4][39][0].apply(exports,arguments)
+},{"./lib/_stream_transform.js":51,"dup":39}],58:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -12200,7 +11936,7 @@ function extend() {
     return target
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (process){
 var Transform = require('readable-stream/transform')
   , inherits  = require('util').inherits
@@ -12300,7 +12036,7 @@ module.exports.obj = through2(function (options, transform, flush) {
 })
 
 }).call(this,require('_process'))
-},{"_process":23,"readable-stream/transform":55,"util":43,"xtend":56}],58:[function(require,module,exports){
+},{"_process":25,"readable-stream/transform":57,"util":45,"xtend":58}],60:[function(require,module,exports){
 var escapeRegExp = require('./escapeRegExp');
 
 module.exports = function defaultToWhiteSpace(characters) {
@@ -12312,14 +12048,14 @@ module.exports = function defaultToWhiteSpace(characters) {
     return '[' + escapeRegExp(characters) + ']';
 };
 
-},{"./escapeRegExp":59}],59:[function(require,module,exports){
+},{"./escapeRegExp":61}],61:[function(require,module,exports){
 var makeString = require('./makeString');
 
 module.exports = function escapeRegExp(str) {
   return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 };
 
-},{"./makeString":60}],60:[function(require,module,exports){
+},{"./makeString":62}],62:[function(require,module,exports){
 /**
  * Ensure some object is a coerced to a string
  **/
@@ -12328,12 +12064,12 @@ module.exports = function makeString(object) {
   return '' + object;
 };
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = function toPositive(number) {
   return number < 0 ? 0 : (+number || 0);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 
 module.exports = function include(str, needle) {
@@ -12341,7 +12077,7 @@ module.exports = function include(str, needle) {
   return makeString(str).indexOf(needle) !== -1;
 };
 
-},{"./helper/makeString":60}],63:[function(require,module,exports){
+},{"./helper/makeString":62}],65:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrimLeft = String.prototype.trimLeft;
@@ -12353,7 +12089,7 @@ module.exports = function ltrim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],64:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":60,"./helper/makeString":62}],66:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var toPositive = require('./helper/toPositive');
 
@@ -12364,7 +12100,7 @@ module.exports = function startsWith(str, starts, position) {
   return str.lastIndexOf(starts, position) === position;
 };
 
-},{"./helper/makeString":60,"./helper/toPositive":61}],65:[function(require,module,exports){
+},{"./helper/makeString":62,"./helper/toPositive":63}],67:[function(require,module,exports){
 var trim = require('./trim');
 
 module.exports = function toNumber(num, precision) {
@@ -12373,7 +12109,7 @@ module.exports = function toNumber(num, precision) {
   return Math.round(num * factor) / factor;
 };
 
-},{"./trim":66}],66:[function(require,module,exports){
+},{"./trim":68}],68:[function(require,module,exports){
 var makeString = require('./helper/makeString');
 var defaultToWhiteSpace = require('./helper/defaultToWhiteSpace');
 var nativeTrim = String.prototype.trim;
@@ -12385,7 +12121,7 @@ module.exports = function trim(str, characters) {
   return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
 };
 
-},{"./helper/defaultToWhiteSpace":58,"./helper/makeString":60}],67:[function(require,module,exports){
+},{"./helper/defaultToWhiteSpace":60,"./helper/makeString":62}],69:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -13935,7 +13671,7 @@ module.exports = function trim(str, characters) {
   }
 }.call(this));
 
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 (function (process){
 /**
  * @module vow
@@ -15267,7 +15003,7 @@ defineAsGlobal && (global.vow = vow);
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":23}],69:[function(require,module,exports){
+},{"_process":25}],71:[function(require,module,exports){
 
 /**
  * Module dependencies.
