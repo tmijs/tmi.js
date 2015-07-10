@@ -3,20 +3,20 @@
 Each and every option listed below is optional. Running tmi.js without options will result as an anonymous connection to Twitch and you will have to join your channels manually.
 
 ``options``: (_Optional_)
-- ``debug``: _Boolean_ — Show debug messages in the console. It is showing when an event is being triggered (Default: _false_)
+- ``debug``: _Boolean_ - Show debug messages in the console. It is showing when an event is being triggered (Default: _false_)
 
 ``connection``: (_Optional_)
-- ``random``: _String_ — Change the server type (Default: _"chat"_, Can be _"chat"_, _"group"_ or _"event"_)
-- ``server``: _String_ — Connect to this server (_Optional_)
-- ``port``: _Integer_ — Connect on this port (_Optional_)
-- ``reconnect``: _Boolean_ — Reconnect to twitch when disconnected (Default: _false_)
-- ``timeout``: _Integer_ — Disconnect from server if not responding (Default: _9999_ (ms))
+- ``random``: _String_ - Change the server type (Default: _"chat"_, Can be _"chat"_, _"group"_ or _"event"_)
+- ``server``: _String_ - Connect to this server (_Optional_)
+- ``port``: _Integer_ - Connect on this port (_Optional_)
+- ``reconnect``: _Boolean_ - Reconnect to twitch when disconnected (Default: _false_)
+- ``timeout``: _Integer_ - Disconnect from server if not responding (Default: _9999_ (ms))
 
 ``identity``: (_Optional_)
-- ``username``: _String_ — Username on Twitch
-- ``password``: _String_ — [OAuth password](http://twitchapps.com/tmi/) on Twitch
+- ``username``: _String_ - Username on Twitch
+- ``password``: _String_ - [OAuth password](http://twitchapps.com/tmi/) on Twitch
 
-``channels``: _Array_ — List of channels to join when connected (Default: _[]_)
+``channels``: _Array_ - List of channels to join when connected (Default: _[]_)
 
 ## Example
 
