@@ -1,6 +1,6 @@
 # Upgrading from twitch-irc
 
-This guide is intended to the developers who were using twitch-irc and are now upgrading to tmi.js. Please read this guide carefully. If you think something is missing, feel free to create an issue or send us a pull request to update the documentation. Remember to follow the [guidelines for contributing](https://github.com/Schmoopiie/tmi.js/blob/master/CONTRIBUTING.md).
+**Read this guide carefully.**
 
 ### First steps
 - Remove ``twitch-irc`` from ``node_modules`` and ``package.json``.
@@ -8,19 +8,23 @@ This guide is intended to the developers who were using twitch-irc and are now u
 - Change ``var irc = require("twitch-irc");`` to ``var irc = require("tmi.js");``
 
 ### Configuration
-We have made some changes in the configuration, some features are deprecated by Twitch, such as ``TWITCHCLIENT``. Default for ``reconnect`` is now **false** and ``serverType`` has been changed to ``random``. See all the available options on the [configuration page](./Configuration.md).
+
+- Changed default value for ``reconnect`` to ``false``.
+- Changed ``serverType`` to ``random``.
+- TwitchClient has been deprecated by Twitch.
 
 ### Events
 
-- **CHAT** and **ACTION** events **are now triggered when the client sends a message using ``client.say()`` or ``client.action()``**, be careful. You will also be receiving exactly what Twitch sends you when you receive a message.
+- [**Chat**](./Events.html#chat) and [**Action**](./Events.html#action) events are now firing when the client sends a message.
+- [**User object**](./Events.html#chat) now includes everything sent by Twitch when you receive a message.
 
-  - ``emote`` became ``emotes``.
+  - Changed ``emote`` to ``emotes``.
   - Empty tag values are now returning ``null`` instead of ``true``.
-  - ``1`` and ``0`` values are returned as booleans (``true`` and ``false``).
-  - We transformed ``emotes`` to an object but the raw data is still available as ``emotes-raw``.
+  - Changed ``1`` and ``0`` values to booleans (``true`` and ``false``).
+  - Transformed ``emotes`` to an object but the raw data is still available as ``emotes-raw``.
   - No more ``specials`` tag, use the new ``user-type`` by Twitch.
 
-```javascript
+~~~ javascript
 {
     color: '#FFFFFF',
     'display-name': 'Schmoopiie',
@@ -31,10 +35,11 @@ We have made some changes in the configuration, some features are deprecated by 
     'emotes-raw': '25:0-4',
     username: 'schmoopiie'
 }
-```
-- **ROOMSTATE** is fired upon joining a channel. Useful is you want to know if the channel is in subscribers-only mode or anything like that. We have modified it to include the channel name.
+~~~
 
-```javascript
+- [**ROOMSTATE**](./Events.html#roomstate) is fired upon joining a channel.
+
+~~~ javascript
 client.on("roomstate", function(channel, state) {
     console.log(state);
 });
@@ -47,10 +52,11 @@ client.on("roomstate", function(channel, state) {
     'subs-only': false,
     channel: '#schmoopiie'
 }
-```
-- **SLOWMODE** no longer returns the length in seconds. We are using the new NOTICE system by Twitch and it is still not perfect.
-- **WHISPER** has been added as an event. First parameter is the username and seconds is the message. **You have to be connected on the group server to send and receive whispers.** Twitch is planning to move it to a new system, so it might break in the next weeks / months.
-- **HOSTING** returns the channel name in lowercase and with a hashtag (#channel).
+~~~
+
+- [**SLOWMODE**](./Events.html#slowmode) no longer returns the length in seconds.
+- [**WHISPER**](./Events.html#whisper) has been added as an event and command. **You have to be connected on the group server to send and receive whispers.** Twitch is planning to move it to a new system, so it might break in the next weeks / months.
+- [**HOSTING**](./Events.html#hosting) is now returning the channel name in lowercase and with a hashtag (#channel).
 
 ### Functions
 
@@ -59,17 +65,17 @@ client.on("roomstate", function(channel, state) {
 
 ### Utils
 
-- Removed **utils.capitalize** because Twitch provides you with the display-name tag (only available if the user has changed his [Display name](http://www.twitch.tv/settings)).
-- Use **utils.cronjobs** only in node.js and io.js, it cannot be used in the browser.
+- Removed **utils.capitalize**, use the ``display-name`` value from the user object.
+- Use **utils.cronjobs** only in Node.js and io.js, it cannot be used in the browser.
 
 ### Database
 
-- Changed the database system a bit. Now using an updated version of LocallyDB and you can call it using ``client.nosql.``. You can change the path of the database using ``client.nosql.path("./db");``.
+- Changed ``client.db.`` to ``client.nosql.``. Change the path of the database using ``client.nosql.path("./db");``.
 
-```javascript
+~~~ javascript
 client.nosql.path("./db");
 
-client.nosql.insert('monsters', [
+client.nosql.insert("monsters", [
     {name: "sphinx", mythology: "greek", eyes: 2, sex: "f", hobbies: ["riddles","sitting","being a wonder"]},
     {name: "hydra", mythology: "greek", eyes: 18, sex: "m", hobbies: ["coiling","terrorizing","growing"]},
     {name: "huldra", mythology: "norse", eyes: 2, sex: "f", hobbies: ["luring","terrorizing"]},
@@ -79,20 +85,20 @@ client.nosql.insert('monsters', [
 ]).then(function() {
     console.log("Inserted data, now getting cid 3..");
 
-    client.nosql.get('monsters', 3).then(function(data) {
+    client.nosql.get("monsters", 3).then(function(data) {
         console.log(data);
     });
 });
-```
+~~~
 
 ### Logger
 
-We have made it compatible for the browser. There is no logging-to-file capabilities and we are not planning to re-add this feature.
+Now compatible for the browser. There is no logging-to-file capabilities and we are not planning to re-add this feature.
 
 ### Commands
 
-- Use ``client.whisper(username, message);`` to send a whisper. **You have to be connected on the group server to send and receive whispers.** Twitch is planning to move it to a new system, so it might break in the next weeks / months.
+- Use ``client.whisper(username, message);`` to [send a whisper](./Commands.html#whisper). **You have to be connected on the group server to send and receive whispers.** Twitch is planning to move it to a new system, so it might break in the next weeks / months.
 
 ### Twitch API / OAuth 2.0
 
-Not yet implemented, use the ``request`` module if you need to query the API. This is not a priority for us.
+Not yet implemented, use the ``request`` module if you need to query the API. This is **not a priority** for us.
