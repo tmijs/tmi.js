@@ -30,6 +30,7 @@ var client = function client(opts) {
     this.opts.identity = opts.identity || {};
     this.opts.options = opts.options || {};
 
+    this.globaluserstate = {};
     this.lastJoined = "";
     this.latency = new Date();
     this.moderators = {};
@@ -149,8 +150,6 @@ client.prototype.handleMessage = function handleMessage(message) {
                     self.userstate["#jtv"] = {};
                     self.emit("connected", self.server, self.port);
 
-                    self.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
-
                     self.pingLoop = setInterval(function() {
                         if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
                             self.ws.send("PING");
@@ -245,6 +244,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                         // There are no moderators for this room.
                         case "no_mods":
                             self.eventMods = [];
+                            break;
+
+                        // Implement this later.
+                        case "msg_banned":
+                            // @msg-id=msg_banned :tmi.twitch.tv NOTICE #channel :You are permanently banned from talking in channel.
                             break;
 
                         // Implement this later.
@@ -351,20 +355,24 @@ client.prototype.handleMessage = function handleMessage(message) {
                 // Received when joining a channel and every time you send a PRIVMSG to a channel.
                 case "USERSTATE":
                     message.tags.username = self.username;
-                    self.userstate[message.params[0]] = message.tags;
-
                     // Add the client to the moderators of this room..
                     if (message.tags["user-type"] === "mod") {
                         if (!self.moderators[self.lastJoined]) { self.moderators[self.lastJoined] = []; }
                         if (self.moderators[self.lastJoined].indexOf(self.username) < 0) { self.moderators[self.lastJoined].push(self.username); }
                     }
+
+                    if (!contains(self.getUsername(), "justinfan") && !self.userstate[utils.normalizeChannel(message.params[0])]) {
+                        self.userstate[message.params[0]] = message.tags;
+                        self.lastJoined = message.params[0];
+                        self.log.info("Joined " + message.params[0]);
+                        self.emit("join", message.params[0], utils.normalizeUsername(self.getUsername()));
+                    }
+                    self.userstate[message.params[0]] = message.tags;
                     break;
 
-                // Will be used in the future to describe non-channel-specific state information.
-                // Source: https://github.com/justintv/Twitch-API/blob/master/chat/capabilities.md#globaluserstate
+                // Describe non-channel-specific state informations.
                 case "GLOBALUSERSTATE":
-                    self.log.warn("Could not parse message from tmi.twitch.tv:");
-                    self.log.warn(message);
+                    self.globaluserstate = message.tags;
                     break;
 
                 case "ROOMSTATE":
@@ -417,15 +425,21 @@ client.prototype.handleMessage = function handleMessage(message) {
                     break;
 
                 case "JOIN":
-                    if (self.username === message.prefix.split("!")[0]) {
+                    if (contains(self.getUsername(), "justinfan") && self.username === message.prefix.split("!")[0]) {
                         self.lastJoined = message.params[0];
                         self.log.info("Joined " + message.params[0]);
+                        self.emit("join", message.params[0], message.prefix.split("!")[0]);
                     }
-                    self.emit("join", message.params[0], message.prefix.split("!")[0]);
+
+                    if (self.username !== message.prefix.split("!")[0]) {
+                        self.emit("join", message.params[0], message.prefix.split("!")[0]);
+                    }
+
                     break;
 
                 case "PART":
                     if (self.username === message.prefix.split("!")[0]) {
+                        if (self.userstate[message.params[0]]) { delete self.userstate[message.params[0]]; }
                         self.log.info("Left " + message.params[0]);
                     }
                     self.emit("part", message.params[0], message.prefix.split("!")[0]);
@@ -545,7 +559,15 @@ client.prototype._openConnection = function _openConnection() {
         }
         // Server is not accepting WebSocket connections..
         else {
-            self.log.error("Server is not accepting WebSocket connections.");
+            self.emit("disconnected", "Sorry, we were unable to connect to chat.");
+
+            if (self.reconnect) {
+                self.log.error("Server is not accepting WebSocket connections. Reconnecting in 10 seconds..");
+                self.emit("reconnect");
+                setTimeout(function() { self.connect(); }, 10000);
+            } else {
+                self.log.error("Server is not accepting WebSocket connections.");
+            }
         }
     });
 };
@@ -570,6 +592,7 @@ client.prototype._onOpen = function _onOpen() {
     this.emit("logon");
 
     // Authentication..
+    this.ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
     this.ws.send("PASS " + this.password);
     this.ws.send("NICK " + this.username);
     this.ws.send("USER " + this.username + " 8 * :" + this.username);
@@ -579,7 +602,7 @@ client.prototype._onOpen = function _onOpen() {
 client.prototype._onMessage = function _onMessage(event) {
     var self = this;
     var parts = event.data.split("\r\n");
-    
+
     parts.forEach(function(line) {
         if (line !== null) {
             self.handleMessage(parse(line));
@@ -592,6 +615,8 @@ client.prototype._onError = function _onError() {
     var self = this;
 
     this.moderators = {};
+    this.userstate = {};
+    this.globaluserstate = {};
     clearInterval(self.pingLoop);
     clearTimeout(self.timeout);
 
@@ -609,6 +634,8 @@ client.prototype._onClose = function _onClose() {
     var self = this;
 
     this.moderators = {};
+    this.userstate = {};
+    this.globaluserstate = {};
     clearInterval(self.pingLoop);
     clearTimeout(self.timeout);
 
@@ -694,7 +721,8 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
 
                 self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-            } else {
+            }
+            else {
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
                 self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
 
