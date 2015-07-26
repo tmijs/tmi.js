@@ -20,13 +20,13 @@ Once included in your page, go to the [configuration page](./Configuration.html)
 Use the non-minified version for better debugging and error(s) reporting:
 
 ~~~ html
-<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.17/tmi.js"></script>
+<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.18/tmi.js"></script>
 ~~~
 
 Minified version (use this in production):
 
 ~~~ html
-<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.17/tmi.min.js"></script>
+<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.18/tmi.min.js"></script>
 ~~~
 
 ## Get involved!
