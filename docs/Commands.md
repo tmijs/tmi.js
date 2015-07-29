@@ -35,7 +35,7 @@ Each and every actions support Promises. Some commands requires you to be logged
 
 Send an action message on a channel. (/me &lt;message&gt;)
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``message``: _String_ - Message (Required)
@@ -48,7 +48,7 @@ client.action("channel", "Your message");
 
 Ban username on channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``username``: _String_ - Username to ban (Required)
@@ -61,7 +61,7 @@ client.ban("channel", "username");
 
 Clear all messages on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -73,12 +73,12 @@ client.clear("channel");
 
 Change the color of your username.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``color``: _String_ - Color name (Required)
 
-**Note**: A channel must be specified for this command to work. Turbo users can change their color using hexadecimal color (like ``#000000`` or ``#FFFFFF``) and non-turbo users can choose one of the following colors:
+**Note:** A channel must be specified for this command to work. Turbo users can change their color using hexadecimal color (like ``#000000`` or ``#FFFFFF``) and non-turbo users can choose one of the following colors:
 
 - Blue
 - BlueViolet
@@ -105,7 +105,7 @@ client.color("channel", "SpringGreen");
 
 Run commercial on a channel for X seconds. Available lengths (seconds) are ``30``, ``60``, ``90``, ``120``, ``150``, ``180``.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``seconds``: _Integer_ - Commercial lengths (Required)
@@ -134,7 +134,7 @@ client.disconnect();
 
 Host a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``target``: _String_ - Channel to host (Required)
@@ -147,7 +147,7 @@ client.host("channel", "target");
 
 Join a channel.
 
-Parameters:
+**Parameters:****
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -159,7 +159,7 @@ client.join("channel");
 
 Mod username on channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``username``: _String_ - Username to add as a moderator (Required)
@@ -172,7 +172,7 @@ client.mod("channel", "username");
 
 Get list of mods on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -190,7 +190,7 @@ client.mods("channel").then(function(mods) {
 
 Leave a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -202,7 +202,7 @@ client.part("channel");
 
 Send a PING to the server.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -214,7 +214,7 @@ client.ping();
 
 Enable R9KBeta on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -226,7 +226,7 @@ client.r9kbeta("channel");
 
 Disable R9KBeta on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -238,7 +238,7 @@ client.r9kbetaoff("channel");
 
 Send a RAW message to the server.
 
-Parameters:
+**Parameters:**
 
 - ``message``: _String_ - Message to send to the server (Required)
 
@@ -250,7 +250,7 @@ client.raw("CAP REQ :twitch.tv/tags");
 
 Send a message on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``message``: _String_ - Message (Required)
@@ -263,7 +263,7 @@ client.say("channel", "Your message");
 
 Enable slow mode on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``length``: _Integer_ - Length in seconds (Optional, default is 300)
@@ -276,7 +276,7 @@ client.slow("channel", 300);
 
 Disable slow mode on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -288,7 +288,7 @@ client.slowoff("channel");
 
 Enable subscriber-only on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -300,7 +300,7 @@ client.subscribers("channel");
 
 Disable subscriber-only on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -312,7 +312,7 @@ client.subscribersoff("channel");
 
 Timeout username on channel for X seconds.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``username``: _String_ - Username to timeout (Required)
@@ -326,7 +326,7 @@ client.timeout("channel", "username", 300);
 
 Unban username on channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``username``: _String_ - Username to unban (Required)
@@ -339,7 +339,7 @@ client.unban("channel", "username");
 
 End the current hosting. You must be the broadcaster or an editor.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
@@ -351,7 +351,7 @@ client.unhost("channel");
 
 Unmod user on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 - ``username``: _String_ - Username to unmod (Required)
@@ -364,9 +364,9 @@ client.unmod("channel", "username");
 
 Send a message on a channel.
 
-**Important**: You have to be connected to a group chat server to send or receive whispers.
+**Important:** You have to be connected to a group chat server to send or receive whispers.
 
-Parameters:
+**Parameters:**
 
 - ``username``: _String_ - Username (Required)
 - ``message``: _String_ - Message (Required)

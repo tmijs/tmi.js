@@ -36,7 +36,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 
 Received action message on channel. (/me &lt;message&gt;)
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``user``: _Object_ - User object
@@ -68,7 +68,7 @@ According to Twitch, the user object is always subject to change.
 
 Received message on channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``user``: _Object_ - User object
@@ -100,7 +100,7 @@ According to Twitch, the user object is always subject to change.
 
 Chat of a channel got cleared.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 
@@ -114,7 +114,7 @@ client.on("clearchat", function (channel) {
 
 Connected to server.
 
-Parameters:
+**Parameters:**
 
 - ``address``: _String_ - Remote address
 - ``port``: _Integer_ - Remote port
@@ -129,7 +129,7 @@ client.on("connected", function (address, port) {
 
 Connecting to a server.
 
-Parameters:
+**Parameters:**
 
 - ``address``: _String_ - Remote address
 - ``port``: _Integer_ - Remote port
@@ -144,7 +144,7 @@ client.on("connecting", function (address, port) {
 
 Got disconnected from server.
 
-Parameters:
+**Parameters:**
 
 - ``reason``: _String_ - Reason why you got disconnected
 
@@ -158,7 +158,7 @@ client.on("disconnected", function (reason) {
 
 Channel is now hosted by another broadcaster. This event is fired only if you are logged in as the broadcaster.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name being hosted
 - ``username``: _String_ - Username hosting you
@@ -174,7 +174,7 @@ client.on("hosted", function (channel, username, viewers) {
 
 Channel is now hosting another channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name that is now hosting
 - ``target``: _String_ - Channel being hosted
@@ -190,7 +190,7 @@ client.on("hosting", function (channel, target, viewers) {
 
 Username has joined a channel. Not available on large channels and is also sent in batch every 30-60secs.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -215,9 +215,9 @@ client.on("logon", function () {
 
 Someone got modded on a channel.
 
-**Important**: It doesn't detect if ``username`` is a new moderator, it is triggered when jtv gives the moderator status to someone on a channel. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
+**Important:** It doesn't detect if ``username`` is a new moderator, it is triggered when jtv gives the moderator status to someone on a channel. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -247,37 +247,37 @@ client.on("mods", function (channel, mods) {
 
 Received a notice from server.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
-- ``msgid``: _String_ - Message ID (See known IDs below)
+- ``msgid``: _String_ - Message ID (See known msg-ids below)
 - ``message``: _String_ - Message received
 
 Known msg-ids:
 
-- ``msg_banned``: You are permanently banned from talking in channel.
-- ``whisper_invalid_self``: You cannot whisper to yourself.
-- ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase a channel subscription at [...]
-- ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
-- ``unrecognized_cmd``: Unrecognized command: [...]
-- ``whisper_limit_per_sec``: You are sending whispers too fast. Try again in a second.
-- ``whisper_limit_per_min``: You are sending whispers too fast. Try again in a minute.
-- ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be in hex (#000000) or one of the following: [...].
 - ``color_changed``: Your color has been changed.
+- ``msg_banned``: You are permanently banned from talking in channel.
+- ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
+- ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase [...]
 - ``no_permission``: You don't have permission to perform that action.
+- ``unrecognized_cmd``: Unrecognized command: [...]
+- ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be [...]
+- ``whisper_invalid_self``: You cannot whisper to yourself.
+- ``whisper_limit_per_min``: You are sending whispers too fast. Try again in a minute.
+- ``whisper_limit_per_sec``: You are sending whispers too fast. Try again in a second.
 
 The following msg-ids wont be returned in the ``notice`` event because they are already available as event listeners:
 
-- ``subs_on``: This room is now in subscribers-only mode.
-- ``subs_off``: This room is no longer in subscribers-only mode.
-- ``slow_on``: This room is now in slow mode. You may send messages every [...] seconds.
-- ``slow_off``: This room is no longer in slow mode.
-- ``r9k_on``: This room is now in r9k mode.
-- ``r9k_off``: This room is no longer in r9k mode.
-- ``host_on``: Now hosting [...]
 - ``host_off``: Exited hosting mode.
-- ``room_mods``: The moderators of this room are [...]
+- ``host_on``: Now hosting [...]
 - ``no_mods``: There are no moderators for this room.
+- ``r9k_off``: This room is no longer in r9k mode.
+- ``r9k_on``: This room is now in r9k mode.
+- ``room_mods``: The moderators of this room are [...]
+- ``slow_off``: This room is no longer in slow mode.
+- ``slow_on``: This room is now in slow mode. You may send messages every [...] seconds.
+- ``subs_off``: This room is no longer in subscribers-only mode.
+- ``subs_on``: This room is now in subscribers-only mode.
 
 ~~~ javascript
 client.on("notice", function (channel, msgid, message) {
@@ -289,7 +289,7 @@ client.on("notice", function (channel, msgid, message) {
 
 User has left a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -314,7 +314,7 @@ client.on("ping", function () {
 
 Sent a PING request ? PONG.
 
-Parameters:
+**Parameters:**
 
 - ``latency``: _Float_ - Current latency
 
@@ -328,7 +328,7 @@ client.on("pong", function (latency) {
 
 Channel enabled or disabled R9K mode.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``enabled``: _Boolean_ - Returns ``true`` if mode is enabled or ``false`` if disabled
@@ -353,7 +353,7 @@ client.on("reconnect", function () {
 
 Triggered upon joining a channel. Gives you the current state of the channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``state``: _Object_ - Current state of the channel
@@ -380,7 +380,7 @@ According to Twitch, the state object is always subject to change.
 
 Channel enabled or disabled slow mode.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``enabled``: _Boolean_ - Returns ``true`` if mode is enabled or ``false`` if disabled
@@ -395,7 +395,7 @@ client.on("slowmode", function (channel, enabled) {
 
 Username has shared how many months he/she has been a subscriber on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -411,7 +411,7 @@ client.on("subanniversary", function (channel, username, months) {
 
 Channel enabled or disabled subscribers-only mode.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``enabled``: _Boolean_ - Returns ``true`` if mode is enabled or ``false`` if disabled
@@ -426,7 +426,7 @@ client.on("subscribers", function (channel, enabled) {
 
 Username has subscribed to a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -441,7 +441,7 @@ client.on("subscription", function (channel, username) {
 
 Username has been timed out on a channel.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -456,7 +456,7 @@ client.on("timeout", function (channel, username) {
 
 Channel ended the current hosting.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``viewers``: _Integer_ - Viewer count
@@ -471,9 +471,9 @@ client.on("unhost", function (channel, viewers) {
 
 Someone got unmodded on a channel.
 
-**Important**: It doesn't detect if ``username`` got removed from moderators list. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
+**Important:** It doesn't detect if ``username`` got removed from moderators list. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
 
-Parameters:
+**Parameters:**
 
 - ``channel``: _String_ - Channel name
 - ``username``: _String_ - Username
@@ -488,9 +488,9 @@ client.on("unmod", function (channel, username) {
 
 Received a whisper.
 
-**Important**: You have to be connected to a group chat server to send or receive whispers.
+**Important:** You have to be connected to a group chat server to send or receive whispers.
 
-Parameters:
+**Parameters:**
 
 - ``username``: _String_ - Username
 - ``message``: _String_ - Message
