@@ -16,6 +16,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 - [Logon](./Events.html#logon)
 - [Mod](./Events.html#mod)
 - [Mods](./Events.html#mods)
+- [Notice](./Events.html#notice)
 - [Part](./Events.html#part)
 - [Ping](./Events.html#ping)
 - [Pong](./Events.html#pong)
@@ -238,6 +239,48 @@ Parameters:
 
 ~~~ javascript
 client.on("mods", function (channel, mods) {
+    // Do your stuff.
+});
+~~~
+
+## Notice
+
+Received a notice from server.
+
+Parameters:
+
+- ``channel``: _String_ - Channel name
+- ``msgid``: _String_ - Message ID (See known IDs below)
+- ``message``: _String_ - Message received
+
+Known msg-ids:
+
+- ``msg_banned``: You are permanently banned from talking in channel.
+- ``whisper_invalid_self``: You cannot whisper to yourself.
+- ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase a channel subscription at [...]
+- ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
+- ``unrecognized_cmd``: Unrecognized command: [...]
+- ``whisper_limit_per_sec``: You are sending whispers too fast. Try again in a second.
+- ``whisper_limit_per_min``: You are sending whispers too fast. Try again in a minute.
+- ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be in hex (#000000) or one of the following: [...].
+- ``color_changed``: Your color has been changed.
+- ``no_permission``: You don't have permission to perform that action.
+
+The following msg-ids wont be returned in the ``notice`` event because they are already available as event listeners:
+
+- ``subs_on``: This room is now in subscribers-only mode.
+- ``subs_off``: This room is no longer in subscribers-only mode.
+- ``slow_on``: This room is now in slow mode. You may send messages every [...] seconds.
+- ``slow_off``: This room is no longer in slow mode.
+- ``r9k_on``: This room is now in r9k mode.
+- ``r9k_off``: This room is no longer in r9k mode.
+- ``host_on``: Now hosting [...]
+- ``host_off``: Exited hosting mode.
+- ``room_mods``: The moderators of this room are [...]
+- ``no_mods``: There are no moderators for this room.
+
+~~~ javascript
+client.on("notice", function (channel, msgid, message) {
     // Do your stuff.
 });
 ~~~
