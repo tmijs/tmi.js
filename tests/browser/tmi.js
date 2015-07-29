@@ -5,13 +5,13 @@ module.exports={
 },{"./lib/client":2}],2:[function(require,module,exports){
 (function (global){
 var commands = require("./commands");
-var cron = (typeof window !== "undefined" ? window.cron : typeof global !== "undefined" ? global.cron : null);
+var cron = (typeof window !== "undefined" ? window['cron'] : typeof global !== "undefined" ? global['cron'] : null);
 var eventEmitter = require("events").EventEmitter;
-var locallydb = (typeof window !== "undefined" ? window.locallydb : typeof global !== "undefined" ? global.locallydb : null);
+var locallydb = (typeof window !== "undefined" ? window['locallydb'] : typeof global !== "undefined" ? global['locallydb'] : null);
 var logger = require("./logger");
 var parse = require("irc-message").parse;
-var timer = require("./timer");
 var server = require("./server");
+var timer = require("./timer");
 var util = require("util");
 var utils = require("./utils");
 var vow = require("vow");
@@ -35,7 +35,8 @@ var client = function client(opts) {
     this.latency = new Date();
     this.moderators = {};
     this.pingLoop = null;
-    this.timeout = null;
+    this.pingTimeout = null;
+    this.reconnectTimer = 0;
     this.username = "";
     this.userstate = {};
     this.wasCloseCalled = false;
@@ -118,7 +119,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     var latency = (currDate.getTime() - self.latency.getTime()) / 1000;
                     self.emit("pong", latency);
 
-                    clearTimeout(self.timeout);
+                    clearTimeout(self.pingTimeout);
                     break;
 
                 default:
@@ -149,13 +150,14 @@ client.prototype.handleMessage = function handleMessage(message) {
                     self.log.info("Connected to server.");
                     self.userstate["#jtv"] = {};
                     self.emit("connected", self.server, self.port);
+                    self.reconnectTimer = 0;
 
                     self.pingLoop = setInterval(function() {
                         if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
                             self.ws.send("PING");
                         }
                         self.latency = new Date();
-                        self.timeout = setTimeout(function () {
+                        self.pingTimeout = setTimeout(function () {
                             if (!_.isNull(self.ws)) {
                                 self.wasCloseCalled = false;
                                 self.log.error("Ping timeout.");
@@ -246,54 +248,64 @@ client.prototype.handleMessage = function handleMessage(message) {
                             self.eventMods = [];
                             break;
 
-                        // Implement this later.
+                        // You are permanently banned from talking in channel.
                         case "msg_banned":
-                            // @msg-id=msg_banned :tmi.twitch.tv NOTICE #channel :You are permanently banned from talking in channel.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // You cannot whisper to yourself.
                         case "whisper_invalid_self":
-                            // @msg-id=whisper_invalid_self :tmi.twitch.tv NOTICE #jtv :You cannot whisper to yourself.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // This room is in subscribers only mode. To talk, purchase a channel subscription at [...]
                         case "msg_subsonly":
-                            // @msg-id=msg_subsonly :tmi.twitch.tv NOTICE #channel :This room is in subscribers only mode. To talk, purchase a channel subscription at http://www.twitch.tv/channel/subscribe?ref=subscriber_only_mode_chat
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // Your message was not sent because you are sending messages too quickly.
                         case "msg_duplicate":
-                            // @msg-id=msg_duplicate :tmi.twitch.tv NOTICE #channel
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // Unrecognized command: /..
                         case "unrecognized_cmd":
-                            // @msg-id=unrecognized_cmd :tmi.twitch.tv NOTICE #jtv :Unrecognized command: /w
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // You are sending whispers too fast. Try again in a second.
                         case "whisper_limit_per_sec":
-                            // @msg-id=whisper_limit_per_sec :tmi.twitch.tv NOTICE #jtv :You are sending whispers too fast. Try again in a second.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // You are sending whispers too fast. Try again in a second.
                         case "whisper_limit_per_min":
-                            // @msg-id=whisper_limit_per_min :tmi.twitch.tv NOTICE #jtv :You are sending whispers too fast. Try again in a second.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // Usage: "/color <color>" - Change your username color. Color must be in hex (#000000) or one of the following: [...].
                         case "usage_color":
-                            // @msg-id=usage_color :tmi.twitch.tv NOTICE #schmoopiie :Usage: "/color <color>" - Change your username color. Color must be in hex (#000000) or one of the following: Blue, BlueViolet, CadetBlue, Chocolate, Coral, DodgerBlue, Firebrick, GoldenRod, Green, HotPink, OrangeRed, Red, SeaGreen, SpringGreen, YellowGreen.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // Your color has been changed.
                         case "color_changed":
-                            // :tmi.twitch.tv NOTICE #schmoopiie :Your color has been changed.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
-                        // Implement this later.
+                        // You don't have permission to perform that action.
                         case "no_permission":
-                            // @msg-id=no_permission :tmi.twitch.tv NOTICE #schmoopiie :You don't have permission to perform that action.
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                             break;
 
                         // Ignore this because we are already listening to HOSTTARGET.
@@ -301,16 +313,17 @@ client.prototype.handleMessage = function handleMessage(message) {
                         case "host_off":
                             //
                             break;
-                        default:
-                            self.log.warn("Could not parse NOTICE from tmi.twitch.tv:");
-                            self.log.warn(message);
-                            break;
-                    }
 
-                    if (contains(message.params[1], "Login unsuccessful")) {
-                        self.wasCloseCalled = true;
-                        self.log.error("Login unsuccessful.");
-                        self.ws.close();
+                        default:
+                            if (contains(message.params[1], "Login unsuccessful")) {
+                                self.wasCloseCalled = true;
+                                self.log.error("Login unsuccessful.");
+                                self.ws.close();
+                            } else {
+                                self.log.warn("Could not parse NOTICE from tmi.twitch.tv:");
+                                self.log.warn(message);
+                            }
+                            break;
                     }
                     break;
 
@@ -347,9 +360,9 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                 case "RECONNECT":
                     self.log.info("Received RECONNECT request from Twitch..");
-                    self.log.info("Disconnecting and reconnecting in 10 seconds..");
+                    self.log.info("Disconnecting and reconnecting in " + self.reconnectTimer / 1000 + " seconds..");
                     self.disconnect();
-                    setTimeout(function() { self.connect(); }, 10000);
+                    setTimeout(function() { self.connect(); }, self.reconnectTimer);
                     break;
 
                 // Received when joining a channel and every time you send a PRIVMSG to a channel.
@@ -462,18 +475,16 @@ client.prototype.handleMessage = function handleMessage(message) {
 
                     // Message is an action..
                     if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
+                        message.tags["message-type"] = "action";
                         self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                         self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-
-                        message.tags["message-type"] = "action";
                         self.emit("message", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
                     }
                     // Message is a regular message..
                     else {
+                        message.tags["message-type"] = "chat";
                         self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
                         self.emit("chat", message.params[0], message.tags, message.params[1], false);
-
-                        message.tags["message-type"] = "chat";
                         self.emit("message", message.params[0], message.tags, message.params[1], false);
                     }
 
@@ -522,6 +533,10 @@ client.prototype.connect = function connect() {
     this.reconnect = typeof this.opts.connection.reconnect === "undefined" ? false : this.opts.connection.reconnect;
     this.server = typeof this.opts.connection.server === "undefined" ? "RANDOM" : this.opts.connection.server;
     this.port = typeof this.opts.connection.port === "undefined" ? 443 : this.opts.connection.port;
+    this.reconnectTimer = this.reconnectTimer + 10000;
+    if (this.reconnectTimer >= 60000) {
+        this.reconnectTimer = 60000;
+    }
 
     // Connect to a random server..
     if (this.server === "RANDOM" || typeof this.opts.connection.random !== "undefined") {
@@ -562,9 +577,9 @@ client.prototype._openConnection = function _openConnection() {
             self.emit("disconnected", "Sorry, we were unable to connect to chat.");
 
             if (self.reconnect) {
-                self.log.error("Server is not accepting WebSocket connections. Reconnecting in 10 seconds..");
+                self.log.error("Server is not accepting WebSocket connections. Reconnecting in " + self.reconnectTimer / 1000 + " seconds..");
                 self.emit("reconnect");
-                setTimeout(function() { self.connect(); }, 10000);
+                setTimeout(function() { self.connect(); }, self.reconnectTimer);
             } else {
                 self.log.error("Server is not accepting WebSocket connections.");
             }
@@ -618,7 +633,7 @@ client.prototype._onError = function _onError() {
     this.userstate = {};
     this.globaluserstate = {};
     clearInterval(self.pingLoop);
-    clearTimeout(self.timeout);
+    clearTimeout(self.pingTimeout);
 
     if (!_.isNull(this.ws)) {
         this.log.error("Unable to connect.");
@@ -637,7 +652,7 @@ client.prototype._onClose = function _onClose() {
     this.userstate = {};
     this.globaluserstate = {};
     clearInterval(self.pingLoop);
-    clearTimeout(self.timeout);
+    clearTimeout(self.pingTimeout);
 
     // User called .disconnect();
     if (this.wasCloseCalled) {
@@ -650,9 +665,9 @@ client.prototype._onClose = function _onClose() {
         this.emit("disconnected", "Unable to connect to chat.");
 
         if (this.reconnect) {
-            this.log.error("Sorry, we were unable to connect to chat. Reconnecting in 10 seconds..");
+            this.log.error("Sorry, we were unable to connect to chat. Reconnecting in " + self.reconnectTimer / 1000 + " seconds..");
             this.emit("reconnect");
-            setTimeout(function() { self.connect(); }, 10000);
+            setTimeout(function() { self.connect(); }, self.reconnectTimer);
         } else {
             this.log.error("Sorry, we were unable to connect to chat.");
         }
@@ -688,7 +703,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                         self.ws.send(command);
                         if (command === "PING") {
                             self.latency = new Date();
-                            self.timeout = setTimeout(function () {
+                            self.pingTimeout = setTimeout(function () {
                                 if (!_.isNull(self.ws)) {
                                     self.wasCloseCalled = false;
                                     self.log.error("Ping timeout.");
@@ -716,17 +731,15 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
 
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
+                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
                 self.log.info("[" + utils.normalizeChannel(channel) + "] *<" + self.getUsername() + ">: " + message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
                 self.emit("action", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
-
-                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "action";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], true);
             }
             else {
+                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "chat";
                 self.log.info("[" + utils.normalizeChannel(channel) + "] <" + self.getUsername() + ">: " + message);
                 self.emit("chat", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
-
-                self.userstate[utils.normalizeChannel(channel)]["message-type"] = "chat";
                 self.emit("message", utils.normalizeChannel(channel), self.userstate[utils.normalizeChannel(channel)], message, true);
             }
             resolve();
@@ -1293,11 +1306,36 @@ function normalizePassword(password) {
     return "oauth:" + ltrim(password.toLowerCase(), "oauth:");
 }
 
+function stringifyPrimitive(v) {
+    switch (typeof v) {
+        case 'string': return v;
+        case 'boolean': return v ? 'true' : 'false';
+        case 'number': return isFinite(v) ? v : '';
+        default: return '';
+    }
+}
+
+function queryString(object) {
+    if (object === null || !object) { object = {}; }
+
+    return Object.keys(object).map(function(k) {
+        var ks = encodeURIComponent(stringifyPrimitive(k)) + '=';
+        if (Array.isArray(object[k])) {
+            return object[k].map(function(v) {
+                return ks + encodeURIComponent(stringifyPrimitive(v));
+            }).join('&');
+        } else {
+            return ks + encodeURIComponent(stringifyPrimitive(object[k]));
+        }
+    }).join('&');
+}
+
 exports.generateJustinfan = generateJustinfan;
 exports.isInteger = isInteger;
 exports.normalizeChannel = normalizeChannel;
 exports.normalizeUsername = normalizeUsername;
 exports.normalizePassword = normalizePassword;
+exports.queryString = queryString;
 
 },{"underscore.string/ltrim":65,"underscore.string/toNumber":67}],8:[function(require,module,exports){
 (function (process,Buffer){
