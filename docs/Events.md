@@ -406,9 +406,10 @@ Channel enabled or disabled slow mode.
 
 - ``channel``: _String_ - Channel name
 - ``enabled``: _Boolean_ - Returns ``true`` if mode is enabled or ``false`` if disabled
+- ``length``: _Integer_ - Slow length value
 
 ~~~ javascript
-client.on("slowmode", function (channel, enabled) {
+client.on("slowmode", function (channel, enabled, length) {
     // Do your stuff.
 });
 ~~~
