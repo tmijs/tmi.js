@@ -1,7 +1,11 @@
-# tmi.js - WORK IN PROGRESS
+# tmi.js
 [![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](http://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](http://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](http://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/issues)
 
 ![](http://i.imgur.com/vsdO7N5.png)
+
+## Beta
+
+We are still in beta and we are doing our best to fix issues as soon as possible. Make sure the module is updated to the latest version before reporting issues. We are bumping the beta version at least once a week. Undocumented NOTICE messages should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/28) and other issues (during beta) should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/3) or [create a new issue](https://github.com/Schmoopiie/tmi.js/issues/new).
 
 ## Install
 
@@ -20,13 +24,13 @@ Once included in your page, go to the [configuration page](./Configuration.html)
 Use the non-minified version for better debugging and error(s) reporting:
 
 ~~~ html
-<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.19/tmi.js"></script>
+<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.20/tmi.js"></script>
 ~~~
 
 Minified version (use this in production):
 
 ~~~ html
-<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.19/tmi.min.js"></script>
+<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.20/tmi.min.js"></script>
 ~~~
 
 ## Get involved!

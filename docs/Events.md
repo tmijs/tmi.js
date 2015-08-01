@@ -245,7 +245,7 @@ client.on("mods", function (channel, mods) {
 
 ## Notice
 
-Received a notice from server.
+Received a notice from server. The goal of these notices is to allow the users to change their language settings and still be able to know programmatically what message was sent by the server. We encourage to use the ``msg-id`` to compare these messages.
 
 **Parameters:**
 
@@ -255,13 +255,35 @@ Received a notice from server.
 
 Known msg-ids:
 
+- ``already_subs_off``: This room is not in subscribers-only mode.
+- ``bad_commercial_error``: Failed to start commercial.
+- ``bad_unban_no_ban``: X is not banned from this room.
+- ``ban_success``: X is now banned from this room
 - ``color_changed``: Your color has been changed.
+- ``commercial_success``: Initiating X second commercial break. Please keep in mind..
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
-- ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase [...]
+- ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase..
 - ``no_permission``: You don't have permission to perform that action.
-- ``unrecognized_cmd``: Unrecognized command: [...]
-- ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be [...]
+- ``timeout_success``: X has been timed out for length seconds.
+- ``unban_success``: X is no longer banned from this room.
+- ``unrecognized_cmd``: Unrecognized command: X
+- ``usage_ban``: Usage: "/ban " - Permanently prevent a user from chatting..
+- ``usage_clear``: Usage: "/clear" - Clear chat history for all users in this room.
+- ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be..
+- ``usage_commercial``: Usage: "/commercial [length]" - Triggers a commercial.
+- ``usage_host``: Usage: "/host " - Host another channel. Use "unhost" to unset host mode.
+- ``usage_mod``: Usage: "/mod " - Grant mod status to a user. Use "mods" to list the..
+- ``usage_r9k_on``: Usage: "/r9kbeta" - Enables r9k mode. See http://bit.ly/bGtBDf for details.
+- ``usage_r9k_off``: Usage: "/r9kbetaoff" - Disables r9k mode.
+- ``usage_slow_on``: Usage: "/slow [duration]" - Enables slow mode..
+- ``usage_slow_off``: Usage: "/slowoff" - Disables slow mode.
+- ``usage_subs_on``: Usage: "/subscribers" - Enables subscribers-only mode..
+- ``usage_subs_off``: Usage: "/subscribersoff" - Disables subscribers-only mode.
+- ``usage_timeout``: Usage: "/timeout [duration]" - Temporarily prevent a user from chatting.
+- ``usage_unban``: Usage: "/unban " - Removes a ban on a user.
+- ``usage_unhost``: Usage: "/unhost" - Stop hosting another channel.
+- ``usage_unmod``: Usage: "/unmod " - Revoke mod status from a user..
 - ``whisper_invalid_self``: You cannot whisper to yourself.
 - ``whisper_limit_per_min``: You are sending whispers too fast. Try again in a minute.
 - ``whisper_limit_per_sec``: You are sending whispers too fast. Try again in a second.
@@ -269,13 +291,13 @@ Known msg-ids:
 The following msg-ids wont be returned in the ``notice`` event because they are already available as event listeners:
 
 - ``host_off``: Exited hosting mode.
-- ``host_on``: Now hosting [...]
+- ``host_on``: Now hosting X
 - ``no_mods``: There are no moderators for this room.
 - ``r9k_off``: This room is no longer in r9k mode.
 - ``r9k_on``: This room is now in r9k mode.
-- ``room_mods``: The moderators of this room are [...]
+- ``room_mods``: The moderators of this room are X
 - ``slow_off``: This room is no longer in slow mode.
-- ``slow_on``: This room is now in slow mode. You may send messages every [...] seconds.
+- ``slow_on``: This room is now in slow mode. You may send messages every X seconds.
 - ``subs_off``: This room is no longer in subscribers-only mode.
 - ``subs_on``: This room is now in subscribers-only mode.
 

@@ -1,9 +1,13 @@
-# tmi.js - WORK IN PROGRESS
+# tmi.js
 [![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](http://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](http://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](http://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/issues)
 
 ![](http://i.imgur.com/vsdO7N5.png)
 
 Twitch is a trademark or registered trademark of Twitch Interactive, Inc. in the U.S. and/or other countries. "tmi.js" is not operated by, sponsored by, or affiliated with Twitch Interactive, Inc. in any way.
+
+## Beta
+
+We are still in beta and we are doing our best to fix issues as soon as possible. Make sure the module is updated to the latest version before reporting issues. We are bumping the beta version at least once a week. Undocumented NOTICE messages should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/28) and other issues (during beta) should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/3) or [create a new issue](https://github.com/Schmoopiie/tmi.js/issues/new).
 
 ## Get involved!
 

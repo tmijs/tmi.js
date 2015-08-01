@@ -54,7 +54,6 @@ client.on("roomstate", function(channel, state) {
 }
 ~~~
 
-- [**SLOWMODE**](./Events.html#slowmode) no longer returns the length in seconds.
 - [**WHISPER**](./Events.html#whisper) has been added as an event and command. **You have to be connected on the group server to send and receive whispers.** Twitch is planning to move it to a new system, so it might break in the next weeks / months.
 - [**HOSTING**](./Events.html#hosting) is now returning the channel name in lowercase and with a hashtag (#channel).
 
