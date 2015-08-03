@@ -264,6 +264,7 @@ Known msg-ids:
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
 - ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase..
+- ``msg_timedout``: You are banned from talking in X for Y more seconds.
 - ``no_permission``: You don't have permission to perform that action.
 - ``timeout_success``: X has been timed out for length seconds.
 - ``unban_success``: X is no longer banned from this room.
