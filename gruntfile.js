@@ -17,8 +17,8 @@ module.exports = function(grunt) {
                     "tests/browser/tmi.js": ["index.js", "/lib/*.js"]
                 },
                 options: {
-                    exclude: ["irc", "cron", "locallydb"],
-                    ignore: ["irc", "cron", "locallydb"]
+                    exclude: ["irc", "cron", "locallydb", "request"],
+                    ignore: ["irc", "cron", "locallydb", "request"]
                 }
             }
         },
