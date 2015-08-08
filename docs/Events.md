@@ -256,15 +256,21 @@ Received a notice from server. The goal of these notices is to allow the users t
 Known msg-ids:
 
 - ``already_subs_off``: This room is not in subscribers-only mode.
+- ``bad_ban_broadcaster``: You cannot ban the broadcaster.
+- ``bad_ban_self``: You cannot ban yourself.
 - ``bad_commercial_error``: Failed to start commercial.
+- ``bad_mod_banned``: X is banned in this room.
+- ``bad_timeout_self``: You cannot timeout yourself.
 - ``bad_unban_no_ban``: X is not banned from this room.
-- ``ban_success``: X is now banned from this room
+- ``ban_success``: X is now banned from this room.
+- ``cmds_available``: Commands available to you in this room (use /help for details)..
 - ``color_changed``: Your color has been changed.
 - ``commercial_success``: Initiating X second commercial break. Please keep in mind..
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
 - ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase..
 - ``msg_timedout``: You are banned from talking in X for Y more seconds.
+- ``no_help``: No help available.
 - ``no_permission``: You don't have permission to perform that action.
 - ``timeout_success``: X has been timed out for length seconds.
 - ``unban_success``: X is no longer banned from this room.
@@ -273,8 +279,12 @@ Known msg-ids:
 - ``usage_clear``: Usage: "/clear" - Clear chat history for all users in this room.
 - ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be..
 - ``usage_commercial``: Usage: "/commercial [length]" - Triggers a commercial.
+- ``usage_disconnect``: Usage: "/disconnect" - Reconnects to chat.
+- ``usage_help``: Usage: "/help" - Lists the commands available to you in this room.
 - ``usage_host``: Usage: "/host " - Host another channel. Use "unhost" to unset host mode.
+- ``usage_me``: Usage: "/me " - Send an "emote" message in the third person.
 - ``usage_mod``: Usage: "/mod " - Grant mod status to a user. Use "mods" to list the..
+- ``usage_mods``: Usage: "/mods" - Lists the moderators of this channel.
 - ``usage_r9k_on``: Usage: "/r9kbeta" - Enables r9k mode. See http://bit.ly/bGtBDf for details.
 - ``usage_r9k_off``: Usage: "/r9kbetaoff" - Disables r9k mode.
 - ``usage_slow_on``: Usage: "/slow [duration]" - Enables slow mode..
