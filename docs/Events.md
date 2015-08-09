@@ -298,6 +298,7 @@ Known msg-ids:
 - ``whisper_invalid_self``: You cannot whisper to yourself.
 - ``whisper_limit_per_min``: You are sending whispers too fast. Try again in a minute.
 - ``whisper_limit_per_sec``: You are sending whispers too fast. Try again in a second.
+- ``whisper_restricted_recipient``: That user's settings prevent them from receiving this whisper.
 
 The following msg-ids wont be returned in the ``notice`` event because they are already available as event listeners:
 
