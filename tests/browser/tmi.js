@@ -10,32 +10,44 @@ var utils = require("./utils");
 var requests = 0;
 var callbacks = {};
 
-module.exports = {
-    // WORK IN PROGRESS.
-    // Very basic GET API function..
-    // E.g: client.api.get("https://api.twitch.tv/kraken/streams?channel=lirik", function (data) { console.log(data); });
-    get: function (url, callback) {
-        // Browser..
-        if (!utils.isNodeJS()) {
-            var callbackName = "jsonp_callback_" + Math.round(100000 * Math.random());
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                callback(data);
-            };
+var api = function api(options, callback) {
+    // Request module is accepting url or uri as an option..
+    var url = typeof options.url === "undefined" ? "" : options.url;
+    if (url === "") { url = typeof options.uri === "undefined" ? "" : options.uri; }
 
-            var script = document.createElement("script");
-            script.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "callback=" + callbackName;
-            document.body.appendChild(script);
-        }
-        // Node.JS..
-        else {
-            request(url, function (err, res, body) {
-                callback(body);
-            })
-        }
+    // Prepend the URL with https://api.twitch.tv/kraken
+    if (!utils.isURL(url)) { url = "https://api.twitch.tv/kraken" + url; }
+
+    // Browser..
+    if (!utils.isNodeJS()) {
+        // Callbacks must match the regex [a-zA-Z_$][\w$]*(\.[a-zA-Z_$][\w$]*)* according to
+        // https://discuss.dev.twitch.tv/t/changes-to-jsonp-callbacks/996
+        var callbackName = "jsonp_callback_" + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
+            delete window[callbackName];
+            document.body.removeChild(script);
+            callback(null, null, data);
+        };
+
+        var script = document.createElement("script");
+        script.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "callback=" + callbackName;
+        document.body.appendChild(script);
     }
-};
+    // Node.JS..
+    else {
+        // Default options..
+        var requestOptions = {
+            url: url,
+            method: "GET"
+        };
+        // Merge the options with the default options..
+        request(utils.mergeRecursive(requestOptions, options), function (err, res, body) {
+            callback(err, res, body);
+        });
+    }
+}
+
+module.exports = api;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./utils":8}],3:[function(require,module,exports){
@@ -92,12 +104,7 @@ var client = function client(opts) {
 
 util.inherits(client, eventEmitter);
 
-client.prototype.api = {};
-
-// Put all api methods in prototype..
-for(var methodName in api) {
-    client.prototype.api[methodName] = api[methodName];
-}
+client.prototype.api = api;
 
 // Put all commands in prototype..
 for(var methodName in commands) {
@@ -326,6 +333,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                         case "whisper_invalid_self":
                         case "whisper_limit_per_min":
                         case "whisper_limit_per_sec":
+                        case "whisper_restricted_recipient":
                           self.log.info("[" + message.params[0] + "] " + message.params[1]);
                           self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
                           break;
@@ -551,8 +559,11 @@ client.prototype.handleMessage = function handleMessage(message) {
                     // Message from JTV..
                     else if (message.tags.username === "jtv") {
                         // Someone is hosting my channel..
-                        if (contains(message.params[1], "is now hosting you")) {
-                            self.emit("hosted", message.params[0], utils.normalizeUsername(message.params[1].split(" ")[0]));
+                        if (contains(message.params[1], "is now hosting you for")) {
+                            self.emit("hosted", message.params[0], utils.normalizeUsername(message.params[1].split(" ")[0]), message.params[1].split(" ")[6]);
+                        }
+                        else if (contains(message.params[1], "is now hosting you")) {
+                            self.emit("hosted", message.params[0], utils.normalizeUsername(message.params[1].split(" ")[0]), 0);
                         }
                     }
                     break;
@@ -721,7 +732,7 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
 
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
             switch (command.toLowerCase()) {
                 case "/mods":
                 case ".mods":
@@ -1321,51 +1332,61 @@ exports.queue = queue;
 var toNumber = require("underscore.string/toNumber");
 var ltrim = require("underscore.string/ltrim");
 
-// Generate a random justinfan username..
-function generateJustinfan() {
-	return "justinfan" + Math.floor((Math.random() * 80000) + 1000);
-}
-
-// Determine if value is a valid integer..
-function isInteger(value) {
-    //0 decimal places
-    var maybeNumber = toNumber(value, 0);
-    return !isNaN(maybeNumber);
-}
-
-// Determine if environment is Node.JS..
-function isNodeJS() {
-	try {
-		if (module.exports = 'object' === typeof process && Object.prototype.toString.call(process) === '[object process]') {
+module.exports = {
+	generateJustinfan: function generateJustinfan() {
+		return "justinfan" + Math.floor((Math.random() * 80000) + 1000);
+	},
+	isInteger: function isInteger(value) {
+	    var maybeNumber = toNumber(value, 0);
+	    return !isNaN(maybeNumber);
+	},
+	isNodeJS: function isNodeJS() {
+		try {
+			if (module.exports = 'object' === typeof process && Object.prototype.toString.call(process) === '[object process]') {
+				return true;
+			}
+			return false;
+		} catch(e) {
+			return false;
+		}
+	},
+	isURL: function isURL(str) {
+		var pattern = new RegExp("^(https?:\\/\\/)?" +
+		"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
+		"((\\d{1,3}\\.){3}\\d{1,3}))" +
+		"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+		"(\\?[;&a-z\\d%_.~+=-]*)?" +
+		"(\\#[-a-z\\d_]*)?$","i");
+		if(!pattern.test(str)) {
+			return false;
+		} else {
 			return true;
 		}
-		return false;
-	} catch(e) {
-		return false;
+	},
+	mergeRecursive: function mergeRecursive(obj1, obj2) {
+	    for (var p in obj2) {
+	        try {
+	            if ( obj2[p].constructor==Object ) {
+	                obj1[p] = MergeRecursive(obj1[p], obj2[p]);
+	            } else {
+	                obj1[p] = obj2[p];
+	            }
+	        } catch(e) {
+	            obj1[p] = obj2[p];
+	        }
+	    }
+	    return obj1;
+	},
+	normalizeChannel: function normalizeChannel(name) {
+	    return "#" + ltrim(name.toLowerCase(), "#");
+	},
+	normalizeUsername: function normalizeUsername(username) {
+	    return ltrim(username.toLowerCase(), "#");
+	},
+	normalizePassword: function normalizePassword(password) {
+	    return "oauth:" + ltrim(password.toLowerCase(), "oauth:");
 	}
 }
-
-// Normalize channel name by including the hash..
-function normalizeChannel(name) {
-    return "#" + ltrim(name.toLowerCase(), "#");
-}
-
-// Normalize username by removing the hash..
-function normalizeUsername(username) {
-    return ltrim(username.toLowerCase(), "#");
-}
-
-// Normalize password by including oauth..
-function normalizePassword(password) {
-    return "oauth:" + ltrim(password.toLowerCase(), "oauth:");
-}
-
-exports.generateJustinfan = generateJustinfan;
-exports.isInteger = isInteger;
-exports.isNodeJS = isNodeJS;
-exports.normalizeChannel = normalizeChannel;
-exports.normalizeUsername = normalizeUsername;
-exports.normalizePassword = normalizePassword;
 
 }).call(this,require('_process'))
 },{"_process":24,"underscore.string/ltrim":66,"underscore.string/toNumber":68}],9:[function(require,module,exports){
