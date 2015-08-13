@@ -5,10 +5,38 @@
 	<head>
 		<title>twitch-tmi</title>
 		<meta charset="utf-8">
+		<style>
+			* {
+				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+				margin: 0;
+			}
+
+			message {
+				position: fixed;
+				color: #444;
+				font-size: 70px;
+				width: 420px;
+				margin-left: -210px;
+				text-align: center;
+				left: 50%;
+				top: 50%;
+				margin-top: -113px;
+				z-index: 9;
+			}
+
+			instructions {
+				font-size: 43%;
+				margin-top: 11px;
+				display: block;
+			}
+		</style>
 	</head>
-	
+
 	<body>
-    Check your console.
+		<message>
+			tmi.js<br/>
+			<instructions>Open the Console</instructions>
+		</message>
 		<script src="tmi.js"></script>
 		<script src="script.js"></script>
 	</body>
