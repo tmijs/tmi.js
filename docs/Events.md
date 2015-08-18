@@ -256,11 +256,17 @@ Received a notice from server. The goal of these notices is to allow the users t
 Known msg-ids:
 
 - ``already_subs_off``: This room is not in subscribers-only mode.
+- ``bad_ban_admin``: You cannot ban admin X.
 - ``bad_ban_broadcaster``: You cannot ban the broadcaster.
+- ``bad_ban_global_mod``: You cannot ban global moderator X.
 - ``bad_ban_self``: You cannot ban yourself.
+- ``bad_ban_staff``: You cannot ban staff X.
 - ``bad_commercial_error``: Failed to start commercial.
 - ``bad_mod_banned``: X is banned in this room.
+- ``bad_timeout_admin``: You cannot timeout admin X.
+- ``bad_timeout_global_mod``: You cannot timeout global moderator X.
 - ``bad_timeout_self``: You cannot timeout yourself.
+- ``bad_timeout_staff``: You cannot timeout staff X.
 - ``bad_unban_no_ban``: X is not banned from this room.
 - ``ban_success``: X is now banned from this room.
 - ``cmds_available``: Commands available to you in this room (use /help for details)..
