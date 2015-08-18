@@ -255,6 +255,7 @@ Received a notice from server. The goal of these notices is to allow the users t
 
 Known msg-ids:
 
+- ``already_banned``: X is already banned in this room.
 - ``already_subs_off``: This room is not in subscribers-only mode.
 - ``bad_ban_admin``: You cannot ban admin X.
 - ``bad_ban_broadcaster``: You cannot ban the broadcaster.
