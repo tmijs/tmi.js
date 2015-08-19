@@ -16,7 +16,16 @@ var api = function api(options, callback) {
     if (url === "") { url = typeof options.uri === "undefined" ? "" : options.uri; }
 
     // Prepend the URL with https://api.twitch.tv/kraken
-    if (!utils.isURL(url)) { url = "https://api.twitch.tv/kraken" + url; }
+    if (!utils.isURL(url)) {
+        if (url.charAt(0) !== "/") {
+            url = "https://api.twitch.tv/kraken/" + url;
+        } else {
+            url = "https://api.twitch.tv/kraken" + url;
+        }
+    }
+
+    // Overwrite URL..
+    options.url = url;
 
     // Browser..
     if (!utils.isNodeJS()) {
@@ -40,6 +49,7 @@ var api = function api(options, callback) {
             url: url,
             method: "GET"
         };
+
         // Merge the options with the default options..
         request(utils.mergeRecursive(requestOptions, options), function (err, res, body) {
             callback(err, res, body);
@@ -90,6 +100,8 @@ var client = function client(opts) {
     this.userstate = {};
     this.wasCloseCalled = false;
     this.ws = null;
+
+    this.banError = "";
 
     this.eventMods = [];
 
@@ -289,15 +301,33 @@ client.prototype.handleMessage = function handleMessage(message) {
                             self.eventMods = [];
                             break;
 
+                        case "already_banned":
+                        case "bad_ban_admin":
+                        case "bad_ban_broadcaster":
+                        case "bad_ban_global_mod":
+                        case "bad_ban_self":
+                        case "bad_ban_staff":
+                        case "bad_mod_banned":
+                        case "usage_ban":
+                            self.banError = message.tags["msg-id"];
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
+                            break;
+
+                        case "ban_success":
+                            self.banError = "";
+                            self.log.info("[" + message.params[0] + "] " + message.params[1]);
+                            self.emit("notice", message.params[0], message.tags["msg-id"], message.params[1]);
+                            break;
+
                         // Send the following msg-ids to the notice event listener..
                         case "already_subs_off":
-                        case "bad_ban_broadcaster":
-                        case "bad_ban_self":
                         case "bad_commercial_error":
-                        case "bad_mod_banned":
+                        case "bad_timeout_admin":
+                        case "bad_timeout_global_mod":
                         case "bad_timeout_self":
+                        case "bad_timeout_staff":
                         case "bad_unban_no_ban":
-                        case "ban_success":
                         case "cmds_available":
                         case "color_changed":
                         case "commercial_success":
@@ -310,7 +340,6 @@ client.prototype.handleMessage = function handleMessage(message) {
                         case "timeout_success":
                         case "unban_success":
                         case "unrecognized_cmd":
-                        case "usage_ban":
                         case "usage_clear":
                         case "usage_color":
                         case "usage_commercial":
@@ -1052,6 +1081,7 @@ var _ = require("underscore");
 var contains = require("underscore.string/include");
 var startsWith = require("underscore.string/startsWith");
 var utils = require("./utils");
+var vow = require("vow");
 
 module.exports = {
     action: function action(channel, message) {
@@ -1059,7 +1089,29 @@ module.exports = {
         return this._sendMessage(channel, message);
     },
     ban: function ban(channel, username) {
-        return this._sendCommand(channel, "/ban " + utils.normalizeUsername(username));
+        var self = this;
+
+        // Promise a result..
+        return new vow.Promise(function(resolve, reject, notify) {
+            // Socket is connected to server..
+            if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3) {
+                // Channel must be defined..
+                if (_.isNull(channel)) { reject("usage_ban"); }
+                // Command looks fine..
+                else {
+                    self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: /ban " + utils.normalizeUsername(username));
+                    self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :/ban " + utils.normalizeUsername(username));
+
+                    // Wait for the banError variable to change to know if resolved or rejected..
+                    self.def("banError", function (oldValue, newValue) {
+                        if (newValue === "") { resolve(channel, username); }
+                        else { reject(newValue); }
+                    });
+                }
+            }
+            // Disconnect from server..
+            else { reject("disconnected"); }
+        }).timeout(500);
     },
     clear: function clear(channel) {
         return this._sendCommand(channel, "/clear");
@@ -1158,7 +1210,7 @@ module.exports = {
     }
 }
 
-},{"./utils":8,"underscore":70,"underscore.string/include":65,"underscore.string/startsWith":67}],5:[function(require,module,exports){
+},{"./utils":8,"underscore":70,"underscore.string/include":65,"underscore.string/startsWith":67,"vow":71}],5:[function(require,module,exports){
 var bunyan = require("bunyan");
 var _ = require("underscore");
 
@@ -1350,13 +1402,43 @@ module.exports = {
 			return false;
 		}
 	},
+	// RegEx by @diegoperini - https://gist.github.com/dperini/729294
 	isURL: function isURL(str) {
-		var pattern = new RegExp("^(https?:\\/\\/)?" +
-		"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
-		"((\\d{1,3}\\.){3}\\d{1,3}))" +
-		"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
-		"(\\?[;&a-z\\d%_.~+=-]*)?" +
-		"(\\#[-a-z\\d_]*)?$","i");
+		var pattern = new RegExp(
+			"^" +
+			// Protocol identifier
+			"(?:(?:https?|ftp)://)" +
+			// User:pass authentication
+			"(?:\\S+(?::\\S*)?@)?" +
+			"(?:" +
+			  // IP address exclusion
+			  // Private & local networks
+			  "(?!(?:10|127)(?:\\.\\d{1,3}){3})" +
+			  "(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
+			  "(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
+			  // IP address dotted notation octets
+			  // Excludes loopback network 0.0.0.0
+			  // Excludes reserved space >= 224.0.0.0
+			  // Excludes network & broacast addresses
+			  // (first & last IP address of each class)
+			  "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
+			  "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
+			  "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
+			"|" +
+			  // Host name
+			  "(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)" +
+			  // Domain name
+			  "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*" +
+			  // TLD identifier
+			  "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))" +
+			  // TLD may end with dot
+			  "\\.?" +
+			")" +
+			// Port number
+			"(?::\\d{2,5})?" +
+			// Resource path
+			"(?:[/?#]\\S*)?" +
+			"$", "i");
 		if(!pattern.test(str)) {
 			return false;
 		} else {
