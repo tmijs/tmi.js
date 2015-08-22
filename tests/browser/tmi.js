@@ -79,6 +79,36 @@ var _ = require("underscore");
 var contains = require("underscore.string/include");
 var startsWith = require("underscore.string/startsWith");
 
+// Polyfill for indexOf() -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf#Compatibility
+// This algorithm matches the one specified in ECMA-262, 5th edition, assuming TypeError and Math.abs() have their original values.
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(searchElement, fromIndex) {
+        var k;
+
+        if (this == null) { throw new TypeError("\"this\" is null or not defined"); }
+
+        var O = Object(this);
+        var len = O.length >>> 0;
+
+        if (len === 0) { return -1; }
+
+        var n = +fromIndex || 0;
+
+        if (Math.abs(n) === Infinity) { n = 0; }
+        if (n >= len) { return -1; }
+
+        k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+        while (k < len) {
+            if (k in O && O[k] === searchElement) {
+                return k;
+            }
+            k++;
+        }
+        return -1;
+    };
+}
+
 // Client instance..
 var client = function client(opts) {
     this.setMaxListeners(0);
@@ -89,6 +119,7 @@ var client = function client(opts) {
     this.opts.identity = opts.identity || {};
     this.opts.options = opts.options || {};
 
+    this.channels = [];
     this.globaluserstate = {};
     this.lastJoined = "";
     this.latency = new Date();
@@ -442,6 +473,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     if (!contains(self.getUsername(), "justinfan") && !self.userstate[utils.normalizeChannel(message.params[0])]) {
                         self.userstate[message.params[0]] = message.tags;
                         self.lastJoined = message.params[0];
+                        self.channels.push(message.params[0]);
                         self.log.info("Joined " + message.params[0]);
                         self.emit("join", message.params[0], utils.normalizeUsername(self.getUsername()));
                     }
@@ -518,6 +550,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 case "JOIN":
                     if (contains(self.getUsername(), "justinfan") && self.username === message.prefix.split("!")[0]) {
                         self.lastJoined = message.params[0];
+                        self.channels.push(message.params[0]);
                         self.log.info("Joined " + message.params[0]);
                         self.emit("join", message.params[0], message.prefix.split("!")[0]);
                     }
@@ -531,6 +564,8 @@ client.prototype.handleMessage = function handleMessage(message) {
                 case "PART":
                     if (self.username === message.prefix.split("!")[0]) {
                         if (self.userstate[message.params[0]]) { delete self.userstate[message.params[0]]; }
+                        var index = self.channels.indexOf(message.params[0]);
+                        if (index !== -1) { self.channels.splice(index, 1); }
                         self.log.info("Left " + message.params[0]);
                     }
                     self.emit("part", message.params[0], message.prefix.split("!")[0]);
@@ -710,6 +745,7 @@ client.prototype._onMessage = function _onMessage(event) {
 client.prototype._onError = function _onError() {
     var self = this;
 
+    this.channels = [];
     this.moderators = {};
     this.userstate = {};
     this.globaluserstate = {};
@@ -729,6 +765,7 @@ client.prototype._onError = function _onError() {
 client.prototype._onClose = function _onClose() {
     var self = this;
 
+    this.channels = [];
     this.moderators = {};
     this.userstate = {};
     this.globaluserstate = {};
@@ -777,8 +814,10 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                     break;
                 default:
                     if (!_.isNull(channel)) {
-                        self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
-                        self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
+                        if (contains(self.channels, utils.normalizeChannel(channel))) {
+                            self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
+                            self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
+                        }
                     } else {
                         self.log.info("Executing command: " + command);
                         self.ws.send(command);
@@ -808,7 +847,7 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
 
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan") && contains(self.channels, utils.normalizeChannel(channel))) {
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
 
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
@@ -838,6 +877,11 @@ client.prototype.getUsername = function getUsername() {
 // Get current options..
 client.prototype.getOptions = function getOptions() {
     return this.opts;
+};
+
+// Get current channels..
+client.prototype.getChannels = function getChannels() {
+    return this.channels;
 };
 
 // Check if username is a moderator on a channel..
@@ -1171,12 +1215,12 @@ module.exports = {
     slow: function slow(channel, seconds) {
         seconds = typeof seconds === "undefined" ? 300 : seconds;
 
-        return this._sendCommand(channel, "/seconds " + seconds);
+        return this._sendCommand(channel, "/slow " + seconds);
     },
     slowmode: function slowmode(channel, seconds) {
         seconds = typeof seconds === "undefined" ? 300 : seconds;
 
-        return this._sendCommand(channel, "/seconds " + seconds);
+        return this._sendCommand(channel, "/slow " + seconds);
     },
     slowoff: function slowoff(channel) {
         return this._sendCommand(channel, "/slowoff");
