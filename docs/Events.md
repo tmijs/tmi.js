@@ -10,6 +10,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 - [Connected](./Events.html#connected)
 - [Connecting](./Events.html#connecting)
 - [Disconnected](./Events.html#disconnected)
+- [Emotesets](./Events.html#emotesets)
 - [Hosted](./Events.html#hosted)
 - [Hosting](./Events.html#hosting)
 - [Join](./Events.html#join)
@@ -151,6 +152,27 @@ Got disconnected from server.
 ~~~ javascript
 client.on("disconnected", function (reason) {
     // Do your stuff.
+});
+~~~
+
+## Emotesets
+
+Received the ``emote-sets`` from Twitch. The ``emote-sets`` contains your emote set, which you can use to request a subset of ``https://api.twitch.tv/kraken/chat/emoticon_images``
+
+Example: ``https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=0,27,33,793``
+
+**Parameters:**
+
+- ``sets``: _String_ - Your emote sets (always contains at least ``0``)
+
+~~~ javascript
+client.on("emotesets", function(sets) {
+    // Using our API function..
+    client.api({
+        url: "https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=" + sets
+    }, function(err, res, body) {
+        console.log(body);
+    });
 });
 ~~~
 
