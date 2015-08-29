@@ -169,7 +169,7 @@ Example: ``https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=0,27,33,7
 client.on("emotesets", function(sets) {
     // Using our API function..
     client.api({
-        url: "https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=" + sets
+        url: "/chat/emoticon_images?emotesets=" + sets
     }, function(err, res, body) {
         console.log(body);
     });
