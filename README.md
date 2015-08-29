@@ -7,18 +7,26 @@ Twitch is a trademark or registered trademark of Twitch Interactive, Inc. in the
 
 ## Beta
 
-We are still in beta and we are doing our best to fix issues as soon as possible. Make sure the module is updated to the latest version before reporting issues. We are bumping the beta version at least once a week. Undocumented NOTICE messages should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/28) and other issues (during beta) should be reported [here](https://github.com/Schmoopiie/tmi.js/issues/3) or [create a new issue](https://github.com/Schmoopiie/tmi.js/issues/new).
+We are still in beta and we are doing our best to fix issues as soon as possible. Always Make sure the module is updated to the latest version before reporting an issue.
+
+## Documentation
+
+Our documentation is available online at http://www.tmijs.org/docs/ - it is synced with the docs directory in this repository. If you want to change something in the documentation, send us a pull request. Don't forget to follow the [contribution guidelines](./CONTRIBUTING.md)!
+
+## Community forums
+
+Join our [community forums](http://www.tmijs.org/forums/) if you need help integrating tmi.js in your app or for general discussion.
 
 ## Get involved!
 
-Help us make the greatest javascript library for Twitch.tv! Follow the [contribution guidelines](./CONTRIBUTING.md) and send us your pull request.
+Help us make the greatest javascript library for Twitch.tv! Follow the [contribution guidelines](./CONTRIBUTING.md) and send us a pull request!
 
 ## Contributors
 
 - Schmoopiie - https://github.com/Schmoopiie
 - celluj34 - https://github.com/celluj34
 
-## Contributing Guidelines
+## Contributing guidelines
 
 Please review the [guidelines for contributing](./CONTRIBUTING.md) to this repository.
 
