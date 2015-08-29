@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    "tests/browser/tmi.js": ["index.js", "/lib/*.js"]
+                    "dist/tmi.js": ["index.js", "/lib/*.js"]
                 },
                 options: {
                     exclude: ["irc", "cron", "locallydb", "request"],
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
         uglify: {
             my_target: {
                 files: {
-                    "tests/browser/tmi.min.js": ["tests/browser/tmi.js"]
+                    "dist/tmi.min.js": ["dist/tmi.js"]
                 }
             }
         }
