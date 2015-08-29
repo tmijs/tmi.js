@@ -477,12 +477,17 @@ client.prototype.handleMessage = function handleMessage(message) {
                         self.log.info("Joined " + message.params[0]);
                         self.emit("join", message.params[0], utils.normalizeUsername(self.getUsername()));
                     }
+
                     self.userstate[message.params[0]] = message.tags;
                     break;
 
                 // Describe non-channel-specific state informations.
                 case "GLOBALUSERSTATE":
                     self.globaluserstate = message.tags;
+
+                    if (typeof message.tags["emote-sets"] !== "undefined") {
+                        self.emit("emotesets", message.tags["emote-sets"]);
+                    }
                     break;
 
                 case "ROOMSTATE":
