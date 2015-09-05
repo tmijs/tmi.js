@@ -299,6 +299,7 @@ Known msg-ids:
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
 - ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase..
 - ``msg_timedout``: You are banned from talking in X for Y more seconds.
+- ``msg_verified_email``: This room requires a verified email address to chat.
 - ``no_help``: No help available.
 - ``no_permission``: You don't have permission to perform that action.
 - ``timeout_success``: X has been timed out for length seconds.
