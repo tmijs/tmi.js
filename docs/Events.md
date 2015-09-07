@@ -297,6 +297,7 @@ Known msg-ids:
 - ``commercial_success``: Initiating X second commercial break. Please keep in mind..
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
+- ``msg_ratelimit``: Your message was not sent because you are sending messages too quickly.
 - ``msg_subsonly``: This room is in subscribers only mode. To talk, purchase..
 - ``msg_timedout``: You are banned from talking in X for Y more seconds.
 - ``msg_verified_email``: This room requires a verified email address to chat.
