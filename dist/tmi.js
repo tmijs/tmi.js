@@ -192,9 +192,11 @@ client.prototype.handleMessage = function handleMessage(message) {
         // Transform the IRCv3 tags..
         if (message.tags) {
             for(var key in message.tags) {
-                if (_.isBoolean(message.tags[key])) { message.tags[key] = null; }
-               else if (message.tags[key] === "1") { message.tags[key] = true; }
-               else if (message.tags[key] === "0") { message.tags[key] = false; }
+                if (key !== "emote-sets") {
+                    if (_.isBoolean(message.tags[key])) { message.tags[key] = null; }
+                    else if (message.tags[key] === "1") { message.tags[key] = true; }
+                    else if (message.tags[key] === "0") { message.tags[key] = false; }
+                }
             }
         }
 
@@ -302,6 +304,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                         case "r9k_on":
                             self.log.info("[" + message.params[0] + "] This room is now in r9k mode.");
                             self.emit("r9kmode", message.params[0], true);
+                            self.emit("r9kbeta", message.params[0], true);
                             break;
 
                         // This room is no longer in r9k mode.
@@ -364,6 +367,8 @@ client.prototype.handleMessage = function handleMessage(message) {
                         case "commercial_success":
                         case "msg_banned":
                         case "msg_duplicate":
+                        case "msg_verified_email":
+                        case "msg_ratelimit":
                         case "msg_subsonly":
                         case "msg_timedout":
                         case "no_help":
@@ -428,7 +433,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                     // Stopped hosting..
                     if (message.params[1].split(" ")[0] === "-") {
                         self.log.info("[" + message.params[0] + "] Exited host mode.");
-                        self.emit("unhost", message.params[0], message.params[1].split(" ")[0]);
+                        self.emit("unhost", message.params[0], message.params[1].split(" ")[1] || "0");
                     }
                     // Now hosting..
                     else {
@@ -498,8 +503,8 @@ client.prototype.handleMessage = function handleMessage(message) {
                     if (message.tags.hasOwnProperty("slow") && !message.tags.hasOwnProperty("subs-only")) {
                         if (typeof message.tags.slow === "boolean") {
                             self.log.info("[" + message.params[0] + "] This room is no longer in slow mode.");
-                            self.emit("slow", message.params[0], false, 0);
-                            self.emit("slowmode", message.params[0], false, 0);
+                            self.emit("slow", message.params[0], false, "0");
+                            self.emit("slowmode", message.params[0], false, "0");
                         } else {
                             self.log.info("[" + message.params[0] + "] This room is now in slow mode.");
                             self.emit("slow", message.params[0], true, message.tags.slow);
@@ -591,21 +596,6 @@ client.prototype.handleMessage = function handleMessage(message) {
                     // Add username (lowercase) to the tags..
                     message.tags.username = message.prefix.split("!")[0];
 
-                    // Message is an action..
-                    if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
-                        message.tags["message-type"] = "action";
-                        self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
-                        self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-                        self.emit("message", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
-                    }
-                    // Message is a regular message..
-                    else {
-                        message.tags["message-type"] = "chat";
-                        self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
-                        self.emit("chat", message.params[0], message.tags, message.params[1], false);
-                        self.emit("message", message.params[0], message.tags, message.params[1], false);
-                    }
-
                     // Message from TwitchNotify..
                     if (message.tags.username === "twitchnotify") {
                         // Someone subscribed to a hosted channel. Who cares.
@@ -633,6 +623,23 @@ client.prototype.handleMessage = function handleMessage(message) {
                         }
                         else if (contains(message.params[1], "is now hosting you")) {
                             self.emit("hosted", message.params[0], utils.normalizeUsername(message.params[1].split(" ")[0]), 0);
+                        }
+                    }
+
+                    else {
+                        // Message is an action..
+                        if (message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
+                            message.tags["message-type"] = "action";
+                            self.log.info("[" + message.params[0] + "] *<" + message.tags.username + ">: " + message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1]);
+                            self.emit("action", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
+                            self.emit("message", message.params[0], message.tags, message.params[1].match(/^\u0001ACTION ([^\u0001]+)\u0001$/)[1], false);
+                        }
+                        // Message is a regular message..
+                        else {
+                            message.tags["message-type"] = "chat";
+                            self.log.info("[" + message.params[0] + "] <" + message.tags.username + ">: " + message.params[1]);
+                            self.emit("chat", message.params[0], message.tags, message.params[1], false);
+                            self.emit("message", message.params[0], message.tags, message.params[1], false);
                         }
                     }
                     break;
@@ -819,10 +826,8 @@ client.prototype._sendCommand = function _sendCommand(channel, command) {
                     break;
                 default:
                     if (!_.isNull(channel)) {
-                        if (contains(self.channels, utils.normalizeChannel(channel))) {
-                            self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
-                            self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
-                        }
+                        self.log.info("[" + utils.normalizeChannel(channel) + "] Executing command: " + command);
+                        self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + command);
                     } else {
                         self.log.info("Executing command: " + command);
                         self.ws.send(command);
@@ -852,7 +857,11 @@ client.prototype._sendMessage = function _sendMessage(channel, message) {
 
     // Promise a result..
     return new vow.Promise(function(resolve, reject, notify) {
-        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan") && contains(self.channels, utils.normalizeChannel(channel))) {
+        if (!_.isNull(self.ws) && self.ws.readyState !== 2 && self.ws.readyState !== 3 && !contains(self.getUsername(), "justinfan")) {
+            if (!self.userstate[utils.normalizeChannel(channel)]) {
+                self.userstate[utils.normalizeChannel(channel)] = {}
+            }
+
             self.ws.send("PRIVMSG " + utils.normalizeChannel(channel) + " :" + message);
 
             if (message.match(/^\u0001ACTION ([^\u0001]+)\u0001$/)) {
