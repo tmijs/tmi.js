@@ -5,7 +5,7 @@
 
 ## Beta
 
-We are still in beta and we are doing our best to fix issues as soon as possible. Always Make sure the module is updated to the latest version before reporting an issue.
+We are still in beta and we are doing our best to fix issues as soon as possible. Always make sure the module is updated to the latest version before reporting an issue.
 
 ## Install
 
