@@ -21,6 +21,8 @@ Each and every options listed below is optional. Running tmi.js without options 
 
 ``channels``: _Array_ - List of channels to join when connected (Default: ``[]``)
 
+``logger``: _Object_ - Custom logger with the methods ``info``, ``warn``, and ``error``
+
 ## Example
 
 ~~~ javascript
