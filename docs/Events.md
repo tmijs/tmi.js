@@ -295,6 +295,8 @@ Known msg-ids:
 - ``cmds_available``: Commands available to you in this room (use /help for details)..
 - ``color_changed``: Your color has been changed.
 - ``commercial_success``: Initiating X second commercial break. Please keep in mind..
+- ``hosts_remaining``: X host commands remaining this half hour.
+- ``host_target_went_offline``: X has gone offline. Exiting host mode
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
 - ``msg_ratelimit``: Your message was not sent because you are sending messages too quickly.
