@@ -40,7 +40,7 @@
     "request": "^2.60.0",
     "underscore": "^1.8.3",
     "underscore.string": "^3.1.1",
-    "ws": "^0.7.2"
+    "ws": "^0.8.0"
   },
   "devDependencies": {
     "babelify": "^6.3.0",
