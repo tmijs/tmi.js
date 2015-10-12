@@ -3,53 +3,46 @@
 
 ![](http://i.imgur.com/vsdO7N5.png)
 
-Twitch is a trademark or registered trademark of Twitch Interactive, Inc. in the U.S. and/or other countries. "tmi.js" is not operated by, sponsored by, or affiliated with Twitch Interactive, Inc. in any way.
+The best place to start with tmi.js is our [documentation page](http://www.tmijs.org/docs/).
 
-## Beta
+This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and every browser that support WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
 
-We are still in beta and we are doing our best to fix issues as soon as possible. Always Make sure the module is updated to the latest version before reporting an issue.
+## Install
 
-## Documentation
+#### Node.js
 
-Our documentation is available online at http://www.tmijs.org/docs/ - it is synced with the docs directory in this repository. If you want to change something in the documentation, send us a pull request. Don't forget to follow the [contribution guidelines](./CONTRIBUTING.md)!
+Install with npm and jump to the [configuration page](./Configuration.md) to get started.
 
-## Community forums
+~~~ bash
+npm install tmi.js --save
+~~~
 
-Join our [community forums](http://www.tmijs.org/forums/) if you need help integrating tmi.js in your app or for general discussion.
+#### CDN provided by MaxCDN
 
-## Get involved!
+To use the tmi.js CDN, just reference the file directly in the script tag.
 
-Help us make the greatest javascript library for Twitch.tv! Follow the [contribution guidelines](./CONTRIBUTING.md) and send us a pull request!
+~~~ html
+<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.23/tmi.min.js"></script>
+~~~
+
+## Community
+
+- Follow [@Schmoopiie on Twitter](https://twitter.com/Schmoopiie).
+- Have a question that is not a bug report ? [Discuss on the tmi.js forum](http://www.tmijs.org/forums/).
+- Found a bug ? [Submit an issue](https://github.com/Schmoopiie/tmi.js/issues/new).
 
 ## Contributors
 
+In order of the [most commits](https://github.com/Schmoopiie/tmi.js/graphs/contributors):
+
 - Schmoopiie - https://github.com/Schmoopiie
 - celluj34 - https://github.com/celluj34
+- justinsacbibit - https://github.com/justinsacbibit
+- Hatsuney - https://github.com/Hatsuney
+- egonny - https://github.com/egonny
+- AlcaDesign - https://github.com/AlcaDesign
+- smalls89 - https://github.com/smalls89
 
 ## Contributing guidelines
 
-Please review the [guidelines for contributing](./CONTRIBUTING.md) to this repository.
-
-## License
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Schmoopiie
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+Please review the [guidelines for contributing](https://github.com/Schmoopiie/tmi.js/blob/master/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/Schmoopiie/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
