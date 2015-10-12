@@ -11,7 +11,7 @@ This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and
 
 #### Node.js
 
-Install with npm and jump to the [configuration page](./Configuration.md) to get started.
+Install with npm and jump to the [configuration page](http://www.tmijs.org/docs/Configuration.html) to get started.
 
 ~~~ bash
 npm install tmi.js --save
