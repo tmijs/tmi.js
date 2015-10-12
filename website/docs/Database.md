@@ -1,17 +1,19 @@
 # Database
 
-For a faster development, we offer a NoSQL solution that requires no configuration. We recommend to use [redis](https://github.com/NodeRedis/node_redis), [mongoose](https://github.com/Automattic/mongoose) or [rethinkdb](https://github.com/rethinkdb/rethinkdb) when your app is production-ready. This feature is only available for Node.js applications.
+**This feature is not available if you are using the built js version**
+
+For a faster development, we offer a NoSQL solution that requires no configuration. We recommend to use [redis](https://github.com/NodeRedis/node_redis), [mongoose](https://github.com/Automattic/mongoose) or [rethinkdb](https://github.com/rethinkdb/rethinkdb) when your app is production-ready.
 
 ## Contents
 
-- [Configuration](./Database.html#configuration)
-- [Get](./Database.html#get)
-- [Insert](./Database.html#insert)
-- [List](./Database.html#list)
-- [Remove](./Database.html#remove)
-- [Replace](./Database.html#replace)
-- [Update](./Database.html#update)
-- [Where](./Database.html#where)
+- [Configuration](./Database.md#configuration)
+- [Get](./Database.md#get)
+- [Insert](./Database.md#insert)
+- [List](./Database.md#list)
+- [Remove](./Database.md#remove)
+- [Replace](./Database.md#replace)
+- [Update](./Database.md#update)
+- [Where](./Database.md#where)
 
 ## Configuration
 

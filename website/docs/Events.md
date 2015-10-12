@@ -4,34 +4,34 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 
 ## Contents
 
-- [Action](./Events.html#action)
-- [Chat](./Events.html#chat)
-- [Clearchat](./Events.html#clearchat)
-- [Connected](./Events.html#connected)
-- [Connecting](./Events.html#connecting)
-- [Disconnected](./Events.html#disconnected)
-- [Emotesets](./Events.html#emotesets)
-- [Hosted](./Events.html#hosted)
-- [Hosting](./Events.html#hosting)
-- [Join](./Events.html#join)
-- [Logon](./Events.html#logon)
-- [Mod](./Events.html#mod)
-- [Mods](./Events.html#mods)
-- [Notice](./Events.html#notice)
-- [Part](./Events.html#part)
-- [Ping](./Events.html#ping)
-- [Pong](./Events.html#pong)
-- [R9kbeta](./Events.html#r9kbeta)
-- [Reconnect](./Events.html#reconnect)
-- [Roomstate](./Events.html#roomstate)
-- [Slowmode](./Events.html#slowmode)
-- [Subanniversary](./Events.html#subanniversary)
-- [Subscribers](./Events.html#subscribers)
-- [Subscription](./Events.html#subscription)
-- [Timeout](./Events.html#timeout)
-- [Unhost](./Events.html#unhost)
-- [Unmod](./Events.html#unmod)
-- [Whisper](./Events.html#whisper)
+- [Action](./Events.md#action)
+- [Chat](./Events.md#chat)
+- [Clearchat](./Events.md#clearchat)
+- [Connected](./Events.md#connected)
+- [Connecting](./Events.md#connecting)
+- [Disconnected](./Events.md#disconnected)
+- [Emotesets](./Events.md#emotesets)
+- [Hosted](./Events.md#hosted)
+- [Hosting](./Events.md#hosting)
+- [Join](./Events.md#join)
+- [Logon](./Events.md#logon)
+- [Mod](./Events.md#mod)
+- [Mods](./Events.md#mods)
+- [Notice](./Events.md#notice)
+- [Part](./Events.md#part)
+- [Ping](./Events.md#ping)
+- [Pong](./Events.md#pong)
+- [R9kbeta](./Events.md#r9kbeta)
+- [Reconnect](./Events.md#reconnect)
+- [Roomstate](./Events.md#roomstate)
+- [Slowmode](./Events.md#slowmode)
+- [Subanniversary](./Events.md#subanniversary)
+- [Subscribers](./Events.md#subscribers)
+- [Subscription](./Events.md#subscription)
+- [Timeout](./Events.md#timeout)
+- [Unhost](./Events.md#unhost)
+- [Unmod](./Events.md#unmod)
+- [Whisper](./Events.md#whisper)
 
 ## Action
 
@@ -237,7 +237,7 @@ client.on("logon", function () {
 
 Someone got modded on a channel.
 
-**Important:** It doesn't detect if ``username`` is a new moderator, it is triggered when jtv gives the moderator status to someone on a channel. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
+**Important:** It doesn't detect if ``username`` is a new moderator, it is triggered when jtv gives the moderator status to someone on a channel. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give the user the moderator status. When leaving a channel, the user gets unmodded.
 
 **Parameters:**
 
@@ -539,7 +539,7 @@ client.on("unhost", function (channel, viewers) {
 
 Someone got unmodded on a channel.
 
-**Important:** It doesn't detect if ``username`` got removed from moderators list. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give him the moderator status. When leaving a channel, the user gets unmodded.
+**Important:** It doesn't detect if ``username`` got removed from moderators list. You will see a lot of ``mod`` / ``unmod`` events on a channel. When a moderator joins a channel, it will take a few seconds for jtv to give the user the moderator status. When leaving a channel, the user gets unmodded.
 
 **Parameters:**
 

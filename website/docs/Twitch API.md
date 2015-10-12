@@ -14,7 +14,7 @@ client.api({
 });
 ~~~
 
-Because JSONP is only supporting the ``GET`` method, Twitch allows you to set the method and the oauth token (if required) in the URL. For instance, this is what you would do to change the title of a channel:
+Because JSONP is only supporting the ``GET`` method, Twitch let you to set the method and the oauth token (if required) in the URL. For instance, this is what you would do to change the title of a channel:
 
 ~~~ javascript
 client.api({

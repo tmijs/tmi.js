@@ -1,17 +1,17 @@
 # Configuration
 
-Each and every options listed below is optional. Running tmi.js without options will result as an anonymous connection to Twitch and you will have to join your channels manually.
+Each and every option listed below is optional. Running tmi.js without options will result as an anonymous connection to Twitch and you will have to join the channels manually.
 
 ``options``: (_Optional_)
 
-- ``debug``: _Boolean_ - Show debug messages in the console. It is showing when an event is being triggered (Default: ``false``)
+- ``debug``: _Boolean_ - Show debug messages in console (Default: ``false``)
 
 ``connection``: (_Optional_)
 
-- ``random``: _String_ - Change the server type (Default: ``"chat"``, Can be ``"chat"``, ``"group"`` or ``"event"``)
-- ``server``: _String_ - Connect to this server (_Optional_)
-- ``port``: _Integer_ - Connect on this port (_Optional_)
-- ``reconnect``: _Boolean_ - Reconnect to twitch when disconnected (Default: ``false``)
+- ``random``: _String_ - Server type / cluster (Default: ``"chat"`` - Can be ``"chat"``, ``"group"`` or ``"event"``)
+- ``server``: _String_ - Connect to this server (_Do not set if you are using a random server_)
+- ``port``: _Integer_ - Connect on this port (_Do not set if you are using a random server_)
+- ``reconnect``: _Boolean_ - Reconnect to Twitch when disconnected from server (Default: ``false``)
 - ``timeout``: _Integer_ - Disconnect from server if not responding (Default: ``9999`` (ms))
 
 ``identity``: (_Optional_)
@@ -26,7 +26,8 @@ Each and every options listed below is optional. Running tmi.js without options 
 ## Example
 
 ~~~ javascript
-var irc = require("tmi.js"); // Do not include this line if included in HTML page
+// Do NOT include this line if you are using the built js version!
+var irc = require("tmi.js");
 
 var options = {
     options: {
