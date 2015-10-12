@@ -32,6 +32,13 @@
     "test": "mocha --require should"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Schmoopiie/tmi.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Schmoopiie/tmi.js/issues"
+  },
   "dependencies": {
     "bunyan": "^1.4.0",
     "cron": "^1.0.9",
