@@ -22,8 +22,10 @@ npm install tmi.js --save
 To use the tmi.js CDN, just reference the file directly in the script tag.
 
 ~~~ html
-<script src="//d2g2wobxbkulb1.cloudfront.net/0.0.23/tmi.min.js"></script>
+<script src="//cdn.tmijs.org/js/0.0.24/tmi.js"></script>
 ~~~
+
+**SourceMap**: [//cdn.tmijs.org/js/0.0.24/tmi.js.map](//cdn.tmijs.org/js/0.0.24/tmi.js.map)
 
 ## Community
 
