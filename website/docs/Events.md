@@ -285,6 +285,8 @@ Known msg-ids:
 - ``bad_ban_self``: You cannot ban yourself.
 - ``bad_ban_staff``: You cannot ban staff X.
 - ``bad_commercial_error``: Failed to start commercial.
+- ``bad_host_hosting``: This channel is already hosting X.
+- ``bad_host_rate_exceeded``: Host target cannot be changed more than 3 times every half hour.
 - ``bad_mod_mod``: X is already a moderator of this room.
 - ``bad_mod_banned``: X is banned in this room.
 - ``bad_timeout_admin``: You cannot timeout admin X.
@@ -308,6 +310,7 @@ Known msg-ids:
 - ``msg_verified_email``: This room requires a verified email address to chat.
 - ``no_help``: No help available.
 - ``no_permission``: You don't have permission to perform that action.
+- ``not_hosting``: No channel is currently being hosted.
 - ``timeout_success``: X has been timed out for length seconds.
 - ``unban_success``: X is no longer banned from this room.
 - ``unmod_success``: You have removed X as a moderator of this room.
