@@ -362,7 +362,7 @@ client.unmod("channel", "username");
 
 ## Whisper
 
-Send a message on a channel.
+Send an instant message to a user.
 
 **Important:** You have to be connected to a group chat server to send or receive whispers.
 
