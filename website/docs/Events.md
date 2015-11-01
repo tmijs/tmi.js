@@ -285,18 +285,21 @@ Known msg-ids:
 - ``bad_ban_self``: You cannot ban yourself.
 - ``bad_ban_staff``: You cannot ban staff X.
 - ``bad_commercial_error``: Failed to start commercial.
+- ``bad_mod_mod``: X is already a moderator of this room.
 - ``bad_mod_banned``: X is banned in this room.
 - ``bad_timeout_admin``: You cannot timeout admin X.
 - ``bad_timeout_global_mod``: You cannot timeout global moderator X.
 - ``bad_timeout_self``: You cannot timeout yourself.
 - ``bad_timeout_staff``: You cannot timeout staff X.
 - ``bad_unban_no_ban``: X is not banned from this room.
+- ``bad_unmod_mod``: X is not a moderator of this room.
 - ``ban_success``: X is now banned from this room.
 - ``cmds_available``: Commands available to you in this room (use /help for details)..
 - ``color_changed``: Your color has been changed.
 - ``commercial_success``: Initiating X second commercial break. Please keep in mind..
 - ``hosts_remaining``: X host commands remaining this half hour.
 - ``host_target_went_offline``: X has gone offline. Exiting host mode
+- ``mod_success``: You have added X as a moderator of this room.
 - ``msg_banned``: You are permanently banned from talking in channel.
 - ``msg_duplicate``: Your message was not sent because you are sending messages too quickly.
 - ``msg_ratelimit``: Your message was not sent because you are sending messages too quickly.
@@ -307,6 +310,7 @@ Known msg-ids:
 - ``no_permission``: You don't have permission to perform that action.
 - ``timeout_success``: X has been timed out for length seconds.
 - ``unban_success``: X is no longer banned from this room.
+- ``unmod_success``: You have removed X as a moderator of this room.
 - ``unrecognized_cmd``: Unrecognized command: X
 - ``usage_ban``: Usage: "/ban " - Permanently prevent a user from chatting..
 - ``usage_clear``: Usage: "/clear" - Clear chat history for all users in this room.
