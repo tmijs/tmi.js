@@ -59,9 +59,11 @@ According to Twitch, the user object is always subject to change.
     emotes: { '25': [ '0-4' ] },
     subscriber: false,
     turbo: true,
+    'user-id': '58355428',
     'user-type': 'mod',
     'emotes-raw': '25:0-4',
-    username: 'schmoopiie'
+    username: 'schmoopiie',
+    'message-type': 'action'
 }
 ~~~
 
@@ -91,9 +93,11 @@ According to Twitch, the user object is always subject to change.
     emotes: { '25': [ '0-4' ] },
     subscriber: false,
     turbo: true,
+    'user-id': '58355428',
     'user-type': 'mod',
     'emotes-raw': '25:0-4',
-    username: 'schmoopiie'
+    username: 'schmoopiie',
+    'message-type': 'chat'
 }
 ~~~
 
@@ -574,4 +578,22 @@ Received a whisper.
 client.on("whisper", function (user, message) {
     // Do your stuff.
 });
+~~~
+
+According to Twitch, the user object is always subject to change.
+
+~~~ javascript
+{
+    color: '#FFFFFF',
+    'display-name': 'Schmoopiie',
+    emotes: { '25': [ '0-4' ] },
+    'message-id': '123',
+    'thread-id': '1234567_12345678',
+    turbo: true,
+    'user-id': '58355428',
+    'user-type': null,
+    'emotes-raw': '25:0-4',
+    username: 'schmoopiie',
+    'message-type': 'whisper'
+}
 ~~~
