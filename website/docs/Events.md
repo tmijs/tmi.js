@@ -567,11 +567,11 @@ Received a whisper.
 
 **Parameters:**
 
-- ``username``: _String_ - Username
+- ``user``: _Object_ - User object
 - ``message``: _String_ - Message
 
 ~~~ javascript
-client.on("whisper", function (username, message) {
+client.on("whisper", function (user, message) {
     // Do your stuff.
 });
 ~~~
