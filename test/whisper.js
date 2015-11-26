@@ -5,8 +5,8 @@ describe("whisper()", function() {
     it("should emit \"whisper\"", function(done) {
         var client = new irc.client();
 
-        client.on("whisper", function(username, message) {
-            username.should.be.exactly("schmoopiie").and.be.a.String();
+        client.on("whisper", function(user, message) {
+            user.should.be.an.Object();
             message.should.be.exactly("Hello! ;-)").and.be.a.String();
             done();
         });
