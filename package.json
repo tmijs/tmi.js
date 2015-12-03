@@ -40,28 +40,28 @@
     "url": "https://github.com/Schmoopiie/tmi.js/issues"
   },
   "dependencies": {
-    "bunyan": "^1.4.0",
-    "cron": "^1.0.9",
-    "irc-message": "^3.0.1",
+    "bunyan": "1.4.0",
+    "cron": "1.0.9",
+    "irc-message": "3.0.1",
     "locallydb": "0.0.9",
-    "request": "^2.60.0",
-    "underscore": "^1.8.3",
-    "underscore.string": "^3.1.1",
-    "ws": "^0.8.0"
+    "request": "2.60.0",
+    "underscore": "1.8.3",
+    "underscore.string": "3.1.1",
+    "ws": "0.8.0"
   },
   "devDependencies": {
-    "babelify": "^6.3.0",
-    "browserify": "^10.2.4",
-    "browserify-shim": "^3.8.9",
-    "glob": "^5.0.14",
-    "gulp": "^3.9.0",
-    "gulp-size": "^2.0.0",
-    "gulp-sourcemaps": "^1.5.2",
-    "gulp-uglify": "^1.4.1",
-    "mocha": "^2.2.5",
-    "should": "^7.0.4",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "babelify": "6.3.0",
+    "browserify": "10.2.4",
+    "browserify-shim": "3.8.9",
+    "glob": "5.0.14",
+    "gulp": "3.9.0",
+    "gulp-size": "2.0.0",
+    "gulp-sourcemaps": "1.5.2",
+    "gulp-uglify": "1.4.1",
+    "mocha": "2.2.5",
+    "should": "7.0.4",
+    "vinyl-buffer": "1.0.0",
+    "vinyl-source-stream": "1.1.0"
   },
   "browserify": {
     "transform": [
