@@ -39,11 +39,13 @@ In order of the [most commits](https://github.com/Schmoopiie/tmi.js/graphs/contr
 
 - Schmoopiie - https://github.com/Schmoopiie
 - celluj34 - https://github.com/celluj34
-- justinsacbibit - https://github.com/justinsacbibit
-- Hatsuney - https://github.com/Hatsuney
-- egonny - https://github.com/egonny
 - AlcaDesign - https://github.com/AlcaDesign
+- UnwrittenFun - https://github.com/UnwrittenFun
+- Hatsuney - https://github.com/Hatsuney
+- justinsacbibit - https://github.com/justinsacbibit
+- egonny - https://github.com/egonny
 - smalls89 - https://github.com/smalls89
+- mertzt89 - https://github.com/mertzt89
 
 ## Contributing guidelines
 
