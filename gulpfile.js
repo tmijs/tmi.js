@@ -21,6 +21,7 @@ function compile(done) {
         bundler.exclude("ws");
         bundler.exclude("utf-8-validate");
         bundler.exclude("bufferutil");
+        bundler.exclude("cron");
 
         bundler.bundle()
         .on("error", function(err) { console.error(err); this.emit("end"); })
