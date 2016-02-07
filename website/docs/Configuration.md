@@ -12,6 +12,7 @@ Each and every option listed below is optional. Running tmi.js without options w
 - ``server``: _String_ - Connect to this server (_Do not set if you are using a random server_)
 - ``port``: _Integer_ - Connect on this port (_Do not set if you are using a random server_)
 - ``reconnect``: _Boolean_ - Reconnect to Twitch when disconnected from server (Default: ``false``)
+- ``secure``: _Boolean_ - Use secure connection (HTTPS) (_Server must accept connections on port 443, use random server if you are not sure_)
 - ``timeout``: _Integer_ - Disconnect from server if not responding (Default: ``9999`` (ms))
 
 ``identity``: (_Optional_)

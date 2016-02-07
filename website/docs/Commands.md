@@ -44,6 +44,21 @@ Send an action message on a channel. (/me &lt;message&gt;)
 client.action("channel", "Your message");
 ~~~
 
+**Promises:**
+
+- Resolved on message sent<sup>1</sup>
+- Rejected on request timed out
+
+1: There is no possible way to know if a message has been sent successfully unless we create two connections. This promise will **always** be resolved unless you are trying to send a message and you're not connected to server.
+
+~~~ javascript
+client.action("channel", "Your message").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Ban
 
 Ban username on channel.
@@ -55,6 +70,19 @@ Ban username on channel.
 
 ~~~ javascript
 client.ban("channel", "username");
+~~~
+
+**Promises:**
+
+- Resolved on [ban_success](./Events.md#notice)
+- Rejected on [already_banned](./Events.md#notice), [bad_ban_admin](./Events.md#notice), [bad_ban_broadcaster](./Events.md#notice), [bad_ban_global_mod](./Events.md#notice), [bad_ban_self](./Events.md#notice), [bad_ban_staff](./Events.md#notice), [no_permission](./Events.md#notice), [usage_ban](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.ban("channel", "username").then(function(data) {
+    // data returns [channel, username]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Clear
@@ -69,16 +97,28 @@ Clear all messages on a channel.
 client.clear("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on [clearchat](./Events.md#clearchat) event
+- Rejected on [no_permission](./Events.md#notice), [usage_clear](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.clear("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Color
 
 Change the color of your username.
 
 **Parameters:**
 
-- ``channel``: _String_ - Channel name (Required)
 - ``color``: _String_ - Color name (Required)
 
-**Note:** A channel must be specified for this command to work. Turbo users can change their color using hexadecimal color (like ``#000000`` or ``#FFFFFF``) and non-turbo users can choose one of the following colors:
+**Note:** Turbo users can change their color using hexadecimal color (like ``#000000`` or ``#FFFFFF``) and non-turbo users can choose one of the following colors:
 
 - Blue
 - BlueViolet
@@ -97,8 +137,21 @@ Change the color of your username.
 - YellowGreen
 
 ~~~ javascript
-client.color("channel", "#C0C0C0");
-client.color("channel", "SpringGreen");
+client.color("#C0C0C0");
+client.color("SpringGreen");
+~~~
+
+**Promises:**
+
+- Resolved on [color_changed](./Events.md#notice)
+- Rejected on [turbo_only_color](./Events.md#notice), [usage_color](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.color("#C0C0C0").then(function(data) {
+    // data returns [color]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Commercial
@@ -114,6 +167,19 @@ Run commercial on a channel for X seconds. Available lengths (seconds) are ``30`
 client.commercial("channel", 30);
 ~~~
 
+**Promises:**
+
+- Resolved on [commercial_success](./Events.md#notice)
+- Rejected on [bad_commercial_error](./Events.md#notice), [no_permission](./Events.md#notice), [usage_commercial](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.commercial("channel", 30).then(function(data) {
+    // data returns [channel, seconds]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Connect
 
 Connect to server.
@@ -122,12 +188,40 @@ Connect to server.
 client.connect();
 ~~~
 
+**Promises:**
+
+- Resolved once connected to the server<sup>1</sup>
+- Rejected if disconnected from server
+
+1: Only fire once, will not fire upon reconnection.
+
+~~~ javascript
+client.connect().then(function(data) {
+    // data returns [server, port]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Disconnect
 
 Disconnect from server.
 
 ~~~ javascript
 client.disconnect();
+~~~
+
+**Promises:**
+
+- Resolved when the socket is closed
+- Rejected if socket is already closed
+
+~~~ javascript
+client.disconnect().then(function(data) {
+    // data returns [server, port]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Host
@@ -143,16 +237,42 @@ Host a channel.
 client.host("channel", "target");
 ~~~
 
+**Promises:**
+
+- Resolved on [hosts_remaining](./Events.md#notice)
+- Rejected on [bad_host_hosting](./Events.md#notice), [bad_host_rate_exceeded](./Events.md#notice), [no_permission](./Events.md#notice), [usage_host](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.host("channel", "target").then(function(data) {
+    // data returns [channel, target]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Join
 
 Join a channel.
 
-**Parameters:****
+**Parameters:**
 
 - ``channel``: _String_ - Channel name (Required)
 
 ~~~ javascript
 client.join("channel");
+~~~
+
+**Promises:**
+
+- Resolved on [USERSTATE](https://github.com/justintv/Twitch-API/blob/master/IRC.md#userstate-1)
+- Rejected on request timed out
+
+~~~ javascript
+client.join("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Mod
@@ -168,6 +288,19 @@ Mod username on channel.
 client.mod("channel", "username");
 ~~~
 
+**Promises:**
+
+- Resolved on [mod_success](./Events.md#notice)
+- Rejected on [usage_mod](./Events.md#notice), [bad_mod_banned](./Events.md#notice), [bad_mod_mod](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.mod("channel", "username").then(function(data) {
+    // data returns [channel, username]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Mods
 
 Get list of mods on a channel.
@@ -177,12 +310,19 @@ Get list of mods on a channel.
 - ``channel``: _String_ - Channel name (Required)
 
 ~~~ javascript
-// Mods event listener required:
 client.mods("channel");
+~~~
 
-// Using promises, no mods event listener required:
-client.mods("channel").then(function(mods) {
-    console.log(mods);
+**Promises:**
+
+- Resolved on [room_mods](./Events.md#notice) or [no_mods](./Events.md#notice)
+- Rejected on [usage_mods](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.mods("channel").then(function(data) {
+    // data returns [moderators]
+}).catch(function(err) {
+    //
 });
 ~~~
 
@@ -198,16 +338,38 @@ Leave a channel.
 client.part("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on leaving a channel
+- Rejected on request timed out
+
+~~~ javascript
+client.part("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Ping
 
 Send a PING to the server.
 
-**Parameters:**
-
-- ``channel``: _String_ - Channel name (Required)
-
 ~~~ javascript
 client.ping();
+~~~
+
+**Promises:**
+
+- Resolved on [PONG](./Events.md#pong) received
+- Rejected on request timed out
+
+~~~ javascript
+client.ping().then(function(data) {
+    // data returns [latency]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## R9kbeta
@@ -222,6 +384,19 @@ Enable R9KBeta on a channel.
 client.r9kbeta("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on [r9k_on](./Events.md#notice)
+- Rejected on [usage_r9k_on](./Events.md#notice), [already_r9k_on](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.r9kbeta("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## R9kbetaoff
 
 Disable R9KBeta on a channel.
@@ -234,6 +409,19 @@ Disable R9KBeta on a channel.
 client.r9kbetaoff("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on [r9k_off](./Events.md#notice)
+- Rejected on [usage_r9k_off](./Events.md#notice), [already_r9k_off](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.r9kbetaoff("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Raw
 
 Send a RAW message to the server.
@@ -244,6 +432,19 @@ Send a RAW message to the server.
 
 ~~~ javascript
 client.raw("CAP REQ :twitch.tv/tags");
+~~~
+
+**Promises:**
+
+- Resolved on message sent
+- Rejected on request timed out
+
+~~~ javascript
+client.raw("CAP REQ :twitch.tv/tags").then(function(data) {
+    // data returns [message]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Say
@@ -259,6 +460,21 @@ Send a message on a channel.
 client.say("channel", "Your message");
 ~~~
 
+**Promises:**
+
+- Resolved on message sent<sup>1</sup>
+- Rejected on request timed out
+
+1: There is no possible way to know if a message has been sent successfully unless we create two connections. This promise will **always** be resolved unless you are trying to send a message and you're not connected to server.
+
+~~~ javascript
+client.say("channel", "Your message").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Slow
 
 Enable slow mode on a channel.
@@ -270,6 +486,19 @@ Enable slow mode on a channel.
 
 ~~~ javascript
 client.slow("channel", 300);
+~~~
+
+**Promises:**
+
+- Resolved on [ROOMSTATE](https://github.com/justintv/Twitch-API/blob/master/IRC.md#roomstate-1)
+- Rejected on [usage_slow_on](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.slow("channel", 300).then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Slowoff
@@ -284,6 +513,19 @@ Disable slow mode on a channel.
 client.slowoff("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on [ROOMSTATE](https://github.com/justintv/Twitch-API/blob/master/IRC.md#roomstate-1)
+- Rejected on [usage_slow_off](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.slowoff("channel", 300).then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Subscribers
 
 Enable subscriber-only on a channel.
@@ -296,6 +538,19 @@ Enable subscriber-only on a channel.
 client.subscribers("channel");
 ~~~
 
+**Promises:**
+
+- Resolved on [subs_on](./Events.md#notice)
+- Rejected on [usage_subs_on](./Events.md#notice), [already_subs_on](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.subscribers("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Subscribersoff
 
 Disable subscriber-only on a channel.
@@ -306,6 +561,19 @@ Disable subscriber-only on a channel.
 
 ~~~ javascript
 client.subscribersoff("channel");
+~~~
+
+**Promises:**
+
+- Resolved on [subs_off](./Events.md#notice)
+- Rejected on [usage_subs_off](./Events.md#notice), [already_subs_off](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.subscribersoff("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Timeout
@@ -322,6 +590,19 @@ Timeout username on channel for X seconds.
 client.timeout("channel", "username", 300);
 ~~~
 
+**Promises:**
+
+- Resolved on [timeout_success](./Events.md#notice)
+- Rejected on [usage_timeout](./Events.md#notice), [bad_timeout_admin](./Events.md#notice), [bad_timeout_broadcaster](./Events.md#notice), [bad_timeout_global_mod](./Events.md#notice), [bad_timeout_self](./Events.md#notice), [bad_timeout_staff](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.timeout("channel", "username", 300).then(function(data) {
+    // data returns [channel, username, seconds]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Unban
 
 Unban username on channel.
@@ -335,6 +616,19 @@ Unban username on channel.
 client.unban("channel", "username");
 ~~~
 
+**Promises:**
+
+- Resolved on [unban_success](./Events.md#notice)
+- Rejected on [usage_unban](./Events.md#notice), [bad_unban_no_ban](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.unban("channel", "username").then(function(data) {
+    // data returns [channel, username]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Unhost
 
 End the current hosting. You must be the broadcaster or an editor.
@@ -345,6 +639,19 @@ End the current hosting. You must be the broadcaster or an editor.
 
 ~~~ javascript
 client.unhost("channel");
+~~~
+
+**Promises:**
+
+- Resolved on [HOSTTARGET](https://github.com/justintv/Twitch-API/blob/master/IRC.md#hosttarget)
+- Rejected on [usage_unhost](./Events.md#notice), [not_hosting](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.unhost("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
 ~~~
 
 ## Unmod
@@ -360,6 +667,19 @@ Unmod user on a channel.
 client.unmod("channel", "username");
 ~~~
 
+**Promises:**
+
+- Resolved on [unmod_success](./Events.md#notice)
+- Rejected on [usage_unmod](./Events.md#notice), [bad_unmod_mod](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.unmod("channel", "username").then(function(data) {
+    // data returns [channel, username]
+}).catch(function(err) {
+    //
+});
+~~~
+
 ## Whisper
 
 Send an instant message to a user.
@@ -373,4 +693,19 @@ Send an instant message to a user.
 
 ~~~ javascript
 client.whisper("username", "Your message");
+~~~
+
+**Promises:**
+
+- Resolved on message sent<sup>1</sup>
+- Rejected on request timed out
+
+1: There is no possible way to know if a message has been sent successfully unless we create two connections. This promise will **always** be resolved unless you are trying to send a message and you're not connected to server.
+
+~~~ javascript
+client.whisper("username", "Your message").then(function(data) {
+    // data returns [username, message]
+}).catch(function(err) {
+    //
+});
 ~~~
