@@ -10,3 +10,4 @@ tests/
 docs/
 dist/
 website/
+.git/
