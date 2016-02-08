@@ -1,9 +1,9 @@
 # tmi.js
-[![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](http://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](http://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](http://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/issues)
+[![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](https://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](https://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](https://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/issues)
 
-![](http://i.imgur.com/vsdO7N5.png)
+![](https://i.imgur.com/vsdO7N5.png)
 
-The best place to start with tmi.js is our [documentation page](http://www.tmijs.org/docs/).
+The best place to start with tmi.js is our [documentation page](https://www.tmijs.org/docs/).
 
 This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and every browser that support WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
 
