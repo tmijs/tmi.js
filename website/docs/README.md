@@ -22,10 +22,10 @@ npm install tmi.js --save
 To use the tmi.js CDN, just reference the file directly in the script tag.
 
 ~~~ html
-<script src="//cdn.tmijs.org/js/0.0.25/tmi.js"></script>
+<script src="//cdn.tmijs.org/js/0.0.26/tmi.js"></script>
 ~~~
 
-**SourceMap**: [//cdn.tmijs.org/js/0.0.25/tmi.js.map](//cdn.tmijs.org/js/0.0.25/tmi.js.map)
+**SourceMap**: [//cdn.tmijs.org/js/0.0.26/tmi.js.map](//cdn.tmijs.org/js/0.0.26/tmi.js.map)
 
 ## Community
 
