@@ -11,6 +11,8 @@ Each and every actions support [Promises](https://developer.mozilla.org/en/docs/
 - [Commercial](./Commands.md#commercial)
 - [Connect](./Commands.md#connect)
 - [Disconnect](./Commands.md#disconnect)
+- [Emoteonly](./Commands.md#emoteonly)
+- [Emoteonlyoff](./Commands.md#emoteonlyoff)
 - [Host](./Commands.md#host)
 - [Join](./Commands.md#join)
 - [Mod](./Commands.md#mod)
@@ -219,6 +221,56 @@ client.disconnect();
 ~~~ javascript
 client.disconnect().then(function(data) {
     // data returns [server, port]
+}).catch(function(err) {
+    //
+});
+~~~
+
+## Emoteonly
+
+Enable emote-only on a channel.
+
+**Parameters:**
+
+- ``channel``: _String_ - Channel name (Required)
+
+~~~ javascript
+client.emoteonly("channel");
+~~~
+
+**Promises:**
+
+- Resolved on [emote_only_on](./Events.md#notice)
+- Rejected on [usage_emote_only_on](./Events.md#notice), [already_emote_only_on](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.emoteonly("channel").then(function(data) {
+    // data returns [channel]
+}).catch(function(err) {
+    //
+});
+~~~
+
+## Emoteonlyoff
+
+Disable emote-only on a channel.
+
+**Parameters:**
+
+- ``channel``: _String_ - Channel name (Required)
+
+~~~ javascript
+client.emoteonlyoff("channel");
+~~~
+
+**Promises:**
+
+- Resolved on [emote_only_off](./Events.md#notice)
+- Rejected on [usage_emote_only_off](./Events.md#notice), [already_emote_only_off](./Events.md#notice), [no_permission](./Events.md#notice) or request timed out
+
+~~~ javascript
+client.emoteonlyoff("channel").then(function(data) {
+    // data returns [channel]
 }).catch(function(err) {
     //
 });

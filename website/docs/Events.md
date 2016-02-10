@@ -10,6 +10,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 - [Connected](./Events.md#connected)
 - [Connecting](./Events.md#connecting)
 - [Disconnected](./Events.md#disconnected)
+- [Emoteomly](./Events.md#emoteonly)
 - [Emotesets](./Events.md#emotesets)
 - [Hosted](./Events.md#hosted)
 - [Hosting](./Events.md#hosting)
@@ -159,6 +160,21 @@ client.on("disconnected", function (reason) {
 });
 ~~~
 
+## Emoteonly
+
+Channel enabled or disabled emote-only mode.
+
+**Parameters:**
+
+- ``channel``: _String_ - Channel name
+- ``enabled``: _Boolean_ - Returns ``true`` if mode is enabled or ``false`` if disabled
+
+~~~ javascript
+client.on("emoteonly", function (channel, enabled) {
+    // Do your stuff.
+});
+~~~
+
 ## Emotesets
 
 Received the ``emote-sets`` from Twitch. The ``emote-sets`` contains your emote set, which you can use to request a subset of ``https://api.twitch.tv/kraken/chat/emoticon_images``
@@ -282,6 +298,9 @@ Received a notice from server. The goal of these notices is to allow the users t
 Known msg-ids:
 
 - ``already_banned``: X is already banned in this room.
+- ``already_emote_only_on``: This room is already in emote-only mode.
+- ``already_emote_only_off``: This room is not in emote-only mode.
+- ``already_subs_on``: This room is already in subscribers-only mode.
 - ``already_subs_off``: This room is not in subscribers-only mode.
 - ``bad_ban_admin``: You cannot ban admin X.
 - ``bad_ban_broadcaster``: You cannot ban the broadcaster.
@@ -303,6 +322,8 @@ Known msg-ids:
 - ``cmds_available``: Commands available to you in this room (use /help for details)..
 - ``color_changed``: Your color has been changed.
 - ``commercial_success``: Initiating X second commercial break. Please keep in mind..
+- ``emote_only_on``: This room is now in emote-only mode.
+- ``emote_only_off``: This room is no longer in emote-only mode.
 - ``hosts_remaining``: X host commands remaining this half hour.
 - ``host_target_went_offline``: X has gone offline. Exiting host mode
 - ``mod_success``: You have added X as a moderator of this room.
@@ -324,6 +345,8 @@ Known msg-ids:
 - ``usage_color``: Usage: "/color <color>" - Change your username color. Color must be..
 - ``usage_commercial``: Usage: "/commercial [length]" - Triggers a commercial.
 - ``usage_disconnect``: Usage: "/disconnect" - Reconnects to chat.
+- ``usage_emote_only_on``: Usage: "/emoteonly" - Enables emote-only mode..
+- ``usage_emote_only_off``: Usage: "/emoteonlyoff" - Disables emote-only mode..
 - ``usage_help``: Usage: "/help" - Lists the commands available to you in this room.
 - ``usage_host``: Usage: "/host " - Host another channel. Use "unhost" to unset host mode.
 - ``usage_me``: Usage: "/me " - Send an "emote" message in the third person.
