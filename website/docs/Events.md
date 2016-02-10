@@ -10,7 +10,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 - [Connected](./Events.md#connected)
 - [Connecting](./Events.md#connecting)
 - [Disconnected](./Events.md#disconnected)
-- [Emoteomly](./Events.md#emoteonly)
+- [Emoteonly](./Events.md#emoteonly)
 - [Emotesets](./Events.md#emotesets)
 - [Hosted](./Events.md#hosted)
 - [Hosting](./Events.md#hosting)
