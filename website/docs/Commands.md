@@ -4,34 +4,34 @@ Each and every actions support [Promises](https://developer.mozilla.org/en/docs/
 
 ## Contents
 
-- [Action](./Commands.md#action)
-- [Ban](./Commands.md#ban)
-- [Clear](./Commands.md#clear)
-- [Color](./Commands.md#color)
-- [Commercial](./Commands.md#commercial)
-- [Connect](./Commands.md#connect)
-- [Disconnect](./Commands.md#disconnect)
-- [Emoteonly](./Commands.md#emoteonly)
-- [Emoteonlyoff](./Commands.md#emoteonlyoff)
-- [Host](./Commands.md#host)
-- [Join](./Commands.md#join)
-- [Mod](./Commands.md#mod)
-- [Mods](./Commands.md#mods)
-- [Part](./Commands.md#part)
-- [Ping](./Commands.md#ping)
-- [R9kbeta](./Commands.md#r9kbeta)
-- [R9kbetaoff](./Commands.md#r9kbetaoff)
-- [Raw](./Commands.md#raw)
-- [Say](./Commands.md#say)
-- [Slow](./Commands.md#slow)
-- [Slowoff](./Commands.md#slowoff)
-- [Subscribers](./Commands.md#subscribers)
-- [Subscribersoff](./Commands.md#subscribersoff)
-- [Timeout](./Commands.md#timeout)
-- [Unban](./Commands.md#unban)
-- [Unhost](./Commands.md#unhost)
-- [Unmod](./Commands.md#unmod)
-- [Whisper](./Commands.md#whisper)
+- [Action](./Commands.md#action) - Send an action message on a channel. (/me &lt;message&gt;)
+- [Ban](./Commands.md#ban) - Ban username on channel.
+- [Clear](./Commands.md#clear) - Clear all messages on a channel.
+- [Color](./Commands.md#color) - Change the color of your username.
+- [Commercial](./Commands.md#commercial) - Run commercial on a channel for X seconds.
+- [Connect](./Commands.md#connect) - Connect to server.
+- [Disconnect](./Commands.md#disconnect) - Disconnect from server.
+- [Emoteonly](./Commands.md#emoteonly) - Enable emote-only on a channel.
+- [Emoteonlyoff](./Commands.md#emoteonlyoff) - Disable emote-only on a channel.
+- [Host](./Commands.md#host) - Host a channel.
+- [Join](./Commands.md#join) - Join a channel.
+- [Mod](./Commands.md#mod) - Mod username on channel.
+- [Mods](./Commands.md#mods) - Get list of mods on a channel.
+- [Part](./Commands.md#part) - Leave a channel.
+- [Ping](./Commands.md#ping) - Send a PING to the server.
+- [R9kbeta](./Commands.md#r9kbeta) - Enable R9KBeta on a channel.
+- [R9kbetaoff](./Commands.md#r9kbetaoff) - Disable R9KBeta on a channel.
+- [Raw](./Commands.md#raw) - Send a RAW message to the server.
+- [Say](./Commands.md#say) - Send a message on a channel.
+- [Slow](./Commands.md#slow) - Enable slow mode on a channel.
+- [Slowoff](./Commands.md#slowoff) - Disable slow mode on a channel.
+- [Subscribers](./Commands.md#subscribers) - Enable subscriber-only on a channel.
+- [Subscribersoff](./Commands.md#subscribersoff) - Disable subscriber-only on a channel.
+- [Timeout](./Commands.md#timeout) - Timeout username on channel for X seconds.
+- [Unban](./Commands.md#unban) - Unban username on channel.
+- [Unhost](./Commands.md#unhost) - End the current hosting.
+- [Unmod](./Commands.md#unmod) - Unmod user on a channel.
+- [Whisper](./Commands.md#whisper) - Send an instant message to a user.
 
 ## Action
 
