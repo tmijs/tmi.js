@@ -6,14 +6,14 @@ For a faster development, we offer a NoSQL solution that requires no configurati
 
 ## Contents
 
-- [Configuration](./Database.md#configuration)
-- [Get](./Database.md#get)
-- [Insert](./Database.md#insert)
-- [List](./Database.md#list)
-- [Remove](./Database.md#remove)
-- [Replace](./Database.md#replace)
-- [Update](./Database.md#update)
-- [Where](./Database.md#where)
+- [Configuration](./Database.md#configuration) - Change the path of your NoSQL.
+- [Get](./Database.md#get) - Retrieve by cid.
+- [Insert](./Database.md#insert) - Insert, add or push a list of elements.
+- [List](./Database.md#list) - List all elements in the collection.
+- [Remove](./Database.md#remove) - Delete an item by cid.
+- [Replace](./Database.md#replace) - Replace the element with the same cid.
+- [Update](./Database.md#update) - Update an element, it will add un-existed key and replace existed.
+- [Where](./Database.md#where) - Search using an object or operators.
 
 ## Configuration
 

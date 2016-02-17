@@ -2,11 +2,11 @@
 
 ## Contents
 
-- [client.getChannels()](./Functions.md#clientgetchannels)
-- [client.getOptions()](./Functions.md#clientgetoptions)
-- [client.getUsername()](./Functions.md#clientgetusername)
-- [client.isMod()](./Functions.md#clientismod)
-- [client.readyState()](./Functions.md#clientreadystate)
+- [client.getChannels()](./Functions.md#clientgetchannels) - Get the current channels.
+- [client.getOptions()](./Functions.md#clientgetoptions) - Get the current options.
+- [client.getUsername()](./Functions.md#clientgetusername) - Get the current username.
+- [client.isMod()](./Functions.md#clientismod) - Is a mod on a channel.
+- [client.readyState()](./Functions.md#clientreadystate) - Get the current state of the socket.
 
 ## client.getChannels()
 

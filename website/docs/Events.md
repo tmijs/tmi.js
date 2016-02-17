@@ -4,35 +4,35 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 
 ## Contents
 
-- [Action](./Events.md#action)
-- [Chat](./Events.md#chat)
-- [Clearchat](./Events.md#clearchat)
-- [Connected](./Events.md#connected)
-- [Connecting](./Events.md#connecting)
-- [Disconnected](./Events.md#disconnected)
-- [Emoteonly](./Events.md#emoteonly)
-- [Emotesets](./Events.md#emotesets)
-- [Hosted](./Events.md#hosted)
-- [Hosting](./Events.md#hosting)
-- [Join](./Events.md#join)
-- [Logon](./Events.md#logon)
-- [Mod](./Events.md#mod)
-- [Mods](./Events.md#mods)
-- [Notice](./Events.md#notice)
-- [Part](./Events.md#part)
-- [Ping](./Events.md#ping)
-- [Pong](./Events.md#pong)
-- [R9kbeta](./Events.md#r9kbeta)
-- [Reconnect](./Events.md#reconnect)
-- [Roomstate](./Events.md#roomstate)
-- [Slowmode](./Events.md#slowmode)
-- [Subanniversary](./Events.md#subanniversary)
-- [Subscribers](./Events.md#subscribers)
-- [Subscription](./Events.md#subscription)
-- [Timeout](./Events.md#timeout)
-- [Unhost](./Events.md#unhost)
-- [Unmod](./Events.md#unmod)
-- [Whisper](./Events.md#whisper)
+- [Action](./Events.md#action) - Received action message on channel.
+- [Chat](./Events.md#chat) - Received message on channel.
+- [Clearchat](./Events.md#clearchat) - Chat of a channel got cleared.
+- [Connected](./Events.md#connected) - Connected to server.
+- [Connecting](./Events.md#connecting) - Connecting to a server.
+- [Disconnected](./Events.md#disconnected) - Got disconnected from server.
+- [Emoteonly](./Events.md#emoteonly) - Channel enabled or disabled emote-only mode.
+- [Emotesets](./Events.md#emotesets) - Received the ``emote-sets`` from Twitch.
+- [Hosted](./Events.md#hosted) - Channel is now hosted by another broadcaster.
+- [Hosting](./Events.md#hosting) - Channel is now hosting another channel.
+- [Join](./Events.md#join) - Username has joined a channel.
+- [Logon](./Events.md#logon) - Connection established, sending informations to server.
+- [Mod](./Events.md#mod) - Someone got modded on a channel.
+- [Mods](./Events.md#mods) - Received the list of moderators of a channel.
+- [Notice](./Events.md#notice) - Received a notice from server.
+- [Part](./Events.md#part) - User has left a channel.
+- [Ping](./Events.md#ping) - Received PING from server.
+- [Pong](./Events.md#pong) - Sent a PING request ? PONG.
+- [R9kbeta](./Events.md#r9kbeta) - Channel enabled or disabled R9K mode.
+- [Reconnect](./Events.md#reconnect) - Trying to reconnect to server.
+- [Roomstate](./Events.md#roomstate) - The current state of the channel.
+- [Slowmode](./Events.md#slowmode) - Gives you the current state of the channel.
+- [Subanniversary](./Events.md#subanniversary) - Username has shared how many months he/she has been a subscriber on a channel.
+- [Subscribers](./Events.md#subscribers) - Channel enabled or disabled subscribers-only mode.
+- [Subscription](./Events.md#subscription) - Username has subscribed to a channel.
+- [Timeout](./Events.md#timeout) - Username has been timed out on a channel.
+- [Unhost](./Events.md#unhost) - Channel ended the current hosting.
+- [Unmod](./Events.md#unmod) - Someone got unmodded on a channel.
+- [Whisper](./Events.md#whisper) - Received a whisper.
 
 ## Action
 
