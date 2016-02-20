@@ -22,10 +22,10 @@ npm install tmi.js --save
 To use the tmi.js CDN, just reference the file directly in the script tag.
 
 ~~~ html
-<script src="//cdn.tmijs.org/js/0.0.26/tmi.js"></script>
+<script src="//cdn.tmijs.org/js/0.0.27/tmi.js"></script>
 ~~~
 
-**SourceMap**: [//cdn.tmijs.org/js/0.0.26/tmi.js.map](//cdn.tmijs.org/js/0.0.26/tmi.js.map)
+**SourceMap**: [//cdn.tmijs.org/js/0.0.27/tmi.js.map](//cdn.tmijs.org/js/0.0.27/tmi.js.map)
 
 ## Community
 
@@ -38,8 +38,8 @@ To use the tmi.js CDN, just reference the file directly in the script tag.
 In order of the [most commits](https://github.com/Schmoopiie/tmi.js/graphs/contributors):
 
 - Schmoopiie - https://github.com/Schmoopiie
-- celluj34 - https://github.com/celluj34
 - AlcaDesign - https://github.com/AlcaDesign
+- celluj34 - https://github.com/celluj34
 - UnwrittenFun - https://github.com/UnwrittenFun
 - Hatsuney - https://github.com/Hatsuney
 - justinsacbibit - https://github.com/justinsacbibit
