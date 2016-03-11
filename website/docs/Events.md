@@ -25,6 +25,7 @@ Some events will only be fired if you are logged in. If you are not familiar wit
 - [R9kbeta](./Events.md#r9kbeta) - Channel enabled or disabled R9K mode.
 - [Reconnect](./Events.md#reconnect) - Trying to reconnect to server.
 - [Roomstate](./Events.md#roomstate) - The current state of the channel.
+- [Serverchange](./Events.md#serverchange) - Channel is no longer located on this cluster.
 - [Slowmode](./Events.md#slowmode) - Gives you the current state of the channel.
 - [Subanniversary](./Events.md#subanniversary) - Username has shared how many months he/she has been a subscriber on a channel.
 - [Subscribers](./Events.md#subscribers) - Channel enabled or disabled subscribers-only mode.
@@ -475,6 +476,20 @@ According to Twitch, the state object is always subject to change.
     'subs-only': false,
     channel: '#schmoopiie'
 }
+~~~
+
+## Serverchange
+
+Channel is no longer located on this cluster. [Read more](https://www.tmijs.org/forums/index.php?/topic/39-channel-specific-chat-server-clusters/)
+
+**Parameters:**
+
+- ``channel``: _String_ - Channel name
+
+~~~ javascript
+client.on("serverchange", function (channel) {
+    // Do your stuff.
+});
 ~~~
 
 ## Slowmode
