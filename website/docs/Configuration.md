@@ -8,7 +8,7 @@ Each and every option listed below is optional. Running tmi.js without options w
 
 ``connection``: (_Optional_)
 
-- ``cluster``: _String_ - Server type (Default: ``"main"`` - Can be ``"main"``, ``"group"``, ``"event"`` or ``"aws"``)
+- ``cluster``: _String_ - Server type (Default: ``"aws"`` - Can be ``"aws"``, ``"group"``, ``"event"`` or ``"main"``)
 - ``server``: _String_ - Connect to this server (_Do not set if you are using a random server from cluster_)
 - ``port``: _Integer_ - Connect on this port (Default: ``80``)
 - ``reconnect``: _Boolean_ - Reconnect to Twitch when disconnected from server (Default: ``false``)
@@ -35,7 +35,7 @@ var options = {
         debug: true
     },
     connection: {
-        cluster: "chat",
+        cluster: "aws",
         reconnect: true
     },
     identity: {
