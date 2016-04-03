@@ -40,7 +40,6 @@
     "url": "https://github.com/Schmoopiie/tmi.js/issues"
   },
   "dependencies": {
-    "bunyan": "1.7.1",
     "irc-message": "3.0.1",
     "request": "2.60.0",
     "underscore": "1.8.3",
