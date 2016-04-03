@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "bunyan": "1.7.1",
-    "cron": "1.0.9",
     "irc-message": "3.0.1",
     "locallydb": "0.0.9",
     "request": "2.60.0",
@@ -69,7 +68,6 @@
   },
   "browserify-shim": {
     "irc": "global:irc",
-    "cron": "global:cron",
     "locallydb": "global:locallydb",
     "request": "global:request"
   },
