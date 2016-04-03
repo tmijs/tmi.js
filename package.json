@@ -42,7 +42,6 @@
   "dependencies": {
     "bunyan": "1.7.1",
     "irc-message": "3.0.1",
-    "locallydb": "0.0.9",
     "request": "2.60.0",
     "underscore": "1.8.3",
     "underscore.string": "3.1.1",
@@ -68,7 +67,6 @@
   },
   "browserify-shim": {
     "irc": "global:irc",
-    "locallydb": "global:locallydb",
     "request": "global:request"
   },
   "browser": {
