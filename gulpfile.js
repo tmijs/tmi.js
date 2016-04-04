@@ -7,7 +7,7 @@ var uglify = require("gulp-uglify");
 var babel = require("babelify");
 var size = require("gulp-size");
 
-function compile(done) {
+function compile() {
     function rebundle() {
         var bundler = browserify(["./index.js"], {
             debug: true,
@@ -21,7 +21,7 @@ function compile(done) {
         bundler.exclude("utf-8-validate");
         bundler.exclude("bufferutil");
 
-        bundler.bundle()
+        return bundler.bundle()
         .on("error", function(err) { console.error(err); this.emit("end"); })
         .pipe(source("tmi.js"))
         .pipe(buffer())
@@ -32,7 +32,7 @@ function compile(done) {
         .pipe(size({ showFiles: true }));
     }
 
-    rebundle();
+    return rebundle();
 }
 
-gulp.task("default", function() { return compile(); });
+gulp.task("default", compile);
