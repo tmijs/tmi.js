@@ -29,7 +29,8 @@
     }
   ],
   "scripts": {
-    "test": "istanbul cover _mocha -- -R spec --require should"
+    "test": "istanbul cover _mocha -- -R spec --require should",
+    "test-win": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require should"
   },
   "license": "MIT",
   "repository": {
