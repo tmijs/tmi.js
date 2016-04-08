@@ -18,6 +18,11 @@
     "robot"
   ],
   "main": "index.js",
+  "files": [
+    "lib",
+    "index.js",
+    "LICENSE"  
+  ],
   "engines": {
     "node": ">=4.0.0"
   },
