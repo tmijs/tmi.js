@@ -736,8 +736,6 @@ client.unmod("channel", "username").then(function(data) {
 
 Send an instant message to a user.
 
-**Important:** You have to be connected to a group chat server to send or receive whispers.
-
 **Parameters:**
 
 - ``username``: _String_ - Username (Required)

@@ -605,8 +605,6 @@ client.on("unmod", function (channel, username) {
 
 Received a whisper.
 
-**Important:** You have to be connected to a group chat server to send or receive whispers.
-
 **Parameters:**
 
 - ``user``: _Object_ - User object
