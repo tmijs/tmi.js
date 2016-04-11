@@ -131,7 +131,7 @@ var events = [{
             r9k: false,
             slow: false,
             'subs-only': false,
-            channel: ''
+            channel: '#schmoopiie'
         }
     ]
 }, {
@@ -225,7 +225,7 @@ describe('client events', function() {
         var expected = e.expected;
         it(`should emit ${name}`, function(cb) {
             var client = new irc.client();
-            
+
             client.on(name, function() {
                 var args = Array.prototype.slice.call(arguments);
                 'Should have reached this callback'.should.be.ok();
@@ -234,11 +234,11 @@ describe('client events', function() {
                 });
                 cb();
             });
-            
+
             client._onMessage({data: data});
         });
     });
-    
+
     it('should emit disconnected', function(cb) {
         var client = new irc.client();
 
@@ -246,7 +246,7 @@ describe('client events', function() {
             reason.should.be.exactly("Connection closed.").and.be.a.String();
             cb();
         });
-        
+
         client.log.error = function noop() {};
         client._onError();
     });
