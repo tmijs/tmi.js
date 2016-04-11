@@ -616,7 +616,7 @@ describe('commands (identity)', function() {
         client.connect();
     });
 
-    ['/me', '\\me'].forEach(function(me) {
+    ['/me', '\\me', '.me'].forEach(function(me) {
         it(`should handle ${me} say`, function(cb) {
             var client = this.client;
             var server = this.server;
