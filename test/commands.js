@@ -2,7 +2,7 @@ var WebSocketServer = require('ws').Server;
 var irc = require('../index.js');
 
 var noop = function() {};
- 
+
 var tests = [{
     command: 'ban',
     inputParams: ['#local7000', 'baduser'],
@@ -99,8 +99,8 @@ var tests = [{
     command: 'join',
     inputParams: ['#local7000'],
     returnedParams: ['#local7000'],
-    serverTest: 'JOIN #schmoopiie',
-    serverCommand: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv JOIN #schmoopiie"',
+    serverTest: 'JOIN #local7000',
+    serverCommand: '@broadcaster-lang=;r9k=0;slow=300;subs-only=0 :tmi.twitch.tv ROOMSTATE #local7000',
     testTimeout: true
 }, {
     command: 'leave',
@@ -440,7 +440,7 @@ describe('commands (justinfan)', function() {
 
             client.connect();
         });
-        
+
         if (test.errorCommands) {
             test.errorCommands.forEach(function(error) {
                 it(`should handle ${test.command} errors`, function(cb) {
@@ -474,7 +474,7 @@ describe('commands (justinfan)', function() {
                 });
             });
         }
-        
+
         if (test.testTimeout) {
             it(`should handle ${test.command} timeout`, function(cb) {
                 var client = this.client;
@@ -641,7 +641,7 @@ describe('commands (identity)', function() {
             client.connect();
         });
     });
-    
+
     ['.', '/', '\\'].forEach(function(prefix) {
         it(`should handle ${prefix} say`, function(cb) {
             var client = this.client;
