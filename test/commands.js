@@ -616,7 +616,7 @@ describe('commands (identity)', function() {
         client.connect();
     });
 
-    ['/me', '\\me'].forEach(function(me) {
+    ['/me', '\\me', '.me'].forEach(function(me) {
         it(`should handle ${me} say`, function(cb) {
             var client = this.client;
             var server = this.server;
@@ -649,6 +649,25 @@ describe('commands (identity)', function() {
             client.on('logon', function() {
                 client.say('#local7000', `${prefix}FOO`).then(function (data) {
                     data[0].should.eql('#local7000');
+                    data.length.should.eql(1);
+                    client.disconnect();
+                    cb();
+                });
+            });
+
+            client.connect();
+        });
+    });
+
+    ['..'].forEach(function(prefix) {
+        it(`should handle ${prefix}message say`, function(cb) {
+            var client = this.client;
+
+            client.on('logon', function() {
+                client.say('#local7000', `${prefix}FOO`).then(function (data) {
+                    data[0].should.eql('#local7000');
+                    data[1].should.eql(`${prefix}FOO`);
+                    data.length.should.eql(2);
                     client.disconnect();
                     cb();
                 });
