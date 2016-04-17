@@ -90,6 +90,7 @@ var tests = [{
     serverTest: '/host',
     serverCommand: '@msg-id=hosts_remaining :tmi.twitch.tv NOTICE #local7000 :5',
     errorCommands: [
+        '@msg-id=bad_host_error :tmi.twitch.tv NOTICE #local7000 :There was a problem hosting channel_to_host. Please try again in a minute.',
         '@msg-id=bad_host_hosting :tmi.twitch.tv NOTICE #local7000 : This channel is already hosting that channel.',
         '@msg-id=bad_host_rate_exceeded :tmi.twitch.tv NOTICE #local7000 : Host target cannot be changed more than 3 times every half hour.',
         '@msg-id=no_permission :tmi.twitch.tv NOTICE #local7000 : You don\'t have permission.',
