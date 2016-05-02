@@ -650,7 +650,7 @@ describe('commands (identity)', function() {
             client.on('logon', function() {
                 client.say('#local7000', `${prefix}FOO`).then(function (data) {
                     data[0].should.eql('#local7000');
-                    data.length.should.eql(1);
+                    data.length.should.eql(2);
                     client.disconnect();
                     cb();
                 });
