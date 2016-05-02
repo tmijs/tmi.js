@@ -2,10 +2,13 @@ var irc = require('../index.js');
 
 var events = [{
     name: 'action',
-    data: "@color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001",
+    data: "@badges=broadcaster/1,turbo/1;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001",
     expected: [
         '#schmoopiie',
         {
+            badges: {
+                '1': ['broadcaster', 'turbo']
+            },
             color: '#0D4200',
             'display-name': 'Schmoopiie',
             emotes: {
@@ -16,6 +19,7 @@ var events = [{
             turbo: true,
             'user-type': 'global_mod',
             'emotes-raw': '25:0-4,12-16/1902:6-10',
+            'badges-raw': 'broadcaster/1,turbo/1',
             username: 'schmoopiie',
             'message-type': 'action'
         },
@@ -23,10 +27,13 @@ var events = [{
     ]
 }, {
     name: 'chat',
-    data: "@color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
+    data: "@badges=broadcaster/1,turbo/1;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
     expected: [
         '#schmoopiie',
         {
+            badges: {
+                '1': ['broadcaster', 'turbo']
+            },
             color: '#0D4200',
             'display-name': 'Schmoopiie',
             emotes: {
@@ -37,6 +44,7 @@ var events = [{
             turbo: true,
             'user-type': 'global_mod',
             'emotes-raw': '25:0-4,12-16/1902:6-10',
+            'badges-raw': 'broadcaster/1,turbo/1',
             username: 'schmoopiie',
             'message-type': 'chat'
         },
