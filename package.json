@@ -21,10 +21,10 @@
   "files": [
     "lib",
     "index.js",
-    "LICENSE"  
+    "LICENSE"
   ],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.4.0"
   },
   "author": "Schmoopiie",
   "contributors": [
