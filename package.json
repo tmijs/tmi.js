@@ -59,6 +59,7 @@
     "gulp-uglify": "1.4.1",
     "mocha": "2.2.5",
     "should": "7.0.4",
+    "sinon": "^1.17.4",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0"
   },
