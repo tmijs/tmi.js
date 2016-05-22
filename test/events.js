@@ -26,6 +26,14 @@ var events = [{
         'Hello :)'
     ]
 }, {
+    name: 'ban',
+    data: '@ban-reason=this\\sis\\sa\\stest :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
+    expected: [
+        '#schmoopiie',
+        'schmoopiie',
+        'this is a test'
+    ]
+}, {
     name: 'chat',
     data: "@badges=broadcaster/1,turbo/1;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
     expected: [
@@ -189,10 +197,12 @@ var events = [{
     ]
 }, {
     name: 'timeout',
-    data: ':tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
+    data: '@ban-duration=60;ban-reason=this\\sis\\sa\\stest :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
     expected: [
         '#schmoopiie',
-        'schmoopiie'
+        'schmoopiie',
+        'this is a test',
+        '60'
     ]
 }, {
     name: 'unhost',
