@@ -94,7 +94,8 @@ var events = [{
     data: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv JOIN #schmoopiie',
     expected: [
         '#schmoopiie',
-        'schmoopiie'
+        'schmoopiie',
+		true
     ]
 }, {
     name: 'mod',
@@ -115,7 +116,8 @@ var events = [{
     data: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv PART #schmoopiie',
     expected: [
         '#schmoopiie',
-        'schmoopiie'
+        'schmoopiie',
+		true
     ]
 }, {
     name: 'ping',
