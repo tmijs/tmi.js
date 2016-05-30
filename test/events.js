@@ -95,7 +95,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'schmoopiie',
-		true
+		false
     ]
 }, {
     name: 'mod',
@@ -117,7 +117,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'schmoopiie',
-		true
+		false
     ]
 }, {
     name: 'ping',
