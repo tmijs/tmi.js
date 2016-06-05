@@ -35,6 +35,11 @@ describe("Ratelimiter()", function() {
                 new RateLimiter(100).should.not.throw(TypeError);
             });
 
+            it("should handle 1.5", function() {
+                new RateLimiter(1.5).should.not.throw(TypeError);
+                new RateLimiter(1.5).limit.should.eql(2);
+            });
+
             it("should not handle 0", function() {
                 () => new RateLimiter(0).should.throw(TypeError);
             });
