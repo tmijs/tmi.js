@@ -34,14 +34,15 @@
     }
   ],
   "scripts": {
-    "test": "istanbul cover _mocha -- -R spec --require should",
-    "test-win": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require should",
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require should",
     "build": "npm-run-all --sequential build:*",
     "build:rimraf": "rimraf ./build",
     "build:mkdirp": "mkdirp ./build",
     "build:dedupe": "npm dedupe",
     "build:browserify": "browserify index.js -o ./build/tmi.js",
-    "build:uglify": "uglifyjs --compress --mangle --output ./build/tmi.min.js --source-map ./build/tmi.js.map ./build/tmi.js"
+    "build:uglify": "uglifyjs --compress --mangle --output ./build/tmi.min.js --source-map ./build/tmi.js.map ./build/tmi.js",
+    "build:sri": "node sri.js ./build/tmi.js",
+    "build:sri-min": "node sri.js ./build/tmi.min.js"
   },
   "license": "MIT",
   "repository": {
@@ -52,7 +53,6 @@
     "url": "https://github.com/Schmoopiie/tmi.js/issues"
   },
   "dependencies": {
-    "irc-message": "3.0.1",
     "request": "2.60.0",
     "ws": "1.0.1"
   },
