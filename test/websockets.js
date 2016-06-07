@@ -1,11 +1,11 @@
 var WebSocketServer = require('ws').Server;
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 describe('websockets', function() {
     before(function() {
         // Initialize websocket server
         this.server = new WebSocketServer({port: 7000});
-        this.client = new irc.client({
+        this.client = new tmi.client({
             connection: {
                 server: 'localhost',
                 port: 7000
@@ -52,7 +52,7 @@ describe('server crashed, with reconnect: false (default)', function() {
     before(function() {
         // Initialize websocket server
         this.server = new WebSocketServer({port: 7000});
-        this.client = new irc.client({
+        this.client = new tmi.client({
             connection: {
                 server: 'localhost',
                 port: 7000
@@ -83,7 +83,7 @@ describe('server crashed, with reconnect: true', function() {
     before(function() {
         // Initialize websocket server
         this.server = new WebSocketServer({port: 7000});
-        this.client = new irc.client({
+        this.client = new tmi.client({
             connection: {
                 server: 'localhost',
                 port: 7000,

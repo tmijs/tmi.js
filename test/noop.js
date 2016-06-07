@@ -1,4 +1,4 @@
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 var tests = [
     ':tmi.twitch.tv 002',
@@ -21,7 +21,7 @@ describe('no-op server events', function() {
                 'Should not call this'.should.not.be.ok();
             };
 
-            var client = new irc.client({
+            var client = new tmi.client({
                 logger: {
                     trace: stopTest,
                     debug: stopTest,
