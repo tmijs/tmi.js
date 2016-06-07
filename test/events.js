@@ -1,4 +1,4 @@
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 var events = [{
     name: 'action',
@@ -95,7 +95,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'schmoopiie',
-		false
+        false
     ]
 }, {
     name: 'mod',
@@ -117,7 +117,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'schmoopiie',
-		false
+        false
     ]
 }, {
     name: 'ping',
@@ -224,6 +224,7 @@ var events = [{
     name: 'whisper',
     data: '@color=#FFFFFF;display-name=Schmoopiie;emotes=;turbo=1;user-type= :schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv WHISPER martinlarouche :Hello! ;-)',
     expected: [
+        '#schmoopiie',
         {
             color: '#FFFFFF',
             'display-name': 'Schmoopiie',
@@ -234,7 +235,8 @@ var events = [{
             username: 'schmoopiie',
             'message-type': 'whisper'
         },
-        'Hello! ;-)'
+        'Hello! ;-)',
+        false
     ]
 }];
 
@@ -244,7 +246,7 @@ describe('client events', function() {
         var data = e.data;
         var expected = e.expected;
         it(`should emit ${name}`, function(cb) {
-            var client = new irc.client();
+            var client = new tmi.client();
 
             client.on(name, function() {
                 var args = Array.prototype.slice.call(arguments);
@@ -260,7 +262,7 @@ describe('client events', function() {
     });
 
     it('should emit disconnected', function(cb) {
-        var client = new irc.client();
+        var client = new tmi.client();
 
         client.on("disconnected", function(reason) {
             reason.should.be.exactly("Connection closed.").and.be.a.String();
