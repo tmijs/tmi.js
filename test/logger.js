@@ -1,17 +1,17 @@
 var hookStd = require('hook-std');
-var irc = require("../index.js");
+var tmi = require("../index.js");
 var log = require("../lib/logger.js");
 var _ = require("../lib/utils.js");
 
 describe("client()", function() {
     it("should default to the stock logger", function() {
-        var client = new irc.client();
+        var client = new tmi.client();
 
         client.log.should.be.ok();
     });
 
     it("should allow a custom logger", function() {
-        var client = new irc.client({
+        var client = new tmi.client({
             logger: console
         });
 
