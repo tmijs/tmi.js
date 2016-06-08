@@ -1,5 +1,5 @@
 # tmi.js
-[![Build Status](https://secure.travis-ci.org/Schmoopiie/tmi.js.png?branch=master)](https://travis-ci.org/Schmoopiie/tmi.js) [![Downloads](https://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](https://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](https://img.shields.io/github/issues/Schmoopiie/tmi.js.svg?style=flat)](https://github.com/Schmoopiie/tmi.js/issues)
+[![Build Status](https://secure.travis-ci.org/tmijs/tmi.js.png?branch=master)](https://travis-ci.org/tmijs/tmi.js) [![Downloads](https://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](https://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](https://img.shields.io/github/issues/tmijs/tmi.js.svg?style=flat)](https://github.com/tmijs/tmi.js/issues)
 
 ![](https://i.imgur.com/vsdO7N5.png)
 
@@ -31,11 +31,11 @@ To use the tmi.js CDN, just reference the file directly in the script tag.
 
 - Follow [@Schmoopiie on Twitter](https://twitter.com/Schmoopiie).
 - Have a question that is not a bug report ? [Discuss on the tmi.js forum](http://www.tmijs.org/forums/).
-- Found a bug ? [Submit an issue](https://github.com/Schmoopiie/tmi.js/issues/new).
+- Found a bug ? [Submit an issue](https://github.com/tmijs/tmi.js/issues/new).
 
 ## Contributors
 
-In order of the [most commits](https://github.com/Schmoopiie/tmi.js/graphs/contributors):
+In order of the [most commits](https://github.com/tmijs/tmi.js/graphs/contributors):
 
 - Schmoopiie - https://github.com/Schmoopiie
 - AlcaDesign - https://github.com/AlcaDesign
@@ -49,4 +49,4 @@ In order of the [most commits](https://github.com/Schmoopiie/tmi.js/graphs/contr
 
 ## Contributing guidelines
 
-Please review the [guidelines for contributing](https://github.com/Schmoopiie/tmi.js/blob/master/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/Schmoopiie/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
+Please review the [guidelines for contributing](https://github.com/tmijs/tmi.js/blob/master/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/tmijs/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
