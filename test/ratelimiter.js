@@ -57,7 +57,7 @@ describe("Ratelimiter()", function() {
             it("should handle 'user'", function() {
                 var limiter = new RateLimiter("user");
                 limiter.should.not.throw(TypeError);
-                limiter.limit.should.eql(30);
+                limiter.limit.should.eql(20);
             });
 
             it("should handle 'mod'", function() {
