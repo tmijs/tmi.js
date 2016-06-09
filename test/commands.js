@@ -1,5 +1,5 @@
 var WebSocketServer = require('ws').Server;
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 var noop = function() {};
 
@@ -340,7 +340,7 @@ describe('commands (justinfan)', function() {
     beforeEach(function() {
         // Initialize websocket server
         this.server = new WebSocketServer({port: 7000});
-        this.client = new irc.client({
+        this.client = new tmi.client({
             connection: {
                 server: 'localhost',
                 port: 7000,
@@ -509,7 +509,7 @@ describe('commands (identity)', function() {
     beforeEach(function() {
         // Initialize websocket server
         this.server = new WebSocketServer({port: 7000});
-        this.client = new irc.client({
+        this.client = new tmi.client({
             connection: {
                 server: 'localhost',
                 port: 7000

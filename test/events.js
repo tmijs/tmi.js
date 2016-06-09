@@ -1,14 +1,12 @@
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 var events = [{
     name: 'action',
-    data: "@badges=broadcaster/1,turbo/1;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001",
+    data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001",
     expected: [
         '#schmoopiie',
         {
-            badges: {
-                '1': ['broadcaster', 'turbo']
-            },
+            badges: { broadcaster: '1', warcraft: 'horde' },
             color: '#0D4200',
             'display-name': 'Schmoopiie',
             emotes: {
@@ -19,7 +17,7 @@ var events = [{
             turbo: true,
             'user-type': 'global_mod',
             'emotes-raw': '25:0-4,12-16/1902:6-10',
-            'badges-raw': 'broadcaster/1,turbo/1',
+            'badges-raw': 'broadcaster/1,warcraft/horde',
             username: 'schmoopiie',
             'message-type': 'action'
         },
@@ -35,13 +33,11 @@ var events = [{
     ]
 }, {
     name: 'chat',
-    data: "@badges=broadcaster/1,turbo/1;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
+    data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
     expected: [
         '#schmoopiie',
         {
-            badges: {
-                '1': ['broadcaster', 'turbo']
-            },
+            badges: { broadcaster: '1', warcraft: 'horde' },
             color: '#0D4200',
             'display-name': 'Schmoopiie',
             emotes: {
@@ -52,7 +48,7 @@ var events = [{
             turbo: true,
             'user-type': 'global_mod',
             'emotes-raw': '25:0-4,12-16/1902:6-10',
-            'badges-raw': 'broadcaster/1,turbo/1',
+            'badges-raw': 'broadcaster/1,warcraft/horde',
             username: 'schmoopiie',
             'message-type': 'chat'
         },
@@ -94,7 +90,8 @@ var events = [{
     data: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv JOIN #schmoopiie',
     expected: [
         '#schmoopiie',
-        'schmoopiie'
+        'schmoopiie',
+        false
     ]
 }, {
     name: 'mod',
@@ -115,7 +112,8 @@ var events = [{
     data: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv PART #schmoopiie',
     expected: [
         '#schmoopiie',
-        'schmoopiie'
+        'schmoopiie',
+        false
     ]
 }, {
     name: 'ping',
@@ -168,11 +166,21 @@ var events = [{
     ]
 }, {
     name: 'subanniversary',
-    data: ':twitchnotify!twitchnotify@twitchnotify.tmi.twitch.tv PRIVMSG #schmoopiie :schmoopiie subscribed for 6 months in a row!',
+    data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
         'schmoopiie',
-        '6'
+        '6',
+        'Great stream -- keep it up!'
+    ]
+}, {
+    name: 'resub',
+    data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    expected: [
+        '#schmoopiie',
+        'schmoopiie',
+        '6',
+        'Great stream -- keep it up!'
     ]
 }, {
     name: 'subscribers',
@@ -222,6 +230,7 @@ var events = [{
     name: 'whisper',
     data: '@color=#FFFFFF;display-name=Schmoopiie;emotes=;turbo=1;user-type= :schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv WHISPER martinlarouche :Hello! ;-)',
     expected: [
+        '#schmoopiie',
         {
             color: '#FFFFFF',
             'display-name': 'Schmoopiie',
@@ -232,7 +241,8 @@ var events = [{
             username: 'schmoopiie',
             'message-type': 'whisper'
         },
-        'Hello! ;-)'
+        'Hello! ;-)',
+        false
     ]
 }];
 
@@ -242,7 +252,7 @@ describe('client events', function() {
         var data = e.data;
         var expected = e.expected;
         it(`should emit ${name}`, function(cb) {
-            var client = new irc.client();
+            var client = new tmi.client();
 
             client.on(name, function() {
                 var args = Array.prototype.slice.call(arguments);
@@ -258,7 +268,7 @@ describe('client events', function() {
     });
 
     it('should emit disconnected', function(cb) {
-        var client = new irc.client();
+        var client = new tmi.client();
 
         client.on("disconnected", function(reason) {
             reason.should.be.exactly("Connection closed.").and.be.a.String();

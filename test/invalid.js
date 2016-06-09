@@ -1,4 +1,4 @@
-var irc = require('../index.js');
+var tmi = require('../index.js');
 
 var tests = [
     'FOO',
@@ -11,7 +11,7 @@ var tests = [
 describe('invalid server events', function() {
     tests.forEach(function(test) {
         it(`should treat "${test}" as invalid`, function() {
-            var client = new irc.client({
+            var client = new tmi.client({
                 logger: {
                     warn: function(message) {
                         message.includes('Could not parse').should.be.ok;
