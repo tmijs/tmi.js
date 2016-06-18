@@ -4,9 +4,9 @@ var tmi = require('../index.js');
 var noop = function() {};
 
 var tests = [
-    ':tmi.twitch.tv NOTICE #schmoopiie : Login unsuccessful.',
-    ':tmi.twitch.tv NOTICE #schmoopiie : Error logging in.',
-    ':tmi.twitch.tv NOTICE #schmoopiie : Invalid NICK.'
+    ':tmi.twitch.tv NOTICE #schmoopiie :Login unsuccessful.',
+    ':tmi.twitch.tv NOTICE #schmoopiie :Error logging in.',
+    ':tmi.twitch.tv NOTICE #schmoopiie :Invalid NICK.'
 ];
 
 describe('handling authentication', function() {
@@ -36,10 +36,10 @@ describe('handling authentication', function() {
         it(`should handle ${test}`, function(cb) {
             var client = this.client;
             var server = this.server;
-            
+
             var parts = test.split(':');
             var message = parts[parts.length - 1].trim();
-            
+
             server.on('connection', function(ws) {
                 ws.on('message', function(message) {
                     if (!message.indexOf('USER')) {
@@ -47,12 +47,12 @@ describe('handling authentication', function() {
                     }
                 });
             });
-            
+
             client.on('disconnected', function(reason) {
                 reason.should.eql(message);
                 cb();
             });
-            
+
             client.connect();
         });
     });
