@@ -11,7 +11,7 @@ This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and
 
 #### Node
 
-Install Node using this [tutorial](https://www.npmjs.com/package/tmi.js/tutorial). Once installed, jump to the [configuration page](./Configuration.html) to get started.
+Install Node using this [tutorial](https://www.npmjs.com/package/tmi.js/tutorial). Once installed, jump to the [documentation](https://docs.tmijs.org/) to get started.
 
 ~~~ bash
 npm i tmi.js --save
