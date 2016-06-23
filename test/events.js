@@ -75,7 +75,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'username',
-        '11'
+        11
     ]
 }, {
     name: 'hosting',
@@ -83,7 +83,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         'schmoopiie',
-        '3'
+        3
     ]
 }, {
     name: 'join',
@@ -154,7 +154,7 @@ var events = [{
     expected: [
         '#schmoopiie',
         true,
-        '8'
+        8
     ]
 }, {
     name: 'slowmode',
@@ -162,15 +162,15 @@ var events = [{
     expected: [
         '#schmoopiie',
         false,
-        '0'
+        0
     ]
 }, {
     name: 'subanniversary',
     data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
-        'schmoopiie',
-        '6',
+        'Schmoopiie',
+        6,
         'Great stream -- keep it up!'
     ]
 }, {
@@ -178,8 +178,8 @@ var events = [{
     data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
-        'schmoopiie',
-        '6',
+        'Schmoopiie',
+        6,
         'Great stream -- keep it up!'
     ]
 }, {
@@ -210,14 +210,14 @@ var events = [{
         '#schmoopiie',
         'schmoopiie',
         'this is a test',
-        '60'
+        60
     ]
 }, {
     name: 'unhost',
     data: ':tmi.twitch.tv HOSTTARGET #schmoopiie :- 0',
     expected: [
         '#schmoopiie',
-        '0'
+        0
     ]
 }, {
     name: 'unmod',
