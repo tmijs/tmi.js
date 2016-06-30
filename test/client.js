@@ -15,6 +15,16 @@ describe("client()", function() {
         var client = new tmi.client({channels: ["avalonstar", "#dayvemsee"]});
         client.opts.channels.should.eql(["#avalonstar", "#dayvemsee"]);
     });
+	
+	it("should accept and normalize a channel name string", function() {
+        var client = new tmi.client({channel: "avalonstar"});
+        client.opts.channels.should.eql(["#avalonstar"]);
+    });
+	
+	it("should accept and normalize channel names as a comma-delimited string", function() {
+        var client = new tmi.client({channel: "avalonstar,#dayvemsee"});
+        client.opts.channels.should.eql(["#avalonstar", "#dayvemsee"]);
+    });
     
     it("should warn when random is specified (deprecated)", function() {
         var logger = {
