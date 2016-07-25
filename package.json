@@ -33,7 +33,7 @@
     }
   ],
   "scripts": {
-    "prepublish": "npm run build",
+    "prepublish": "babel lib/ --out-dir es5",
     "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require should",
     "build": "npm-run-all --sequential build:*",
     "build:rimraf": "rimraf ./build",
