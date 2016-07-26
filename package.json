@@ -17,7 +17,7 @@
     "bot",
     "robot"
   ],
-  "main": "es5/tmi.js",
+  "main": "index.js",
   "files": [
     "es5",
     "LICENSE"

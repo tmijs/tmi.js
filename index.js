@@ -1,3 +1,3 @@
 module.exports={
-	client:require("./lib/client")
+	client:require("./es5/client")
 };
