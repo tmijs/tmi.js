@@ -18,9 +18,6 @@ A few examples:
 
 * ``client: your commit message here.``
 * ``utils: your commit message here.``
-* ``logger: your commit message here.``
-
-The documentation is the only exception, you should use ``docs`` as the scope if you change anything in the documentation folder. Your changes will be automatically updated on the website.
 
 ## License
 

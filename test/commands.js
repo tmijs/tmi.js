@@ -5,8 +5,8 @@ var noop = function() {};
 
 var tests = [{
     command: 'ban',
-    inputParams: ['#local7000', 'baduser'],
-    returnedParams: ['#local7000', 'baduser'],
+    inputParams: ['#local7000', 'baduser', 'some reason'],
+    returnedParams: ['#local7000', 'baduser', 'some reason'],
     serverTest: '/ban',
     serverCommand: '@msg-id=ban_success :tmi.twitch.tv NOTICE #local7000 :baduser',
     errorCommands: [
@@ -86,7 +86,7 @@ var tests = [{
 }, {
     command: 'host',
     inputParams: ['#local7000', 'schmoopiie'],
-    returnedParams: ['#local7000', 'schmoopiie', '5'],
+    returnedParams: ['#local7000', 'schmoopiie', 5],
     serverTest: '/host',
     serverCommand: '@msg-id=hosts_remaining :tmi.twitch.tv NOTICE #local7000 :5',
     errorCommands: [
