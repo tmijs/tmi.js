@@ -67,6 +67,7 @@
     "npm-run-all": "1.7.0",
     "rimraf": "2.5.2",
     "should": "7.0.4",
+    "sinon": "1.17.6",
     "uglify-js": "2.6.2"
   },
   "browser": {
