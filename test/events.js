@@ -206,7 +206,7 @@ var events = [{
             'msg-param-months': '6',
             'room-id': '20624989',
             subscriber: false,
-            'system-msg': 'Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!',
+            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
@@ -234,7 +234,7 @@ var events = [{
             'msg-param-months': '6',
             'room-id': '20624989',
             subscriber: false,
-            'system-msg': 'Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!',
+            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
