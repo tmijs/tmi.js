@@ -193,22 +193,14 @@ var events = [{
         6,
         'Great stream -- keep it up!',
         {
-            badges: { staff: '1', broadcaster: '1', turbo: '1' },
             color: '#008000',
             'display-name': 'Schmoopiie',
             emotes: null,
             mod: false,
-            'msg-id': 'resub',
-            'msg-param-months': '6',
-            'room-id': '20624989',
-            subscriber: false,
-            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
-            login: 'schmoopiie',
-            turbo: true,
-            'user-id': '20624989',
             'user-type': 'staff',
             'emotes-raw': null,
-            'badges-raw': 'staff/1,broadcaster/1,turbo/1'
+            username: 'schmoopiie',
+            'message-type': 'resub'
         }
     ]
 }, {
@@ -220,22 +212,15 @@ var events = [{
         6,
         'Great stream -- keep it up!',
         {
-            badges: { staff: '1', broadcaster: '1', turbo: '1' },
             color: '#008000',
             'display-name': 'Schmoopiie',
             emotes: null,
             mod: false,
-            'msg-id': 'resub',
-            'msg-param-months': '6',
-            'room-id': '20624989',
-            subscriber: false,
-            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
-            login: 'schmoopiie',
-            turbo: true,
-            'user-id': '20624989',
             'user-type': 'staff',
             'emotes-raw': null,
-            'badges-raw': 'staff/1,broadcaster/1,turbo/1'
+            username: 'schmoopiie',
+            'message-type': 'resub',
+            'msg-param-months': 6
         }
     ]
 }, {
