@@ -191,7 +191,17 @@ var events = [{
         '#schmoopiie',
         'Schmoopiie',
         6,
-        'Great stream -- keep it up!'
+        'Great stream -- keep it up!',
+        {
+            color: '#008000',
+            'display-name': 'Schmoopiie',
+            emotes: null,
+            mod: false,
+            'user-type': 'staff',
+            'emotes-raw': null,
+            username: 'schmoopiie',
+            'message-type': 'resub'
+        }
     ]
 }, {
     name: 'resub',
@@ -200,7 +210,18 @@ var events = [{
         '#schmoopiie',
         'Schmoopiie',
         6,
-        'Great stream -- keep it up!'
+        'Great stream -- keep it up!',
+        {
+            color: '#008000',
+            'display-name': 'Schmoopiie',
+            emotes: null,
+            mod: false,
+            'user-type': 'staff',
+            'emotes-raw': null,
+            username: 'schmoopiie',
+            'message-type': 'resub',
+            'msg-param-months': 6
+        }
     ]
 }, {
     name: 'subscribers',
