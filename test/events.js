@@ -186,15 +186,15 @@ var events = [{
     ]
 }, {
     name: 'subanniversary',
-    data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
         'Schmoopiie',
         6,
         'Great stream -- keep it up!',
         {
-            badges: { broadcaster: '1', staff: '1', turbo: '1' },
-            'badges-raw': 'staff/1,broadcaster/1,turbo/1',
+            badges: { staff: '1', subscriber: '6', turbo: '1' },
+            'badges-raw': 'staff/1,subscriber/6,turbo/1',
             color: '#008000',
             'display-name': 'Schmoopiie',
             emotes: null,
@@ -205,8 +205,8 @@ var events = [{
             'msg-id': 'resub',
             'msg-param-months': '6',
             'room-id': '20624989',
-            subscriber: false,
-            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
+            subscriber: true,
+            'system-msg': 'Schmoopiie has subscribed for 6 months!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
@@ -214,15 +214,15 @@ var events = [{
     ]
 }, {
     name: 'resub',
-    data: '@badges=staff/1,broadcaster/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\shas\ssubscribed\sfor\s6\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=0;system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
         'Schmoopiie',
         6,
         'Great stream -- keep it up!',
         {
-            badges: { broadcaster: '1', staff: '1', turbo: '1' },
-            'badges-raw': 'staff/1,broadcaster/1,turbo/1',
+            badges: { staff: '1', subscriber: '6', turbo: '1' },
+            'badges-raw': 'staff/1,subscriber/6,turbo/1',
             color: '#008000',
             'display-name': 'Schmoopiie',
             emotes: null,
@@ -233,8 +233,8 @@ var events = [{
             'msg-id': 'resub',
             'msg-param-months': '6',
             'room-id': '20624989',
-            subscriber: false,
-            'system-msg': 'Schmoopiieshasssubscribedsfors6smonths!',
+            subscriber: true,
+            'system-msg': 'Schmoopiie has subscribed for 6 months!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
