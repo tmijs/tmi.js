@@ -5,7 +5,7 @@
 
 The best place to start with tmi.js is our [documentation page](https://docs.tmijs.org/).
 
-This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and every browser that support WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
+This module currently supports [Node.js 4.x](https://nodejs.org/en/download/) and every browser that supports WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
 
 ## Install
 
@@ -14,7 +14,7 @@ This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and
 Install Node using this [tutorial](https://www.npmjs.com/package/tmi.js/tutorial). Once installed, jump to the [documentation](https://docs.tmijs.org/) to get started.
 
 ~~~ bash
-npm i tmi.js --save
+npm install tmi.js --save
 ~~~
 
 #### CDN provided by MaxCDN
