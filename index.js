@@ -9,5 +9,6 @@ String.prototype.includes || (String.prototype.includes = function() {
 });
 
 module.exports={
-	client:require("./lib/client")
+	client:require("./lib/client"),
+    Client:require("./lib/client")
 };
