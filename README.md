@@ -26,8 +26,7 @@ We support [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/
 Use Subresource Integrity only if you reference a specific version of tmi.js.
 
 ~~~ html
-<!--Sourcemap: //cdn.tmijs.org/js/1.1.0/tmi.js.map-->
-<script src="//cdn.tmijs.org/js/1.1.1/tmi.min.js" integrity="sha384-8Q+qSu52Px9pRIc72XaZ9pFAFWO/bidhybR512f3TwwFKkdwyvF/lVKixrhp4u3h" crossorigin="anonymous"></script>
+<!--Sourcemap: //cdn.tmijs.org/js/1.2.0/tmi.js.map-->
 ~~~
 
 You **must** provide the major version when using the latest branch.
@@ -48,18 +47,23 @@ You **must** provide the major version when using the latest branch.
 In order of the [most commits](https://github.com/tmijs/tmi.js/graphs/contributors):
 
 - Schmoopiie - [https://github.com/Schmoopiie](https://github.com/Schmoopiie)
-- ben-eb - [https://github.com/ben-eb](https://github.com/ben-eb)
 - AlcaDesign - [https://github.com/AlcaDesign](https://github.com/AlcaDesign)
+- ben-eb - [https://github.com/ben-eb](https://github.com/ben-eb)
+- d-fischer - [https://github.com/d-fischer](https://github.com/d-fischer)
 - celluj34 - [https://github.com/celluj34](https://github.com/celluj34)
-- d-4-ni - [https://github.com/d-4-ni](https://github.com/d-4-ni)
-- UnwrittenFun - [https://github.com/UnwrittenFun](https://github.com/UnwrittenFun)
-- Hatsuney - [https://github.com/Hatsuney](https://github.com/Hatsuney)
+- dbkynd - [https://github.com/dbkynd](https://github.com/dbkynd)
+- subperks - [https://github.com/subperks](https://github.com/subperks)
+- roberthartung - [https://github.com/roberthartung](https://github.com/roberthartung)
 - justinsacbibit - [https://github.com/justinsacbibit](https://github.com/justinsacbibit)
+- Hatsuney - [https://github.com/Hatsuney](https://github.com/Hatsuney)
+- ImNatho - [https://github.com/ImNatho](https://github.com/ImNatho)
+- Jonliney - [https://github.com/Jonliney](https://github.com/Jonliney)
+- UnwrittenFun - [https://github.com/UnwrittenFun](https://github.com/UnwrittenFun)
 - joein3d - [https://github.com/joein3d](https://github.com/joein3d)
 - egonny - [https://github.com/egonny](https://github.com/egonny)
 - smalls89 - [https://github.com/smalls89](https://github.com/smalls89)
-- subperks - [https://github.com/subperks](https://github.com/subperks)
 - mertzt89 - [https://github.com/mertzt89](https://github.com/mertzt89)
+- artemisbot - [https://github.com/artemisbot](https://github.com/artemisbot)
 
 ## Contributing guidelines
 
