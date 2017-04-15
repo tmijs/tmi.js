@@ -27,6 +27,7 @@ Use Subresource Integrity only if you reference a specific version of tmi.js.
 
 ~~~ html
 <!--Sourcemap: //cdn.tmijs.org/js/1.2.0/tmi.js.map-->
+<script src="//cdn.tmijs.org/js/1.2.0/tmi.min.js" integrity="sha384-DoZAyJQroNdYGlcal7Io2y257WPV8WJxseQJ36L/i+PA5mZyhfIBFsJfRDwDL/+G" crossorigin="anonymous"></script>
 ~~~
 
 You **must** provide the major version when using the latest branch.
