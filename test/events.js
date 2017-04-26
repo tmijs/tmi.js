@@ -259,12 +259,12 @@ var events = [{
     data: '@badges=staff/1,subscriber/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=sub;room-id=20624989;subscriber=1;msg-param-sub-plan=Prime;msg-param-sub-plan-name=Channel\\sSubscription\\s(Schmoopiie);system-msg=Schmoopiie\\sjust\\ssubscribed!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
-        'schmoopiie',
+        'Schmoopiie',
         {
           'prime': true,
           'plan': 'Prime',
           'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
-        }
+        },
         'Great stream -- keep it up!',
         {
             badges: { staff: '1', subscriber: '1', turbo: '1' },
