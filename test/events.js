@@ -186,7 +186,7 @@ var events = [{
     ]
 }, {
     name: 'subanniversary',
-    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=1;system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=1;msg-param-sub-plan=Prime;msg-param-sub-plan-name=Channel\\sSubscription\\s(Schmoopiie);system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
         'Schmoopiie',
@@ -204,17 +204,24 @@ var events = [{
             mod: false,
             'msg-id': 'resub',
             'msg-param-months': '6',
+            'msg-param-sub-plan': 'Prime',
+            'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
             'room-id': '20624989',
             subscriber: true,
             'system-msg': 'Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
+        },
+        {
+          'prime': true,
+          'plan': 'Prime',
+          'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
         }
     ]
 }, {
     name: 'resub',
-    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=1;system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    data: '@badges=staff/1,subscriber/6,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=resub;msg-param-months=6;room-id=20624989;subscriber=1;msg-param-sub-plan=Prime;msg-param-sub-plan-name=Channel\\sSubscription\\s(Schmoopiie);system-msg=Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
     expected: [
         '#schmoopiie',
         'Schmoopiie',
@@ -232,13 +239,20 @@ var events = [{
             mod: false,
             'msg-id': 'resub',
             'msg-param-months': '6',
+            'msg-param-sub-plan': 'Prime',
+            'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
             'room-id': '20624989',
             subscriber: true,
             'system-msg': 'Schmoopiie\\shas\\ssubscribed\\sfor\\s6\\smonths!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
-        }
+        },
+        {
+          'prime': true,
+          'plan': 'Prime',
+          'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
+        },
     ]
 }, {
     name: 'subscribers',
