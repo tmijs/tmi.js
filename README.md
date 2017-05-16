@@ -26,8 +26,8 @@ We support [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/
 Use Subresource Integrity only if you reference a specific version of tmi.js.
 
 ~~~ html
-<!--Sourcemap: //cdn.tmijs.org/js/1.2.0/tmi.js.map-->
-<script src="//cdn.tmijs.org/js/1.2.0/tmi.min.js" integrity="sha384-DoZAyJQroNdYGlcal7Io2y257WPV8WJxseQJ36L/i+PA5mZyhfIBFsJfRDwDL/+G" crossorigin="anonymous"></script>
+<!--Sourcemap: //cdn.tmijs.org/js/1.2.1/tmi.js.map-->
+<script src="//cdn.tmijs.org/js/1.2.1/tmi.min.js" integrity="sha384-eE0n7sm1W7DOUI2Xh5I4qSpZTe6hupAO0ovLfqEy0yVJtGRBNfssdmjbJhEYm6Bw" crossorigin="anonymous"></script>
 ~~~
 
 You **must** provide the major version when using the latest branch.
@@ -53,6 +53,7 @@ In order of the [most commits](https://github.com/tmijs/tmi.js/graphs/contributo
 - d-fischer - [https://github.com/d-fischer](https://github.com/d-fischer)
 - celluj34 - [https://github.com/celluj34](https://github.com/celluj34)
 - dbkynd - [https://github.com/dbkynd](https://github.com/dbkynd)
+- JDBar - [https://github.com/JDBar](https://github.com/JDBar)
 - subperks - [https://github.com/subperks](https://github.com/subperks)
 - roberthartung - [https://github.com/roberthartung](https://github.com/roberthartung)
 - justinsacbibit - [https://github.com/justinsacbibit](https://github.com/justinsacbibit)
