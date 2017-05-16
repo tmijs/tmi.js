@@ -216,7 +216,7 @@ var events = [{
         {
           'prime': true,
           'plan': 'Prime',
-          'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
+          'planName': 'Channel Subscription (Schmoopiie)'
         }
     ]
 }, {
@@ -251,7 +251,7 @@ var events = [{
         {
           'prime': true,
           'plan': 'Prime',
-          'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
+          'planName': 'Channel Subscription (Schmoopiie)'
         },
     ]
 }, {
@@ -277,7 +277,7 @@ var events = [{
         {
           'prime': true,
           'plan': 'Prime',
-          'planName': 'Channel\\sSubscription\\s(Schmoopiie)'
+          'planName': 'Channel Subscription (Schmoopiie)'
         },
         'Great stream -- keep it up!',
         {
