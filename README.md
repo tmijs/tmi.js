@@ -1,3 +1,5 @@
+## Note: this is a fork that uses rollup to bundle and includes build for publishing in npm
+
 # tmi.js
 [![Build Status](https://secure.travis-ci.org/tmijs/tmi.js.png?branch=master)](https://travis-ci.org/tmijs/tmi.js) [![Downloads](https://img.shields.io/npm/dm/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Npm Version](https://img.shields.io/npm/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Node Version](https://img.shields.io/node/v/tmi.js.svg?style=flat)](https://www.npmjs.org/package/tmi.js) [![Issues](https://img.shields.io/github/issues/tmijs/tmi.js.svg?style=flat)](https://github.com/tmijs/tmi.js/issues)
 
