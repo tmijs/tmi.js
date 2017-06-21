@@ -1,5 +1,3 @@
-"use strict";
-
 // Initialize the queue with a specific delay..
 function queue(defaultDelay) {
     this.queue = [];
@@ -23,19 +21,15 @@ queue.prototype.run = function run(index) {
 
 // Go to the next in queue..
 queue.prototype.next = function next() {
-    var _this = this;
-
     var i = this.index++;
     var at = this.queue[i];
     var next = this.queue[this.index];
 
-    if (!at) {
-        return;
-    }
+    if (!at) { return; }
 
     at.fn();
-    next && setTimeout(function () {
-        _this.next();
+    next && setTimeout(() => {
+        this.next();
     }, next.delay || this.defaultDelay);
 };
 

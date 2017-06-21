@@ -1,5 +1,3 @@
-"use strict";
-
 /*
     Copyright (c) 2013-2015, Fionn Kelleher All rights reserved.
 
@@ -42,9 +40,7 @@ module.exports = {
             tags["badges-raw"] = tags["badges"];
             tags["badges"] = badges;
         }
-        if (_.isBoolean(tags["badges"])) {
-            tags["badges-raw"] = null;
-        }
+        if (_.isBoolean(tags["badges"])) { tags["badges-raw"] = null; }
 
         return tags;
     },
@@ -64,9 +60,7 @@ module.exports = {
             tags["emotes-raw"] = tags["emotes"];
             tags["emotes"] = emotes;
         }
-        if (_.isBoolean(tags["emotes"])) {
-            tags["emotes-raw"] = null;
-        }
+        if (_.isBoolean(tags["emotes"])) { tags["emotes-raw"] = null; }
 
         return tags;
     },
@@ -74,14 +68,14 @@ module.exports = {
     // Parse regex emotes..
     emoteRegex: function emoteRegex(msg, code, id, obj) {
         var space = /\S+/g;
-        var regex = new RegExp("(\\b|^|\s)" + _.unescapeHtml(code) + "(\\b|$|\s)");
+        var regex = new RegExp("(\\b|^|\s)"+_.unescapeHtml(code)+"(\\b|$|\s)");
         var match;
 
         // Check if emote code matches using RegExp and push it to the object..
         while ((match = space.exec(msg)) !== null) {
             if (regex.test(match[0])) {
                 obj[id] = obj[id] || [];
-                obj[id].push([match.index, space.lastIndex - 1]);
+                obj[id].push([match.index, space.lastIndex - 1])
             }
         }
     },
@@ -105,15 +99,15 @@ module.exports = {
     transformEmotes: function transformEmotes(emotes) {
         var transformed = "";
 
-        Object.keys(emotes).forEach(function (id) {
-            transformed = transformed + id + ":";
-            emotes[id].forEach(function (index) {
-                transformed = transformed + index.join("-") + ",";
+        Object.keys(emotes).forEach((id) => {
+            transformed = `${transformed+id}:`;
+            emotes[id].forEach((index) => {
+                transformed = `${transformed+index.join("-")},`;
             });
-            transformed = transformed.slice(0, -1) + "/";
+            transformed = `${transformed.slice(0,-1)}/`;
         });
 
-        return transformed.slice(0, -1);
+        return transformed.slice(0,-1);
     },
 
     // Parse Twitch messages..
@@ -124,9 +118,10 @@ module.exports = {
             prefix: null,
             command: null,
             params: []
+        }
 
-            // Position and nextspace are used by the parser as a reference..
-        };var position = 0;
+        // Position and nextspace are used by the parser as a reference..
+        var position = 0;
         var nextspace = 0;
 
         // The first thing we check for is IRCv3.2 message tags.
@@ -237,4 +232,4 @@ module.exports = {
 
         return message;
     }
-};
+}

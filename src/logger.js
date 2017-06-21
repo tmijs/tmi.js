@@ -1,23 +1,21 @@
-"use strict";
-
 var _ = require('./utils');
 
 var currentLevel = "info";
-var levels = { "trace": 0, "debug": 1, "info": 2, "warn": 3, "error": 4, "fatal": 5
+var levels = { "trace": 0, "debug": 1, "info": 2, "warn": 3, "error": 4, "fatal": 5 }
 
-    // Logger implementation..
-};function log(level) {
+// Logger implementation..
+function log(level) {
     // Return a console message depending on the logging level..
     return function (message) {
         if (levels[level] >= levels[currentLevel]) {
-            console.log("[" + _.formatDate(new Date()) + "] " + level + ": " + message);
+            console.log(`[${_.formatDate(new Date())}] ${level}: ${message}`);
         }
-    };
+    }
 }
 
 module.exports = {
     // Change the current logging level..
-    setLevel: function setLevel(level) {
+    setLevel: function(level) {
         currentLevel = level;
     },
     trace: log("trace"),
