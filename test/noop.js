@@ -1,4 +1,4 @@
-var tmi = require('../index.js');
+var tmi = require('../src/index.js');
 
 var tests = [
     ':tmi.twitch.tv 002',

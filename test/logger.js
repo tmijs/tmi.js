@@ -1,7 +1,7 @@
 var hookStd = require('hook-std');
-var tmi = require("../index.js");
-var log = require("../lib/logger.js");
-var _ = require("../lib/utils.js");
+var tmi = require("../src/index.js");
+var log = require("../src/logger.js");
+var _ = require("../src/utils.js");
 
 describe("client()", function() {
     it("should default to the stock logger", function() {

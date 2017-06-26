@@ -1,5 +1,5 @@
 var WebSocketServer = require('ws').Server;
-var tmi = require('../index.js');
+var tmi = require('../src/index.js');
 
 var noop = function() {};
 
