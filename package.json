@@ -17,9 +17,11 @@
     "bot",
     "robot"
   ],
-  "main": "index.js",
+  "main": "lib/index.js",
   "files": [
+    "dist",
     "lib",
+    "src",
     "index.js",
     "LICENSE"
   ],
