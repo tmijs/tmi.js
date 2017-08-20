@@ -270,35 +270,38 @@ var events = [{
     ]
 }, {
     name: 'subscription',
-    data: '@badges=staff/1,subscriber/1,turbo/1;color=#008000;display-name=Schmoopiie;emotes=;mod=0;msg-id=sub;room-id=20624989;subscriber=1;msg-param-sub-plan=Prime;msg-param-sub-plan-name=Channel\\sSubscription\\s(Schmoopiie);system-msg=Schmoopiie\\sjust\\ssubscribed!;login=schmoopiie;turbo=1;user-id=20624989;user-type=staff :tmi.twitch.tv USERNOTICE #schmoopiie :Great stream -- keep it up!',
+    data: '@badges=subscriber/0,premium/1;color=;display-name=Schmoopiie;emotes=;id=3c472723-4a8d-4c40-87aa-8c351db3c518;login=schmoopiie;mod=0;msg-id=sub;msg-param-months=1;msg-param-sub-plan-name=Channel\\sSubscription\\s(Schmoopiie);msg-param-sub-plan=Prime;room-id=26610234;subscriber=0;system-msg=Schmoopiie\\sjust\\ssubscribed\\swith\\sTwitch\\sPrime!;tmi-sent-ts=1503243634748;turbo=0;user-id=20624989;user-type= :tmi.twitch.tv USERNOTICE #schmoopiie',
     expected: [
         '#schmoopiie',
         'Schmoopiie',
         {
-          'prime': true,
-          'plan': 'Prime',
-          'planName': 'Channel Subscription (Schmoopiie)'
+            prime: true,
+            plan: 'Prime',
+            planName: 'Channel Subscription (Schmoopiie)'
         },
-        'Great stream -- keep it up!',
+        null,
         {
-            badges: { staff: '1', subscriber: '1', turbo: '1' },
-            'badges-raw': 'staff/1,subscriber/1,turbo/1',
-            color: '#008000',
+            badges: { subscriber: '0', premium: '1' },
+            color: null,
             'display-name': 'Schmoopiie',
             emotes: null,
-            'emotes-raw': null,
+            id: '3c472723-4a8d-4c40-87aa-8c351db3c518',
             login: 'schmoopiie',
-            'message-type': 'sub',
             mod: false,
             'msg-id': 'sub',
-            'msg-param-sub-plan': 'Prime',
+            'msg-param-months': true,
             'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
-            'room-id': '20624989',
-            subscriber: true,
-            'system-msg': 'Schmoopiie\\sjust\\ssubscribed!',
-            turbo: true,
+            'msg-param-sub-plan': 'Prime',
+            'room-id': '26610234',
+            subscriber: false,
+            'system-msg': 'Schmoopiie\\sjust\\ssubscribed\\swith\\sTwitch\\sPrime!',
+            'tmi-sent-ts': '1503243634748',
+            turbo: false,
             'user-id': '20624989',
-            'user-type': 'staff'
+            'user-type': null,
+            'emotes-raw': null,
+            'badges-raw': 'subscriber/0,premium/1',
+            'message-type': 'sub'
         }
     ]
 }, {
@@ -356,7 +359,16 @@ describe('client events', function() {
                 var args = Array.prototype.slice.call(arguments);
                 'Should have reached this callback'.should.be.ok();
                 expected && expected.forEach(function(data, index) {
-                    args[index].should.eql(data);
+                    if (args[index] === null) {
+                        /*
+                        *  null is a special case for deep object comparison
+                        *  using should.
+                        *  Since null is not an object, we cannot call
+                        *  null.should
+                        * */
+                        (args[index] === data).should.be.true();
+                    } else
+                        args[index].should.eql(data);
                 });
                 cb();
             });
