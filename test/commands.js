@@ -307,6 +307,12 @@ var tests = [{
         '@msg-id=usage_unban :tmi.twitch.tv NOTICE #local7000 : Usage: "/unban "'
     ]
 }, {
+    command: 'unban',
+    inputParams: ['#local7000', 'baduser'],
+    returnedParams: ['#local7000', 'baduser'],
+    serverTest: '/unban',
+    serverCommand: '@msg-id=untimeout_success :tmi.twitch.tv NOTICE #local7000 :baduser'
+}, {
     command: 'unhost',
     inputParams: ['#local7000'],
     returnedParams: ['#local7000'],
