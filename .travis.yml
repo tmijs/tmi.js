@@ -1,3 +1,14 @@
 language: node_js
 node_js:
   - '4'
+
+after_success:
+  - npm run build
+
+deploy:
+  - provider: npm
+    email: $NPM_EMAIL
+    api_key: $NPM_TOKEN
+    skip_cleanup: true
+    on:
+      tags: true

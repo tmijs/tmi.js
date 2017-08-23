@@ -42,7 +42,8 @@
     "build:browserify": "browserify index.js -o ./build/tmi.js",
     "build:uglify": "uglifyjs --compress --mangle --output ./build/tmi.min.js --source-map ./build/tmi.js.map ./build/tmi.js",
     "build:sri": "node sri.js ./build/tmi.js",
-    "build:sri-min": "node sri.js ./build/tmi.min.js"
+    "build:sri-min": "node sri.js ./build/tmi.min.js",
+    "docs:sri-min": "node ./.ci/docs-sri.js ./build/tmi.min.js"
   },
   "license": "MIT",
   "repository": {
