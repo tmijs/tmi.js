@@ -1,6 +1,6 @@
 {
-  "name": "tmi.js",
-  "version": "1.2.1",
+  "name": "@cvpcasada/tmi.js",
+  "version": "1.2.2",
   "description": "Javascript library for the Twitch Messaging Interface.",
   "keywords": [
     "tmi",
@@ -18,7 +18,9 @@
     "robot"
   ],
   "main": "index.js",
+  "module": "build/tmi.es.js",
   "files": [
+    "build",
     "lib",
     "index.js",
     "LICENSE"
@@ -39,8 +41,7 @@
     "build:rimraf": "rimraf ./build",
     "build:mkdirp": "mkdirp ./build",
     "build:dedupe": "npm dedupe",
-    "build:browserify": "browserify index.js -o ./build/tmi.js",
-    "build:uglify": "uglifyjs --compress --mangle --output ./build/tmi.min.js --source-map ./build/tmi.js.map ./build/tmi.js",
+    "build:rollup": "rollup -c && rollup -c --environment PRODUCTION",
     "build:sri": "node sri.js ./build/tmi.js",
     "build:sri-min": "node sri.js ./build/tmi.min.js"
   },
@@ -57,32 +58,30 @@
     "ws": "1.0.1"
   },
   "devDependencies": {
-    "babel-preset-es2015": "6.6.0",
-    "babelify": "7.2.0",
-    "browserify": "13.0.0",
+    "babel-cli": "^6.24.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.2.1",
     "hook-std": "0.2.0",
     "istanbul": "0.4.2",
     "mkdirp": "0.5.1",
     "mocha": "2.2.5",
-    "npm-run-all": "1.7.0",
+    "npm-run-all": "^4.0.2",
     "rimraf": "2.5.2",
-    "should": "7.0.4",
-    "uglify-js": "2.6.2"
+    "rollup": "^0.41.5",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-inject": "^2.0.0",
+    "rollup-plugin-json": "^2.1.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-uglify": "^1.0.1",
+    "should": "7.0.4"
   },
   "browser": {
     "ws": false,
-    "request": false
-  },
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "es2015"
-          ]
-        }
-      ]
-    ]
+    "request": false,
+    "@cvpcasada/tmi.js": "build/tmi.js"   
   }
 }
