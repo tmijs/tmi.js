@@ -24,7 +24,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=4.4.0"
+    "node": ">=7.10.1"
   },
   "author": "Schmoopiie",
   "contributors": [
