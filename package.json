@@ -34,7 +34,7 @@
     }
   ],
   "scripts": {
-    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require should",
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --exit",
     "build": "npm-run-all --sequential build:*",
     "build:rimraf": "rimraf ./build",
     "build:mkdirp": "mkdirp ./build",
