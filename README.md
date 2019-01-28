@@ -3,44 +3,47 @@
 
 ![](https://i.imgur.com/vsdO7N5.png)
 
-The best place to start with tmi.js is our [documentation page](https://docs.tmijs.org/).
+[Documentation](https://docs.tmijs.org/)
 
-This module currently support [Node.js 4.x](https://nodejs.org/en/download/) and every browser that support WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
+This module currently supports [Node.js 7.x](https://nodejs.org/en/download/) and every browser that supports WebSockets. The current WebSocket protocol being used by this module is **HyBi drafts 13-17**.
 
 ## Install
 
-#### Node
+### Node
 
-Install Node using this [tutorial](https://www.npmjs.com/package/tmi.js/tutorial). Once installed, jump to the [documentation](https://docs.tmijs.org/) to get started.
+```bash
+$ npm i tmi.js --save
+```
 
-~~~ bash
-npm i tmi.js --save
-~~~
+### Browser
 
-#### CDN provided by MaxCDN
+Available as "`tmi`" on `window`.
 
-Reference the file directly in the script tag.
+```html
+<script src="/scripts/tmi.min.js"></script>
+```
 
-We support [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) (SRI) which allows the browser to verify that the files being delivered have not been modified. This [https://www.w3.org/TR/SRI/](https://www.w3.org/TR/SRI/) is currently being implemented by browsers. Adding the new integrity attribute will ensure your application gains this security improvement as browsers support it.
+#### Prebuilt Releases
 
-Use Subresource Integrity only if you reference a specific version of tmi.js.
+[Release page](https://github.com/tmijs/tmi.js/releases)
 
-~~~ html
-<!--Sourcemap: //cdn.tmijs.org/js/1.2.1/tmi.js.map-->
-<script src="//cdn.tmijs.org/js/1.2.1/tmi.min.js" integrity="sha384-eE0n7sm1W7DOUI2Xh5I4qSpZTe6hupAO0ovLfqEy0yVJtGRBNfssdmjbJhEYm6Bw" crossorigin="anonymous"></script>
-~~~
+#### Build Yourself
 
-You **must** provide the major version when using the latest branch.
+```bash
+$ git clone https://github.com/tmijs/tmi.js.git
+$ npm install
+$ npm start build
+```
 
-~~~ html
-<!--Sourcemap: //cdn.tmijs.org/js/latest/1.x/tmi.js.map-->
-<script src="//cdn.tmijs.org/js/latest/1.x/tmi.min.js"></script>
-~~~
+#### Content Delivery Network (CDN)
+
+Not available at the moment.
 
 ## Community
 
 - Follow [@Schmoopiie on Twitter](https://twitter.com/Schmoopiie).
-- Have a question that is not a bug report ? [Discuss on the tmi.js forum](http://www.tmijs.org/forums/).
+- Follow [@AlcaMagic on Twitter](https://twitter.com/AlcaMagic).
+<!-- - Have a question that is not a bug report ? [Discuss on the tmi.js forum](http://www.tmijs.org/forums/). -->
 - Found a bug ? [Submit an issue](https://github.com/tmijs/tmi.js/issues/new).
 
 ## Contributors
@@ -56,16 +59,24 @@ In order of the [most commits](https://github.com/tmijs/tmi.js/graphs/contributo
 - JDBar - [https://github.com/JDBar](https://github.com/JDBar)
 - subperks - [https://github.com/subperks](https://github.com/subperks)
 - roberthartung - [https://github.com/roberthartung](https://github.com/roberthartung)
-- justinsacbibit - [https://github.com/justinsacbibit](https://github.com/justinsacbibit)
-- Hatsuney - [https://github.com/Hatsuney](https://github.com/Hatsuney)
-- ImNatho - [https://github.com/ImNatho](https://github.com/ImNatho)
+- JohnnyToumieh - [https://github.com/JohnnyToumieh](https://github.com/JohnnyToumieh)
+- mdolr - [https://github.com/mdolr](https://github.com/mdolr)
+- sfsepark - [https://github.com/sfsepark](https://github.com/sfsepark)
 - Jonliney - [https://github.com/Jonliney](https://github.com/Jonliney)
 - UnwrittenFun - [https://github.com/UnwrittenFun](https://github.com/UnwrittenFun)
-- joein3d - [https://github.com/joein3d](https://github.com/joein3d)
-- egonny - [https://github.com/egonny](https://github.com/egonny)
-- smalls89 - [https://github.com/smalls89](https://github.com/smalls89)
-- mertzt89 - [https://github.com/mertzt89](https://github.com/mertzt89)
+- justinsacbibit - [https://github.com/justinsacbibit](https://github.com/justinsacbibit)
+- lauriys - [https://github.com/lauriys](https://github.com/lauriys)
+- mccxiv - [https://github.com/mccxiv](https://github.com/mccxiv)
+- derpierre65 - [https://github.com/derpierre65](https://github.com/derpierre65)
+- SnareChops - [https://github.com/SnareChops](https://github.com/SnareChops)
+- haganbmj - [https://github.com/haganbmj](https://github.com/haganbmj)
 - artemisbot - [https://github.com/artemisbot](https://github.com/artemisbot)
+- joein3d - [https://github.com/joein3d](https://github.com/joein3d)
+- mertzt89 - [https://github.com/mertzt89](https://github.com/mertzt89)
+- smalls89 - [https://github.com/smalls89](https://github.com/smalls89)
+- Egonny - [https://github.com/egonny](https://github.com/egonny)
+- Hatsuney - [https://github.com/Hatsuney](https://github.com/Hatsuney)
+- ImNatho - [https://github.com/ImNatho](https://github.com/ImNatho)
 
 ## Contributing guidelines
 
