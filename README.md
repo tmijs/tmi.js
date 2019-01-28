@@ -44,7 +44,9 @@ Not available at the moment.
 - Follow [@Schmoopiie on Twitter](https://twitter.com/Schmoopiie).
 - Follow [@AlcaMagic on Twitter](https://twitter.com/AlcaMagic).
 <!-- - Have a question that is not a bug report ? [Discuss on the tmi.js forum](http://www.tmijs.org/forums/). -->
-- Found a bug ? [Submit an issue](https://github.com/tmijs/tmi.js/issues/new).
+- Found a bug: [submit an issue.](https://github.com/tmijs/tmi.js/issues/new)
+- Discussion and help about tmi.js: [Twitch API Discord Server](https://discord.gg/8NXaEyV)
+- For everything else: [Official TwitchDev Discord Server](https://link.twitch.tv/devchat)
 
 ## Contributors
 
