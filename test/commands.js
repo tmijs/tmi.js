@@ -644,13 +644,37 @@ describe('commands (identity)', function() {
     it(`should break up long messages (> 500 characters)`, function(cb) {
         var client = this.client;
         var server = this.server;
-        var lorem = `lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem
-                     lorem lorem lorem lorem lorem lorem lorem lorem ipsum`;
+        var lorem = 'lorem '.repeat(89) + 'ipsum';
+        var calls = 0;
+
+        server.on('connection', function(ws) {
+            ws.on('message', function(message) {
+                if (~message.indexOf('PRIVMSG')) {
+                    ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
+                }
+            });
+        });
+
+        client.on('chat', function(channel, user, message) {
+            calls++;
+            if (calls > 1) {
+                message.should.containEql('ipsum');
+                client.disconnect();
+                cb();
+            }
+        });
+
+        client.on('logon', function() {
+            client.say('#local7000', lorem);
+        });
+
+        client.connect();
+    });
+
+    it(`should break up long messages without spaces (> 500 characters)`, function(cb) {
+        var client = this.client;
+        var server = this.server;
+        var lorem = 'lorem'.repeat(100) + 'ipsum';
         var calls = 0;
 
         server.on('connection', function(ws) {
