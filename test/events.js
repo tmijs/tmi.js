@@ -127,6 +127,13 @@ var events = [{
         '#schmoopiie',
         ['user1', 'user2', 'user3']
     ]
+},  {
+    name: 'mods',
+    data: '@msg-id=no_mods :tmi.twitch.tv NOTICE #schmoopiie :There are no moderators of this channel.',
+    expected: [
+        '#schmoopiie',
+        []
+    ]
 }, {
     name: 'part',
     data: ':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv PART #schmoopiie',

@@ -335,6 +335,37 @@ var tests = [{
         '@msg-id=usage_unmod :tmi.twitch.tv NOTICE #local7000 : Usage: "/unmod "'
     ]
 }, {
+    command: 'vip',
+    inputParams: ['#local7000', 'schmoopiie'],
+    returnedParams: ['#local7000', 'schmoopiie'],
+    serverTest: '/vip',
+    serverCommand: '@msg-id=vip_success :tmi.twitch.tv NOTICE #local7000 :You have added User as a vip of this channel.',
+    errorCommands: [
+        '@msg-id=bad_vip_grantee_banned :tmi.twitch.tv NOTICE #local7000 :User is banned in this channel. You must unban this user before granting VIP status.',
+        '@msg-id=bad_vip_grantee_already_vip :tmi.twitch.tv NOTICE #local7000 :User is already a VIP of this channel.',
+        '@msg-id=usage_vip :tmi.twitch.tv NOTICE #local7000 :Usage: "/vip User" - Grant mod status to a user.',
+        no_permission,
+        msg_channel_suspended
+    ]
+}, {
+    command: 'unvip',
+    inputParams: ['#local7000', 'schmoopiie'],
+    returnedParams: ['#local7000', 'schmoopiie'],
+    serverTest: '/unvip',
+    serverCommand: '@msg-id=unvip_success :tmi.twitch.tv NOTICE #local7000 :You have removed User as a VIP of this channel..',
+    errorCommands: [
+        '@msg-id=bad_unvip_grantee_not_vip :tmi.twitch.tv NOTICE #local7000 :User is not a VIP of this channel.',
+        '@msg-id=usage_unvip :tmi.twitch.tv NOTICE #local7000 :Usage: "/unvip User" - Revoke VIP status from a user. Use "vips" to list the VIPs of this channel.',
+        no_permission,
+        msg_channel_suspended
+    ]
+}, {
+    command: 'vips',
+    inputParams: ['#local7000'],
+    returnedParams: [],
+    serverTest: '/vips',
+    serverCommand: '@msg-id=no_vips :tmi.twitch.tv NOTICE #local7000 :This channel does not have any VIPs.'
+}, {
     command: 'whisper',
     inputParams: ['moddymcmodface', 'You got unmodded! D:'],
     returnedParams: ['moddymcmodface', 'You got unmodded! D:'],
