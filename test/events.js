@@ -1,3 +1,4 @@
+var should = require('should');
 var tmi = require('../index.js');
 
 var events = [{
@@ -25,11 +26,15 @@ var events = [{
     ]
 }, {
     name: 'ban',
-    data: '@ban-reason=this\\sis\\sa\\stest :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
+    data: '@room-id=20624989;target-user-id=20624989 :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
     expected: [
         '#schmoopiie',
         'schmoopiie',
-        'this is a test'
+        null,
+        {
+            'room-id': '20624989',
+            'target-user-id': '20624989'
+        }
     ]
 }, {
     name: 'chat',
@@ -319,12 +324,17 @@ var events = [{
     ]
 }, {
     name: 'timeout',
-    data: '@ban-duration=60;ban-reason=this\\sis\\sa\\stest :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
+    data: '@ban-duration=60;room-id=20624989;target-user-id=20624989 :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
     expected: [
         '#schmoopiie',
         'schmoopiie',
-        'this is a test',
-        60
+        null,
+        60,
+        {
+            'ban-duration': '60',
+            'room-id': '20624989',
+            'target-user-id': '20624989'
+        }
     ]
 }, {
     name: 'unhost',
@@ -368,11 +378,16 @@ describe('client events', function() {
         it(`should emit ${name}`, function(cb) {
             var client = new tmi.client();
 
-            client.on(name, function() {
-                var args = Array.prototype.slice.call(arguments);
+            client.on(name, function(...args) {
                 'Should have reached this callback'.should.be.ok();
                 expected && expected.forEach(function(data, index) {
-                    args[index].should.eql(data);
+                    // console.log({ a: args[index], data });
+                    if(data === null) {
+                        should.not.exist(args[index]);
+                    }
+                    else {
+                        args[index].should.eql(data);
+                    }
                 });
                 cb();
             });
