@@ -2,6 +2,11 @@ var WebSocketServer = require('ws').Server;
 var tmi = require('../index.js');
 
 var noop = function() {};
+var catchConnectError = err => {
+    if(err !== 'Connection closed.') {
+        console.error(err);
+    }
+};
 
 var no_permission = '@msg-id=no_permission :tmi.twitch.tv NOTICE #local7000 :You don\'t have permission.';
 var msg_channel_suspended = '@msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #local7000 :This channel has been suspended.'
@@ -442,7 +447,7 @@ describe('commands (justinfan)', function() {
             });
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     it('should handle ping timeout', function(cb) {
@@ -462,7 +467,7 @@ describe('commands (justinfan)', function() {
             });
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     tests.forEach(function(test) {
@@ -499,7 +504,7 @@ describe('commands (justinfan)', function() {
                 });
             });
 
-            client.connect();
+            client.connect().catch(catchConnectError);
         });
 
         if (test.errorCommands) {
@@ -531,7 +536,7 @@ describe('commands (justinfan)', function() {
                         });
                     });
 
-                    client.connect();
+                    client.connect().catch(catchConnectError);
                 });
             });
         }
@@ -559,7 +564,7 @@ describe('commands (justinfan)', function() {
                     });
                 });
 
-                client.connect();
+                client.connect().catch(catchConnectError);
             });
         }
     });
@@ -607,7 +612,7 @@ describe('commands (identity)', function() {
             });
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     it(`should handle say`, function(cb) {
@@ -631,7 +636,7 @@ describe('commands (identity)', function() {
             });
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     it(`should handle say when disconnected`, function(cb) {
@@ -668,7 +673,7 @@ describe('commands (identity)', function() {
             client.say('#local7000', lorem);
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     it(`should break up long messages without spaces (> 500 characters)`, function(cb) {
@@ -698,7 +703,7 @@ describe('commands (identity)', function() {
             client.say('#local7000', lorem);
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     ['/me', '\\me', '.me'].forEach(function(me) {
@@ -723,7 +728,7 @@ describe('commands (identity)', function() {
                 });
             });
 
-            client.connect();
+            client.connect().catch(catchConnectError);
         });
     });
 
@@ -740,7 +745,7 @@ describe('commands (identity)', function() {
                 });
             });
 
-            client.connect();
+            client.connect().catch(catchConnectError);
         });
     });
 
@@ -758,7 +763,7 @@ describe('commands (identity)', function() {
                 });
             });
 
-            client.connect();
+            client.connect().catch(catchConnectError);
         });
     });
 });

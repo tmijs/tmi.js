@@ -1,6 +1,12 @@
 var WebSocketServer = require('ws').Server;
 var tmi = require('../index.js');
 
+var catchConnectError = err => {
+    if(err !== 'Connection closed.') {
+        console.error(err);
+    }
+};
+
 describe('websockets', function() {
     before(function() {
         // Initialize websocket server
@@ -39,7 +45,7 @@ describe('websockets', function() {
             cb();
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 
     after(function() {
@@ -75,7 +81,7 @@ describe('server crashed, with reconnect: false (default)', function() {
             cb();
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 });
 
@@ -109,6 +115,6 @@ describe('server crashed, with reconnect: true', function() {
             }, client.reconnectTimer);
         });
 
-        client.connect();
+        client.connect().catch(catchConnectError);
     });
 });

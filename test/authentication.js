@@ -2,6 +2,11 @@ var WebSocketServer = require('ws').Server;
 var tmi = require('../index.js');
 
 var noop = function() {};
+var catchConnectError = err => {
+    if(!['Connection closed.', 'Login unsuccessful.', 'Error logging in.', 'Invalid NICK.'].includes(err)) {
+        console.error(err);
+    }
+};
 
 var tests = [
     ':tmi.twitch.tv NOTICE #schmoopiie :Login unsuccessful.',
@@ -53,7 +58,7 @@ describe('handling authentication', function() {
                 cb();
             });
 
-            client.connect();
+            client.connect().catch(catchConnectError);
         });
     });
 });
