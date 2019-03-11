@@ -47,7 +47,7 @@ describe('handling authentication', function() {
 
             server.on('connection', function(ws) {
                 ws.on('message', function(message) {
-                    if (!message.indexOf('USER')) {
+                    if (!message.indexOf('NICK')) {
                         ws.send(test);
                     }
                 });

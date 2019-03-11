@@ -25,8 +25,8 @@ describe('websockets', function() {
 
         server.on('connection', function(ws) {
             ws.on('message', function(message) {
-                // Ensure that the message starts with USER
-                if (message.indexOf('USER')) {
+                // Ensure that the message starts with NICK
+                if (message.indexOf('NICK')) {
                     return;
                 }
                 var user = client.getUsername();

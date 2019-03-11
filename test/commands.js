@@ -477,8 +477,8 @@ describe('commands (justinfan)', function() {
 
             server.on('connection', function(ws) {
                 ws.on('message', function(message) {
-                    // Ensure that the message starts with USER
-                    if (!message.indexOf('USER')) {
+                    // Ensure that the message starts with NICK
+                    if (!message.indexOf('NICK')) {
                         var user = client.getUsername();
                         ws.send(`:${user}! JOIN #local7000`);
                         return;
@@ -515,8 +515,8 @@ describe('commands (justinfan)', function() {
 
                     server.on('connection', function(ws) {
                         ws.on('message', function(message) {
-                            // Ensure that the message starts with USER
-                            if (!message.indexOf('USER')) {
+                            // Ensure that the message starts with NICK
+                            if (!message.indexOf('NICK')) {
                                 var user = client.getUsername();
                                 ws.send(`:${user}! JOIN #local7000`);
                                 return;
@@ -548,8 +548,8 @@ describe('commands (justinfan)', function() {
 
                 server.on('connection', function(ws) {
                     ws.on('message', function(message) {
-                        // Ensure that the message starts with USER
-                        if (!message.indexOf('USER')) {
+                        // Ensure that the message starts with NICK
+                        if (!message.indexOf('NICK')) {
                             ws.send(`dummy`);
                             return;
                         }
