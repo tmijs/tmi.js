@@ -38,26 +38,36 @@ var events = [{
     ]
 }, {
     name: 'chat',
-    data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
+    // data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
+    data: "@badge-info=subscriber/21;badges=broadcaster/1,subscriber/12,overwatch-league-insider_2019A/1;color=#177DE3;display-name=Alca;emotes=499:3-4;flags=;id=c5ddcb05-85ae-4a60-91bc-7704c7031257;mod=0;room-id=7676884;subscriber=1;tmi-sent-ts=1554296462753;turbo=0;user-id=7676884;user-type= :alca!alca@alca.tmi.twitch.tv PRIVMSG #alca :Hi :)",
     expected: [
-        '#schmoopiie',
+        '#alca',
         {
-            badges: { broadcaster: '1', warcraft: 'horde' },
-            color: '#0D4200',
-            'display-name': 'Schmoopiie',
-            emotes: {
-                '25': ['0-4', '12-16'],
-                '1902': ['6-10']
+            'badge-info': { subscriber: '21' },
+            badges: {
+                broadcaster: '1',
+                subscriber: '12',
+                'overwatch-league-insider_2019A': '1'
             },
-            subscriber: false,
-            turbo: true,
-            'user-type': 'global_mod',
-            'emotes-raw': '25:0-4,12-16/1902:6-10',
-            'badges-raw': 'broadcaster/1,warcraft/horde',
-            username: 'schmoopiie',
+            color: '#177DE3',
+            'display-name': 'Alca',
+            emotes: { '499': [ '3-4' ] },
+            flags: null,
+            id: 'c5ddcb05-85ae-4a60-91bc-7704c7031257',
+            mod: false,
+            'room-id': '7676884',
+            subscriber: true,
+            'tmi-sent-ts': '1554296462753',
+            turbo: false,
+            'user-id': '7676884',
+            'user-type': null,
+            'emotes-raw': '499:3-4',
+            'badge-info-raw': 'subscriber/21',
+            'badges-raw': 'broadcaster/1,subscriber/12,overwatch-league-insider_2019A/1',
+            username: 'alca',
             'message-type': 'chat'
         },
-        'Hello :)'
+        'Hi :)'
     ]
 }, {
     name: 'cheer',
