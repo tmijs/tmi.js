@@ -220,10 +220,10 @@ var events = [{
             'msg-param-cumulative-months': '7',
             'msg-param-should-share-streak': false,
             'msg-param-sub-plan': 'Prime',
-            'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
+            'msg-param-sub-plan-name': 'Channel Subscription (Schmoopiie)',
             'room-id': '20624989',
             subscriber: true,
-            'system-msg': 'Schmoopiie\\sSubscribed\\swith\\sTwitch\\sPrime.',
+            'system-msg': 'Schmoopiie Subscribed with Twitch Prime.',
             'tmi-sent-ts': '1500000000000',
             turbo: false,
             'user-id': '20624989',
@@ -260,10 +260,10 @@ var events = [{
             'msg-param-should-share-streak': true,
             'msg-param-streak-months': '6',
             'msg-param-sub-plan': 'Prime',
-            'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
+            'msg-param-sub-plan-name': 'Channel Subscription (Schmoopiie)',
             'room-id': '20624989',
             subscriber: true,
-            'system-msg': 'Schmoopiie\\sSubscribed\\swith\\sTwitch\\sPrime.',
+            'system-msg': 'Schmoopiie Subscribed with Twitch Prime.',
             'tmi-sent-ts': '1500000000000',
             turbo: false,
             'user-id': '20624989',
@@ -313,10 +313,10 @@ var events = [{
             mod: false,
             'msg-id': 'sub',
             'msg-param-sub-plan': 'Prime',
-            'msg-param-sub-plan-name': 'Channel\\sSubscription\\s(Schmoopiie)',
+            'msg-param-sub-plan-name': 'Channel Subscription (Schmoopiie)',
             'room-id': '20624989',
             subscriber: true,
-            'system-msg': 'Schmoopiie\\sjust\\ssubscribed!',
+            'system-msg': 'Schmoopiie just subscribed!',
             turbo: true,
             'user-id': '20624989',
             'user-type': 'staff'
@@ -379,7 +379,7 @@ describe('client events', function() {
             var client = new tmi.client();
 
             client.on(name, function(...args) {
-                'Should have reached this callback'.should.be.ok();
+                'Reach this callback'.should.be.ok();
                 expected && expected.forEach(function(data, index) {
                     // console.log({ a: args[index], data });
                     if(data === null) {
@@ -396,7 +396,7 @@ describe('client events', function() {
         });
     });
 
-    it('should emit disconnected', function(cb) {
+    it('emits disconnected', function(cb) {
         var client = new tmi.client();
 
         client.on("disconnected", function(reason) {

@@ -66,7 +66,7 @@ describe('server crashed, with reconnect: false (default)', function() {
         });
     });
 
-    it('should gracefully handle the error', function(cb) {
+    it('gracefully handle the error', function(cb) {
         this.timeout(15000);
         var client = this.client;
         var server = this.server;
@@ -98,7 +98,7 @@ describe('server crashed, with reconnect: true', function() {
         });
     });
 
-    it('should attempt to reconnect', function(cb) {
+    it('attempt to reconnect', function(cb) {
         this.timeout(15000);
         var client = this.client;
         var server = this.server;
