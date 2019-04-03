@@ -38,7 +38,7 @@ describe('handling authentication', function() {
     });
 
     tests.forEach(function(test) {
-        it(`should handle ${test}`, function(cb) {
+        it(`handle ${test}`, function(cb) {
             var client = this.client;
             var server = this.server;
 

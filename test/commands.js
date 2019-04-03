@@ -420,14 +420,14 @@ describe('commands (justinfan)', function() {
         this.client = null;
     });
 
-    it('should handle commands when disconnected', function(cb) {
+    it('handles commands when disconnected', function(cb) {
         this.client.subscribers('local7000').then(noop, function(err) {
             err.should.eql('Not connected to server.');
             cb();
         });
     });
 
-    it('should handle ping', function(cb) {
+    it('handles ping', function(cb) {
         var client = this.client;
         var server = this.server;
 
@@ -450,7 +450,7 @@ describe('commands (justinfan)', function() {
         client.connect().catch(catchConnectError);
     });
 
-    it('should handle ping timeout', function(cb) {
+    it('handles ping timeout', function(cb) {
         var client = this.client;
         var server = this.server;
 

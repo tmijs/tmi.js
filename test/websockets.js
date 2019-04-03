@@ -19,7 +19,7 @@ describe('websockets', function() {
         });
     });
 
-    it('should handle join & part commands', function(cb) {
+    it('handles join & part commands', function(cb) {
         var client = this.client;
         var server = this.server;
 

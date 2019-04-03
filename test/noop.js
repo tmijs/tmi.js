@@ -16,7 +16,7 @@ var tests = [
 
 describe('no-op server events', function() {
     tests.forEach(function(test) {
-        it(`should treat "${test}" as a no-op`, function() {
+        it(`treat "${test}" as a no-op`, function() {
             var stopTest = function() {
                 'Should not call this'.should.not.be.ok();
             };

@@ -375,7 +375,7 @@ describe('client events', function() {
         var name = e.name;
         var data = e.data;
         var expected = e.expected;
-        it(`should emit ${name}`, function(cb) {
+        it(`emit ${name}`, function(cb) {
             var client = new tmi.client();
 
             client.on(name, function(...args) {
