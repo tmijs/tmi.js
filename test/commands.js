@@ -550,7 +550,7 @@ describe('commands (justinfan)', function() {
                     ws.on('message', function(message) {
                         // Ensure that the message starts with NICK
                         if (!message.indexOf('NICK')) {
-                            ws.send(`dummy`);
+                            ws.send('dummy');
                             return;
                         }
                     });
