@@ -25,6 +25,22 @@ var events = [{
         'Hello :)'
     ]
 }, {
+    name: 'automod',
+    data: "@msg-id=msg_rejected :tmi.twitch.tv NOTICE #schmoopiie :Hey! Your message is being checked by mods and has not been sent.",
+    expected: [
+        '#schmoopiie',
+        'msg_rejected',
+        'Hey! Your message is being checked by mods and has not been sent.'
+    ]
+}, {
+    name: 'automod',
+    data: "@msg-id=msg_rejected_mandatory :tmi.twitch.tv NOTICE #schmoopiie :Your message wasn't posted due to conflicts with the channel's moderation settings.",
+    expected: [
+        '#schmoopiie',
+        'msg_rejected_mandatory',
+        "Your message wasn't posted due to conflicts with the channel's moderation settings."
+    ]
+}, {
     name: 'ban',
     data: '@room-id=20624989;target-user-id=20624989 :tmi.twitch.tv CLEARCHAT #schmoopiie :schmoopiie',
     expected: [
