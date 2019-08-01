@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"rootDir": "src",
+		"outDir": "lib",
+		"watch": true,
+		"target": "es6",
+		"declaration": true
+	},
+	"include": [
+		"src/**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"lib"
+	]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "tmi.js",
+  "version": "2.0.0",
+  "description": "Javascript library for the Twitch Messaging Interface.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "nyc --reporter=lcov mocha --exit",
+    "build": "tsc"
+  },
+  "files": [
+    "lib",
+    "LICENSE"
+  ],
+  "keywords": [
+    "tmi", "twitch", "twitch.tv", "message", "messaging", "interface", "bot"
+  ],
+  "author": "Jacob Foster",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tmijs/tmi.js-v2.git"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/node": "^12.6.8",
+    "tekko": "^2.3.0"
+  }
+}
