@@ -4,8 +4,8 @@
   "description": "Javascript library for the Twitch Messaging Interface.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov mocha --exit",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "nyc --reporter=lcov mocha --exit"
   },
   "files": [
     "lib",
