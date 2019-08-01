@@ -12,7 +12,13 @@
     "LICENSE"
   ],
   "keywords": [
-    "tmi", "twitch", "twitch.tv", "message", "messaging", "interface", "bot"
+    "tmi",
+    "twitch",
+    "twitch.tv",
+    "message",
+    "messaging",
+    "interface",
+    "bot"
   ],
   "author": "Jacob Foster",
   "license": "ISC",
