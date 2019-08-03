@@ -18,7 +18,7 @@ export interface FetchResponse extends IncomingMessage {
 
 /**
  * 
- * @param {FetchOptions} options Options for the request.
+ * @param options Options for the request.
  */
 export function fetch(options: Partial<FetchOptions>): Promise<FetchResponse> {
 	return new Promise((resolve, reject) => {

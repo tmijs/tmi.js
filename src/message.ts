@@ -45,9 +45,9 @@ export class ChatMessage {
 
 	/**
 	 * 
-	 * @param {Client} client A tmi.js Client instance.
-	 * @param {tekko.Message} data Parsed IRC data.
-	 * @param {string} raw Raw IRC message.
+	 * @param client A tmi.js Client instance.
+	 * @param data Parsed IRC data.
+	 * @param raw Raw IRC message.
 	 */
 	constructor(client: Client, data: tekko.Message, raw: string) {
 		this.client = client;

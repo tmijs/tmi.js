@@ -6,7 +6,6 @@ import { ClientOptions, Connection, DisconnectEvent } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
 import { User } from './user';
-import { ChatMessageTags } from './tags';
 
 const defaultTMIHost = 'irc.chat.twitch.tv';
 const defaultTMIPort = 6697;
@@ -179,7 +178,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Send a raw IRC message to the TMI servers.
 	 * 
-	 * @param {string} message Raw IRC message to append with CRLF.
+	 * @param message Raw IRC message to append with CRLF.
 	 */
 	sendRaw(message: string) {
 		this.socket.write(message + '\r\n', err => {
@@ -191,7 +190,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Send multiple raw IRC messages to the TMI servers.
 	 * 
-	 * @param {string[]} messages List of messages to join with CRLF and send.
+	 * @param messages List of messages to join with CRLF and send.
 	 */
 	sendRawArray(messages: string[]) {
 		return this.sendRaw(messages.join('\r\n'));
@@ -229,8 +228,8 @@ export class Client extends EventEmitter {
 	/**
 	 * Send a chat message to a channel on Twitch.
 	 * 
-	 * @param {string | Channel} channel Channel to send the message to.
-	 * @param {string} message Message to send.
+	 * @param channel Channel to send the message to.
+	 * @param message Message to send.
 	 */
 	say(channel: string | Channel, message: string) {
 		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
