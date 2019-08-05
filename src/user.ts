@@ -43,26 +43,26 @@ export class User {
 		this.color = tags.get('color');
 	}
 	/** Check that the user has the "broadcaster" badge. */
-	isBroadcaster() {
+	isBroadcaster(): boolean {
 		return this.badges.has('broadcaster');
 	}
 	/** Check that the user has the "moderator" badge. */
-	isMod() {
+	isMod(): boolean {
 		return this.badges.has('moderator');
 	}
 	/** Check that the user has the "subscriber" badge. */
-	isSub() {
+	isSub(): boolean {
 		return this.badges.has('subscriber');
 	}
 	/** Check that the user has the "vip" badge. */
-	isVIP() {
+	isVIP(): boolean {
 		return this.badges.has('vip');
 	}
 	/**
 	 * Get how long a user has been subscribed in months. 0 if never
 	 * subscribed.
 	 */
-	monthsSubbed() {
+	monthsSubbed(): number {
 		const subbed = this.badgeInfo.get('subscriber');
 		if(!subbed) {
 			return 0;
