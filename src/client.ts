@@ -44,6 +44,8 @@ export interface Client {
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/** Received a GLOBALUSERSTATE command. */
 	on(event: 'globaluserstate', listener: (user: User) => void): this;
+	/** Received a ROOMSTATE command. */
+	on(event: 'roomstate', listener: (data: MessageData) => void): this;
 
 	emit(event: string, data?: any);
 	emit(event: 'error', error: Error);
@@ -53,6 +55,7 @@ export interface Client {
 	emit(event: 'join', data: JoinEvent);
 	emit(event: 'part', data: PartEvent);
 	emit(event: 'globaluserstate', data: User);
+	emit(event: 'roomstate', data: MessageData);
 }
 
 /**
@@ -170,7 +173,7 @@ export class Client extends EventEmitter {
 				this.options.identity.name = name;
 			}
 		}
-			// noop
+		// noop
 		else if(noopIRCCommands.includes(command)) {}
 		else {
 			const data = new MessageData(this, parsedData, message);
@@ -213,6 +216,9 @@ export class Client extends EventEmitter {
 				const channel = new DummyChannel(this, name, data.tags);
 				this.user = new ClientUser(name, data.tags, channel);
 				this.emit('globaluserstate', this.user);
+			}
+			else if(command === 'ROOMSTATE') {
+				this.emit('roomstate', data);
 			}
 			else {
 				this.emit('unhandled-command', data);
