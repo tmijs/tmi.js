@@ -23,9 +23,9 @@ export interface Client {
 	/** Client disconnected from the TMI servers. */
 	on(event: 'disconnected', listener: (data: DisconnectEvent) => void): this;
 	/** Received some unfiltered data from the TMI servers. */
-	on(event: 'data', listener: (data: MessageData) => void): this;
-	/** Received a PRIVMSG. */
-	on(event: 'privmsg', listener: (data: ChatMessage) => void): this;
+	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
+	/** Received a chat message. */
+	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/** Received a GLOBALUSERSTATE. */
 	on(event: 'globaluserstate', listener: (user: User) => void): this;
 	/** Received a PING from the TMI servers. */
@@ -136,11 +136,10 @@ export class Client extends EventEmitter {
 		}
 		else if(command === 'PRIVMSG') {
 			const data = new ChatMessage(this, parsedData, message);
-			this.emit('privmsg', data);
+			this.emit('message', data);
 		}
 		else if(command === '001') {
 			const name = parsedData.params[0];
-			// this.options.identity.name
 			if(!this.options.identity) {
 				this.options.identity = { name, auth: null };
 			}
@@ -148,10 +147,8 @@ export class Client extends EventEmitter {
 				this.options.identity.name = name;
 			}
 		}
-		
-		else if(noopIRCCommands.includes(command)) {
 			// noop
-		}
+		else if(noopIRCCommands.includes(command)) {}
 		else {
 			const data = new MessageData(this, parsedData, message);
 			if(command === 'JOIN') {
@@ -171,7 +168,7 @@ export class Client extends EventEmitter {
 				this.emit('globaluserstate', this.user);
 			}
 			else {
-				this.emit('data', data);
+				this.emit('unhandled-command', data);
 			}
 		}
 	}
