@@ -42,6 +42,8 @@ export class ChatMessage {
 	user: User;
 	tags: ChatMessageTags;
 	message: string;
+	isAction: boolean;
+	isCheer: boolean;
 
 	/**
 	 * 
@@ -55,7 +57,14 @@ export class ChatMessage {
 		this.raw = raw;
 		this.tags = new ChatMessageTags(data.tags);
 		this.channel = new Channel(client, data.params[0], this.tags);
-		this.message = data.params[1];
+		const msg = data.params[1];
+		this.message = msg;
+		this.isAction = false;
+		if(msg.startsWith('\u0001ACTION ') && msg.endsWith('\u0001')) {
+			this.isAction = true;
+			this.message = msg.slice(8, -1);
+		}
+		this.isCheer = this.tags.has('bits');
 		const { name } = data.prefix;
 		this.user = new User(name, this.tags, this.channel);
 	}
