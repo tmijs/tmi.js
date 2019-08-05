@@ -23,24 +23,36 @@ const noopIRCCommands = [
 
 export interface Client {
 	on(event: string, listener: Function): this;
+	/**
+	 * Received some unfiltered data from the TMI servers.
+	 * TODO: REMOVE
+	 * */
+	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
 	/** An error occurred. */
 	on(event: 'error', listener: (error: Error) => void): this;
+	/** Received a PING from the TMI servers. */
+	on(event: 'ping', listener: () => void): this;
 	/** Client connected to the TMI servers. */
 	on(event: 'connected', listener: () => void): this;
 	/** Client disconnected from the TMI servers. */
 	on(event: 'disconnected', listener: (data: DisconnectEvent) => void): this;
-	/** Received some unfiltered data from the TMI servers. */
-	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
 	/** Client joined or another user joined a channel. */
 	on(event: 'join', listener: (data: JoinEvent) => void): this;
 	/** Client parted or another user parted a channel. */
 	on(event: 'part', listener: (data: PartEvent) => void): this;
 	/** Received a chat message. */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
-	/** Received a GLOBALUSERSTATE. */
+	/** Received a GLOBALUSERSTATE command. */
 	on(event: 'globaluserstate', listener: (user: User) => void): this;
-	/** Received a PING from the TMI servers. */
-	on(event: 'ping', listener: () => void): this;
+
+	emit(event: string, data?: any);
+	emit(event: 'error', error: Error);
+	emit(event: 'ping');
+	emit(event: 'connected');
+	emit(event: 'disconnected', data: DisconnectEvent);
+	emit(event: 'join', data: JoinEvent);
+	emit(event: 'part', data: PartEvent);
+	emit(event: 'globaluserstate', data: User);
 }
 
 /**
