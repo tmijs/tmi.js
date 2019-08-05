@@ -70,3 +70,12 @@ export class User {
 		return parseInt(subbed, 10);
 	}
 }
+
+export class ClientUser extends User {
+	isClientUser: true;
+
+	constructor(login: string, tags: ChatMessageTags, channel: Channel) {
+		super(login, tags, channel);
+		this.isClientUser = true;
+	}
+}

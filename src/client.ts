@@ -2,10 +2,17 @@ import { EventEmitter } from 'events';
 import * as tls from 'tls';
 import * as tekko from 'tekko';
 
-import { ClientOptions, Connection, DisconnectEvent } from './types';
+import {
+	ClientOptions,
+	UserOrClientUser,
+	Connection,
+	DisconnectEvent,
+	JoinEvent,
+	PartEvent
+} from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
-import { User } from './user';
+import { User, ClientUser } from './user';
 
 const defaultTMIHost = 'irc.chat.twitch.tv';
 const defaultTMIPort = 6697;
@@ -24,6 +31,10 @@ export interface Client {
 	on(event: 'disconnected', listener: (data: DisconnectEvent) => void): this;
 	/** Received some unfiltered data from the TMI servers. */
 	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
+	/** Client joined or another user joined a channel. */
+	on(event: 'join', listener: (data: JoinEvent) => void): this;
+	/** Client parted or another user parted a channel. */
+	on(event: 'part', listener: (data: PartEvent) => void): this;
 	/** Received a chat message. */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/** Received a GLOBALUSERSTATE. */
@@ -45,7 +56,7 @@ export class Client extends EventEmitter {
 	/** Details about the connection. */
 	connection: Connection;
 	/** User of the authenticated user for the client */
-	user: User;
+	user: ClientUser;
 	/** List of joined channels. */
 	channels: Channel[];
 
@@ -151,20 +162,44 @@ export class Client extends EventEmitter {
 		else if(noopIRCCommands.includes(command)) {}
 		else {
 			const data = new MessageData(this, parsedData, message);
+			const { params, prefix } = data;
+			const [ channelName ] = params;
+			const isSelf = this.user && prefix.name === this.user.login;
 			if(command === 'JOIN') {
-				if(data.prefix.name === this.user.login) {
-					const channel = new Channel(this, data.params[0], data.tags);
-					this.emit('join', channel);
+				const channel = new Channel(this, channelName, data.tags);
+				let user = this.user as UserOrClientUser;
+				if(!isSelf) {
+					user = new User(prefix.name, data.tags, channel);
 				}
+				this.emit('join', { channel, user });
+			}
+			else if(command === 'PART') {
+				let channel = null;
+				for(let i = 0; i < this.channels.length; i++) {
+					if(this.channels[i].login === channelName) {
+						channel = this.channels[i];
+						if(isSelf) {
+							this.channels.splice(i, 1);
+						}
+						break;
+					}
+				}
+				if(!channel) {
+					channel = new Channel(this, channelName, data.tags);
+				}
+				let user = this.user as UserOrClientUser;
+				if(!isSelf) {
+					user = new User(prefix.name, data.tags, channel);
+				}
+				this.emit('part', { channel, user });
 			}
 			else if(command === 'GLOBALUSERSTATE') {
-				const data = new MessageData(this, parsedData, message);
 				let name = null;
 				if(this.options.identity) {
 					name = this.options.identity.name;
 				}
 				const channel = new DummyChannel(this, name, data.tags);
-				this.user = new User(name, data.tags, channel);
+				this.user = new ClientUser(name, data.tags, channel);
 				this.emit('globaluserstate', this.user);
 			}
 			else {

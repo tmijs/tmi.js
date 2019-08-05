@@ -1,4 +1,9 @@
 import { ChatMessageTags, MessageTags } from "./tags";
+import { Channel } from "./channel";
+import { User, ClientUser } from "./user";
+
+export type UserOrClientUser = User | ClientUser;
+export type Tags = ChatMessageTags | MessageTags;
 
 /** The indexes of emotes in the message. */
 export interface EmoteIndexes {
@@ -34,4 +39,12 @@ export interface DisconnectEvent {
 	hadError: boolean;
 }
 
-export type Tags = ChatMessageTags | MessageTags;
+export interface JoinEvent {
+	channel: Channel;
+	user: UserOrClientUser;
+}
+
+export interface PartEvent {
+	channel: Channel;
+	user: UserOrClientUser;
+}
