@@ -80,14 +80,13 @@ export class Client extends EventEmitter {
 	connection: Connection;
 	/** User of the authenticated user for the client */
 	user: ClientUser;
-	/** List of joined channels. */
-	channels: Channel[];
+	channels: Map<string, Channel>;
 
 	constructor(opts: ClientOptions = {}) {
 		super();
 		this.socket = null;
 		// this.ircCommandHandler = new IRCCommandHandler(this);
-		this.channels = [];
+		this.channels = new Map();
 		this.options = opts || {};
 		this.user = null;
 		const { connection: connectionOpts = {} } = opts;
@@ -163,14 +162,12 @@ export class Client extends EventEmitter {
 		if(command === 'PING') {
 			this.sendRaw('PONG :tmi.twitch.tv');
 			this.emit('ping');
+			return;
 		}
 		else if(parsedData.prefix && parsedData.prefix.user === 'jtv') {
 			console.log('JTV');
 			console.log(parsedData);
-		}
-		else if(command === 'PRIVMSG') {
-			const data = new ChatMessage(this, parsedData, message);
-			this.emit('message', data);
+			return;
 		}
 		else if(command === '001') {
 			const name = parsedData.params[0];
@@ -180,57 +177,61 @@ export class Client extends EventEmitter {
 			else {
 				this.options.identity.name = name;
 			}
+			return;
 		}
 		// noop
-		else if(noopIRCCommands.includes(command)) {}
-		else {
-			const data = new MessageData(this, parsedData, message);
-			const { params, prefix } = data;
-			const [ channelName ] = params;
-			const isSelf = this.user && prefix.name === this.user.login;
-			if(command === 'JOIN') {
-				const channel = new Channel(this, channelName, data.tags);
-				let user = this.user as UserOrClientUser;
-				if(!isSelf) {
-					user = new User(prefix.name, data.tags, channel);
-				}
-				this.emit('join', { channel, user });
+		else if(noopIRCCommands.includes(command)) {
+			return;
+		}
+		const data = new MessageData(this, parsedData, message);
+		const { params, prefix, tags } = data;
+		const [ channelName ] = params;
+		let channel = null;
+		if(channelName) {
+			channel = this.channels.get(channelName);
+			if(!channel) {
+				channel = new Channel(this, channelName, tags);
 			}
-			else if(command === 'PART') {
-				let channel = null;
-				for(let i = 0; i < this.channels.length; i++) {
-					if(this.channels[i].login === channelName) {
-						channel = this.channels[i];
-						if(isSelf) {
-							this.channels.splice(i, 1);
-						}
-						break;
-					}
-				}
-				if(!channel) {
-					channel = new Channel(this, channelName, data.tags);
-				}
-				let user = this.user as UserOrClientUser;
-				if(!isSelf) {
-					user = new User(prefix.name, data.tags, channel);
-				}
-				this.emit('part', { channel, user });
+		}
+		const isSelf = this.user && prefix.name === this.user.login;
+		if(command === 'PRIVMSG') {
+			const data = new ChatMessage(this, parsedData, message);
+			this.emit('message', data);
+		}
+		else if(command === 'JOIN') {
+			this.channels.set(channelName, channel);
+			let user = this.user as UserOrClientUser;
+			if(!isSelf) {
+				user = new User(prefix.name, tags, channel);
 			}
-			else if(command === 'GLOBALUSERSTATE') {
-				let name = null;
-				if(this.options.identity) {
-					name = this.options.identity.name;
-				}
+			this.emit('join', { channel, user });
+		}
+		else if(command === 'PART') {
+			const wasJoined = this.channels.delete(channelName);
+			const hadState = this.user.states.delete(channelName);
+			if(!channel) {
+				channel = new Channel(this, channelName, tags);
+			}
+			let user = this.user as UserOrClientUser;
+			if(!isSelf) {
+				user = new User(prefix.name, tags, channel);
+			}
+			this.emit('part', { channel, user });
+		}
+		else if(command === 'GLOBALUSERSTATE') {
+			let name = null;
+			if(this.options.identity) {
+				name = this.options.identity.name;
+			}
 			const channel = new DummyChannel(this, name, tags);
 			this.user = new ClientUser(tags, channel);
 			this.emit('globaluserstate', { user: this.user });
 		}
-			else if(command === 'ROOMSTATE') {
-				this.emit('roomstate', data);
-			}
-			else {
-				this.emit('unhandled-command', data);
-			}
+		else if(command === 'ROOMSTATE') {
+			this.emit('roomstate', data);
+		}
+		else {
+			this.emit('unhandled-command', data);
 		}
 	}
 	/**
