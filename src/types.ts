@@ -1,6 +1,6 @@
 import { ChatMessageTags, MessageTags } from "./tags";
 import { Channel } from "./channel";
-import { User, ClientUser } from "./user";
+import { User, ClientUser, UserState } from "./user";
 
 export type UserOrClientUser = User | ClientUser;
 export type Tags = ChatMessageTags | MessageTags;
@@ -51,4 +51,8 @@ export interface PartEvent {
 
 export interface GlobalUserStateEvent {
 	user: ClientUser;
+}
+
+export interface UserStateEvent {
+	state: UserState;
 }

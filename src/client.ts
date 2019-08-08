@@ -9,11 +9,12 @@ import {
 	DisconnectEvent,
 	JoinEvent,
 	PartEvent,
-	GlobalUserStateEvent
+	GlobalUserStateEvent,
+	UserStateEvent
 } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
-import { User, ClientUser } from './user';
+import { User, ClientUser, UserState } from './user';
 
 const defaultTMIHost = 'irc.chat.twitch.tv';
 const defaultTMIPort = 6697;
@@ -49,6 +50,13 @@ export interface Client {
 	on(
 		event: 'globaluserstate',
 		listener: (data: GlobalUserStateEvent) => void
+	): this;
+	/**
+	 * Received a USERSTATE command.
+	 */
+	on(
+		event: 'userstate',
+		listener: (data: UserStateEvent) => void
 	): this;
 	/**
 	 * Received a ROOMSTATE command.
@@ -186,7 +194,7 @@ export class Client extends EventEmitter {
 		const data = new MessageData(this, parsedData, message);
 		const { params, prefix, tags } = data;
 		const [ channelName ] = params;
-		let channel = null;
+		let channel: Channel = null;
 		if(channelName) {
 			channel = this.channels.get(channelName);
 			if(!channel) {
@@ -226,6 +234,18 @@ export class Client extends EventEmitter {
 			const channel = new DummyChannel(this, name, tags);
 			this.user = new ClientUser(tags, channel);
 			this.emit('globaluserstate', { user: this.user });
+		}
+		else if(command === 'USERSTATE') {
+			let state: UserState;
+			if(this.user.states.has(channelName)) {
+				state = this.user.states.get(channelName);
+				state.update(tags);
+			}
+			else {
+				state = new UserState(tags, channel);
+				this.user.states.set(channelName, state);
+			}
+			this.emit('userstate', { state });
 		}
 		else if(command === 'ROOMSTATE') {
 			this.emit('roomstate', data);

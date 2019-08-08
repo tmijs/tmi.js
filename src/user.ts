@@ -1,6 +1,6 @@
 import { Client } from './client';
 import { Channel } from './channel';
-import { Badges, BadgeInfo, ChatMessageTags } from './tags';
+import { Badges, BadgeInfo, ChatMessageTags, MessageTags } from './tags';
 
 /** A chat user associated with a channel. */
 export class User {
@@ -76,11 +76,23 @@ export class User {
 	}
 }
 
+export class UserState extends User {
+	constructor(tags: ChatMessageTags, channel: Channel) {
+		super(channel.client.user.login, tags, channel);
+		this.isClientUser = true;
+	}
+	update(tags: MessageTags) {
+		// TODO
+	}
+}
+
 export class ClientUser extends User {
 	isClientUser: true;
+	states: Map<string, UserState>;
 
 	constructor(tags: ChatMessageTags, channel: Channel) {
 		super(channel.client.user.login, tags, channel);
 		this.isClientUser = true;
+		this.states = new Map();
 	}
 }
