@@ -31,6 +31,10 @@ export class User {
 	 * be assigned for the duration of the session.
 	 */
 	color: string;
+	/**
+	 * Whether or not this user is the user object of the client instance.
+	 */
+	isClientUser: boolean;
 
 	constructor(login: string, tags: ChatMessageTags, channel: Channel) {
 		this.client = channel.client;
@@ -41,6 +45,7 @@ export class User {
 		this.badges = tags.get('badges');
 		this.badgeInfo = tags.get('badge-info');
 		this.color = tags.get('color');
+		this.isClientUser = false;
 	}
 	/** Check that the user has the "broadcaster" badge. */
 	isBroadcaster(): boolean {
@@ -74,8 +79,8 @@ export class User {
 export class ClientUser extends User {
 	isClientUser: true;
 
-	constructor(login: string, tags: ChatMessageTags, channel: Channel) {
-		super(login, tags, channel);
+	constructor(tags: ChatMessageTags, channel: Channel) {
+		super(channel.client.user.login, tags, channel);
 		this.isClientUser = true;
 	}
 }

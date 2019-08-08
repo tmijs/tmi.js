@@ -213,10 +213,10 @@ export class Client extends EventEmitter {
 				if(this.options.identity) {
 					name = this.options.identity.name;
 				}
-				const channel = new DummyChannel(this, name, data.tags);
-				this.user = new ClientUser(name, data.tags, channel);
-				this.emit('globaluserstate', this.user);
-			}
+			const channel = new DummyChannel(this, name, tags);
+			this.user = new ClientUser(tags, channel);
+			this.emit('globaluserstate', this.user);
+		}
 			else if(command === 'ROOMSTATE') {
 				this.emit('roomstate', data);
 			}
