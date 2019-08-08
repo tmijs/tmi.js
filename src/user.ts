@@ -1,15 +1,23 @@
 import { Client } from './client';
-import { Channel } from './channel';
+import { Channel, DummyChannel } from './channel';
 import { Badges, BadgeInfo, ChatMessageTags, MessageTags } from './tags';
 
-/** A chat user associated with a channel. */
+/**
+ * A chat user from a channel.
+ */
 export class User {
 	client: Client;
-	/** The login name of the user. */
+	/**
+	 * The login name of the user.
+	 */
 	login: string;
-	/** The ID of the user. */
+	/**
+	 * The ID of the user.
+	 */
 	id: string;
-	/** The channel that the user is associated with. */
+	/**
+	 * The channel that the user is from.
+	 */
 	channel: Channel;
 	/**
 	 * The user's display name is similar to their login name except that it can
@@ -17,7 +25,9 @@ export class User {
 	 * whitespace at the start or end.
 	 */
 	displayName: string;
-	/** Badges that the user has set for display. */
+	/**
+	 * Badges that the user has set for display.
+	 */
 	badges: Badges;
 	/**
 	 * Metadata related to some of the `badges`. For instance "subscriber" will
@@ -36,6 +46,11 @@ export class User {
 	 */
 	isClientUser: boolean;
 
+	/**
+	 * @param login The login name for the user.
+	 * @param tags The tags for the user.
+	 * @param channel The channel from the originating message.
+	 */
 	constructor(login: string, tags: ChatMessageTags, channel: Channel) {
 		this.client = channel.client;
 		this.login = login;
@@ -47,25 +62,34 @@ export class User {
 		this.color = tags.get('color');
 		this.isClientUser = false;
 	}
-	/** Check that the user has the "broadcaster" badge. */
+	/**
+	 * Check that the user has the "broadcaster" badge.
+	 */
 	isBroadcaster(): boolean {
 		return this.badges.has('broadcaster');
 	}
-	/** Check that the user has the "moderator" badge. */
+	/**
+	 * Check that the user has the "moderator" badge.
+	 */
 	isMod(): boolean {
 		return this.badges.has('moderator');
 	}
-	/** Check that the user has the "subscriber" badge. */
+	/**
+	 * Check that the user has the "subscriber" badge.
+	 */
 	isSub(): boolean {
 		return this.badges.has('subscriber');
 	}
-	/** Check that the user has the "vip" badge. */
+	/**
+	 * Check that the user has the "vip" badge.
+	 */
 	isVIP(): boolean {
 		return this.badges.has('vip');
 	}
 	/**
-	 * Get how long a user has been subscribed in months. 0 if never
-	 * subscribed.
+	 * Get how long a user has been subscribed in months. Will be `0` if they
+	 * have never subscribed, is not currently subscribed, or for some other
+	 * reason the badge is not being displayed.
 	 */
 	monthsSubbed(): number {
 		const subbed = this.badgeInfo.get('subscriber');
@@ -76,21 +100,52 @@ export class User {
 	}
 }
 
+/**
+ * A state for the client user in a channel.
+ */
 export class UserState extends User {
-	constructor(tags: ChatMessageTags, channel: Channel) {
+	/**
+	 * @param tags Tags for the user in the channel.
+	 * @param channel Channel for the user state.
+	 */
+	constructor(tags: MessageTags, channel: Channel) {
 		super(channel.client.user.login, tags, channel);
 		this.isClientUser = true;
 	}
+	/**
+	 * Update the state of the user.
+	 *
+	 * @param tags Updated tags for the state.
+	 */
 	update(tags: MessageTags) {
 		// TODO
 	}
 }
 
+/**
+ * The user of the client.
+ */
 export class ClientUser extends User {
+	/**
+	 * A dummy channel.
+	 */
+	channel: DummyChannel;
+	/**
+	 * This user is the client user.
+	 */
 	isClientUser: true;
+	/**
+	 * The states for the client user by the respective channels.
+	 */
 	states: Map<string, UserState>;
 
-	constructor(tags: ChatMessageTags, channel: Channel) {
+	/**
+	 * @param client A tmi.js Client instance.
+	 * @param name The name of the client user.
+	 * @param tags Tags for the user.
+	 */
+	constructor(client: Client, name: string, tags: MessageTags) {
+		const channel = new DummyChannel(client, name, tags);
 		super(channel.client.user.login, tags, channel);
 		this.isClientUser = true;
 		this.states = new Map();

@@ -4,21 +4,43 @@ import { request as req } from 'https';
 import { User } from './user';
 
 export interface AskOptions {
+	/**
+	 * Fully qualified URL or partial URL to be appended to baseURL if supplied.
+	 */
 	url: string;
+	/**
+	 * Base URL to be prepended to url.
+	 */
 	baseURL?: string;
+	/**
+	 * HTTP verb to use. Defaults to GET.
+	 */
 	method?: string;
+	/**
+	 * Headers to add to the request.
+	 */
 	headers?: ({ [key: string]: string });
+	/**
+	 * Send bodies (TODO) and parse responses as JSON.
+	 */
 	json?: boolean;
+	// TODO: Query string
 }
 
 export interface AskResponse extends IncomingMessage {
+	/**
+	 * Unparsed body of the response.
+	 */
 	rawBody: string;
+	/**
+	 * Possibly parsed body of the response.
+	 */
 	body: any;
 }
 
 /**
  * Make a simple HTTP request.
- * 
+ *
  * @param options Options for the request.
  */
 export function ask(options: Partial<AskOptions>): Promise<AskResponse> {
@@ -63,6 +85,11 @@ export function ask(options: Partial<AskOptions>): Promise<AskResponse> {
 	});
 }
 
+/**
+ * Make a request to the kraken API. Adds the base URL and v5 headers.
+ *
+ * @param options Options for the request.
+ */
 export function kraken(options: Partial<AskOptions>) {
 	const headers = {
 		Accept: 'application/vnd.twitchtv.v5+json'
@@ -78,6 +105,11 @@ export function kraken(options: Partial<AskOptions>) {
 	});
 }
 
+/**
+ * Validate a user token.
+ *
+ * @param token A user token.
+ */
 export function validateToken(token: string) {
 	return ask({
 		url: 'https://id.twitch.tv/oauth2/validate',
@@ -88,6 +120,11 @@ export function validateToken(token: string) {
 	});
 }
 
+/**
+ * Get the emotes for a user.
+ *
+ * @param userID A User or a user ID to look up.
+ */
 export function getEmotes(userID: string | User) {
 	if(userID instanceof User) {
 		userID = userID.id;

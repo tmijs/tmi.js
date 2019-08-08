@@ -13,15 +13,29 @@ const numberMessageTags = [
 	'msg-param-viewerCount', 'msg-param-threshold'
 ];
 
+/**
+ * Twitch emotes within the message.
+ */
 export interface MessageEmotes {
+	/**
+	 * Get an emote's indexes in the message.
+	 *
+	 * @param emoteID ID of the emote.
+	 * @returns An array of start and end objects for the indexes of the emotes
+	 * in the message.
+	 */
 	get(emoteID: string): EmoteIndexes[];
 }
 
-/** Twitch emotes within the message. */
 export class MessageEmotes extends Map<string, EmoteIndexes[]> {
-	/** The raw emotes tag value that was parsed. */
+	/**
+	 * The raw emotes tag value that was parsed.
+	 */
 	raw: string;
 
+	/**
+	 * @param raw The raw string for the emotes.
+	 */
 	constructor(raw: string = '') {
 		super();
 		this.raw = raw;
@@ -42,10 +56,14 @@ export class MessageEmotes extends Map<string, EmoteIndexes[]> {
 	}
 }
 
-/** Tags for a chat message. */
+/**
+ * Tags for a message.
+ */
 export interface MessageTags {
 	get(key: string): any;
-	/** Badges that the user has set for display. */
+	/**
+	 * Badges that the user has set for display.
+	 */
 	get(key: 'badges'): Badges;
 	/**
 	 * Metadata related to some of the `badges`. For instance "subscriber" will
@@ -65,13 +83,20 @@ export interface MessageTags {
 	 * whitespace at the start or end.
 	 */
 	get(key: 'display-name'): string;
-	/** A  */
+	/**
+	 * The available emote sets sent TMI. Likely to give inaccurate results.
+	 */
 	get(key: 'emote-sets'): string;
-	/** The ID of the user associated with the chat message. */
+	/**
+	 * The ID of the user from the chat message.
+	 */
 	get(key: 'user-id'): string;
 }
 
 export class MessageTags extends Map<string, any> {
+	/**
+	 * @param data Parsed tag data for the message.
+	 */
 	constructor(data: tekko.MessageTags = {}) {
 		super();
 		for(const [ key, val ] of Object.entries(data)) {
@@ -133,10 +158,16 @@ export class MessageTags extends Map<string, any> {
 	}
 }
 
-/** Tags for a chat message. */
+/**
+ * Tags for a chat message.
+ *
+ * @see https://dev.twitch.tv/docs/irc/tags#privmsg-twitch-tags
+ */
 export interface ChatMessageTags {
 	get(key: string): any;
-	/** Badges that the user has set for display. */
+	/**
+	 * Badges that the user has set for display.
+	 */
 	get(key: 'badges'): Badges;
 	/**
 	 * Metadata related to some of the `badges`. For instance "subscriber" will
@@ -156,19 +187,33 @@ export interface ChatMessageTags {
 	 * whitespace at the start or end.
 	 */
 	get(key: 'display-name'): string;
-	/** TODO: WRITE THIS. */
+	/**
+	 * TODO: WRITE THIS.
+	 */
 	get(key: 'emotes'): MessageEmotes | undefined;
-	/** Unused? */
+	/**
+	 * Unused?
+	 */
 	get(key: 'flags'): string;
-	/** The UUID of the message. */
+	/**
+	 * The UUID of the message.
+	 */
 	get(key: 'id'): string;
-	/** True if the user is a chat moderator for the channel. */
+	/**
+	 * True if the user is a chat moderator for the channel.
+	 */
 	get(key: 'mod'): boolean;
-	/** The ID of the broadcaster associated with the channel. */
+	/**
+	 * The ID of the broadcaster of the channel.
+	 */
 	get(key: 'room-id'): string;
-	/** A numeric timestamp that the message was sent at. */
+	/**
+	 * A numeric timestamp that the message was sent at.
+	 */
 	get(key: 'tmi-sent-ts'): string;
-	/** The ID of the user associated with the chat message. */
+	/**
+	 * The ID of the user from the chat message.
+	 */
 	get(key: 'user-id'): string;
 }
 
@@ -178,80 +223,150 @@ export class ChatMessageTags extends MessageTags {
 	// }
 }
 
-/** @see https://badges.twitch.tv/v1/badges/global/display */
-/** @see https://badges.twitch.tv/v1/badges/channels/:channelID/display */
+/**
+ * A Map of chat badges.
+ *
+ * @see https://badges.twitch.tv/v1/badges/global/display
+ * @see https://badges.twitch.tv/v1/badges/channels/:channelID/display
+ */
 export interface Badges {
 	get(key: string): string;
-	/** User is an anonymous user. */
+	/**
+	 * User is an anonymous user.
+	 */
 	get(key: 'anonymous-cheerer'): string;
-	/** User has used Bits at some point. */
+	/**
+	 * User has used Bits at some point.
+	 */
 	get(key: 'bits'): string;
-	/** User participated in a Bits charity event. */
+	/**
+	 * User participated in a Bits charity event.
+	 */
 	get(key: 'bits-charity'): string;
-	/** User is a Bits leader on the leaderboard. */
+	/**
+	 * User is a Bits leader on the leaderboard.
+	 */
 	get(key: 'bits-leader'): string;
-	/** User is the broadcaster of the channel. */
+	/**
+	 * User is the broadcaster of the channel.
+	 */
 	get(key: 'broadcaster'): string;
-	/** User received an award for being a good Clipper. */
+	/**
+	 * User received an award for being a good Clipper.
+	 */
 	get(key: 'clip-champ'): string;
-	/** User is an extension instead of a human. */
+	/**
+	 * User is an extension instead of a human.
+	 */
 	get(key: 'extension'): string;
-	/** User is a moderator of the channel. */
+	/**
+	 * User is a moderator of the channel.
+	 */
 	get(key: 'moderator'): string;
-	/** User is a Twitch Partner. */
+	/**
+	 * User is a Twitch Partner.
+	 */
 	get(key: 'partner'): string;
-	/** User has Twitch Prime. */
+	/**
+	 * User has Twitch Prime.
+	 */
 	get(key: 'premium'): string;
-	/** User is a Staff member of Twitch. */
+	/**
+	 * User is a Staff member of Twitch.
+	 */
 	get(key: 'staff'): string;
-	/** User has gifted subs to the channel at some point. */
+	/**
+	 * User has gifted subs to the channel at some point.
+	 */
 	get(key: 'sub-gifter'): string;
-	/** User is currently a subscriber of the channel. */
+	/**
+	 * User is currently a subscriber of the channel.
+	 */
 	get(key: 'subscriber'): string;
-	/** User has Twitch Turbo. */
+	/**
+	 * User has Twitch Turbo.
+	 */
 	get(key: 'turbo'): string;
-	/** User is AutoMod instead of a human. */
+	/**
+	 * User is AutoMod instead of a human.
+	 */
 	get(key: 'twitchbot'): string;
-	/** User is a VIP of the channel. */
+	/**
+	 * User is a VIP of the channel.
+	 */
 	get(key: 'vip'): string;
-	
+
 	has(key: string): boolean;
-	/** User is an anonymous user. */
+	/**
+	 * User is an anonymous user.
+	 */
 	has(key: 'anonymous-cheerer'): boolean;
-	/** User has used Bits at some point. */
+	/**
+	 * User has used Bits at some point.
+	 */
 	has(key: 'bits'): boolean;
-	/** User participated in a Bits charity event. */
+	/**
+	 * User participated in a Bits charity event.
+	 */
 	has(key: 'bits-charity'): boolean;
-	/** User is a Bits leader on the leaderboard. */
+	/**
+	 * User is a Bits leader on the leaderboard.
+	 */
 	has(key: 'bits-leader'): boolean;
-	/** User is the broadcaster of the channel. */
+	/**
+	 * User is the broadcaster of the channel.
+	 */
 	has(key: 'broadcaster'): boolean;
-	/** User received an award for being a good Clipper. */
+	/**
+	 * User received an award for being a good Clipper.
+	 */
 	has(key: 'clip-champ'): boolean;
-	/** User is an extension instead of a human. */
+	/**
+	 * User is an extension instead of a human.
+	 */
 	has(key: 'extension'): boolean;
-	/** User is a moderator of the channel. */
+	/**
+	 * User is a moderator of the channel.
+	 */
 	has(key: 'moderator'): boolean;
-	/** User is a Twitch Partner. */
+	/**
+	 * User is a Twitch Partner.
+	 */
 	has(key: 'partner'): boolean;
-	/** User has Twitch Prime. */
+	/**
+	 * User has Twitch Prime.
+	 */
 	has(key: 'premium'): boolean;
-	/** User is a Staff member of Twitch. */
+	/**
+	 * User is a Staff member of Twitch.
+	 */
 	has(key: 'staff'): boolean;
-	/** User has gifted subs to the channel at some point. */
+	/**
+	 * User has gifted subs to the channel at some point.
+	 */
 	has(key: 'sub-gifter'): boolean;
-	/** User is currently a subscriber of the channel. */
+	/**
+	 * User is currently a subscriber of the channel.
+	 */
 	has(key: 'subscriber'): boolean;
-	/** User has Twitch Turbo. */
+	/**
+	 * User has Twitch Turbo.
+	 */
 	has(key: 'turbo'): boolean;
-	/** User is AutoMod instead of a human. */
+	/**
+	 * User is AutoMod instead of a human.
+	 */
 	has(key: 'twitchbot'): boolean;
-	/** User is a VIP of the channel. */
+	/**
+	 * User is a VIP of the channel.
+	 */
 	has(key: 'vip'): boolean;
 }
 
-/** A Map of chat badges. */
 export class Badges extends Map<string, string> {
+	/**
+	 * @param data The raw string for the badges.
+	 */
 	constructor(data: string) {
 		super();
 		if(!data) {
@@ -265,12 +380,16 @@ export class Badges extends Map<string, string> {
 	}
 }
 
+/**
+ * Metadata related to the chat badges in the badges tag.
+ */
 export interface BadgeInfo {
 	get(key: string): string;
-	/** Indicates the exact number of months the user has been a subscriber */
+	/**
+	 * Indicates the exact number of months the user has been a subscriber
+	 */
 	get(key: 'subscriber'): string;
 }
 
-/** Metadata related to the chat badges in the badges tag. */
 export class BadgeInfo extends Badges {
 }

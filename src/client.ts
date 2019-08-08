@@ -23,26 +23,43 @@ const noopIRCCommands = [
 	'CAP', '002', '003', '004', '353', '366', '375', '372', '376'
 ];
 
+/**
+ * The tmi.js chat client.
+ */
 export interface Client {
 	on(event: string, listener: Function): this;
 	/**
 	 * Received some unfiltered data from the TMI servers.
 	 * TODO: REMOVE
-	 * */
+	 */
 	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
-	/** An error occurred. */
+	/**
+	 * An error occurred.
+	 */
 	on(event: 'error', listener: (error: Error) => void): this;
-	/** Received a PING from the TMI servers. */
+	/**
+	 * Received a PING command from the TMI servers.
+	 */
 	on(event: 'ping', listener: () => void): this;
-	/** Client connected to the TMI servers. */
+	/**
+	 * Client connected to the TMI servers.
+	 */
 	on(event: 'connected', listener: () => void): this;
-	/** Client disconnected from the TMI servers. */
+	/**
+	 * Client disconnected from the TMI servers.
+	 */
 	on(event: 'disconnected', listener: (data: DisconnectEvent) => void): this;
-	/** Client joined or another user joined a channel. */
+	/**
+	 * Client joined or another user joined a channel.
+	 */
 	on(event: 'join', listener: (data: JoinEvent) => void): this;
-	/** Client parted or another user parted a channel. */
+	/**
+	 * Client parted or another user parted a channel.
+	 */
 	on(event: 'part', listener: (data: PartEvent) => void): this;
-	/** Received a chat message. */
+	/**
+	 * Received a chat message.
+	 */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/**
 	 * Received a GLOBALUSERSTATE command.
@@ -74,22 +91,35 @@ export interface Client {
 	emit(event: 'roomstate', data: MessageData);
 }
 
-/**
- * The tmi.js chat client.
- */
 export class Client extends EventEmitter {
-	/** The socket connection used by the client. */
+	/**
+	 * The socket connection used by the client.
+	 */
 	socket: tls.TLSSocket | import('net').Socket;
-	/** The IRC command handler. */
+	/**
+	 * The IRC command handler.
+	 */
 	// ircCommandHandler: IRCCommandHandler;
-	/** The original client options. */
+	/**
+	 * The original client options.
+	 */
 	options: ClientOptions;
-	/** Details about the connection. */
+	/**
+	 * Details about the connection.
+	 */
 	connection: Connection;
-	/** User of the authenticated user for the client */
+	/**
+	 * User of the authenticated user for the client
+	 */
 	user: ClientUser;
+	/**
+	 * List of joined channels.
+	 */
 	channels: Map<string, Channel>;
 
+	/**
+	 * @param opts Options for the CLient.
+	 */
 	constructor(opts: ClientOptions = {}) {
 		super();
 		this.socket = null;
@@ -123,7 +153,7 @@ export class Client extends EventEmitter {
 	}
 	/**
 	 * Connection to the TMI servers closed.
-	 * 
+	 *
 	 * @param hadError `true` if the socket had a transmission error.
 	 */
 	_onClose(hadError: boolean) {
@@ -136,7 +166,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Emitted when an error occurs with the connection. The 'close' event will
 	 * be called directly following this event.
-	 * 
+	 *
 	 * @param error The error.
 	 */
 	_onError(error: Error) {
@@ -144,7 +174,7 @@ export class Client extends EventEmitter {
 	}
 	/**
 	 * Receieved data on the connection to the TMI servers.
-	 * 
+	 *
 	 * @param rawData The data from the connection.
 	 */
 	_onData(rawData: string) {
@@ -161,7 +191,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Handle a single line of the message data from the TMI connection in IRC
 	 * format.
-	 * 
+	 *
 	 * @param message IRC message from the TMI servers.
 	 */
 	_handleMessage(message: string) {
@@ -231,8 +261,7 @@ export class Client extends EventEmitter {
 			if(this.options.identity) {
 				name = this.options.identity.name;
 			}
-			const channel = new DummyChannel(this, name, tags);
-			this.user = new ClientUser(tags, channel);
+			this.user = new ClientUser(this, name, tags);
 			this.emit('globaluserstate', { user: this.user });
 		}
 		else if(command === 'USERSTATE') {
@@ -256,7 +285,7 @@ export class Client extends EventEmitter {
 	}
 	/**
 	 * Send a raw IRC message to the TMI servers.
-	 * 
+	 *
 	 * @param message Raw IRC message to append with CRLF.
 	 */
 	sendRaw(message: string) {
@@ -268,13 +297,15 @@ export class Client extends EventEmitter {
 	}
 	/**
 	 * Send multiple raw IRC messages to the TMI servers.
-	 * 
+	 *
 	 * @param messages List of messages to join with CRLF and send.
 	 */
 	sendRawArray(messages: string[]) {
 		return this.sendRaw(messages.join('\r\n'));
 	}
-	/** Connect to the TMI servers. */
+	/**
+	 * Connect to the TMI servers.
+	 */
 	connect(): Promise<any> {
 		const { host, port } = this.connection;
 		this.socket = tls.connect({ host, port });
@@ -306,7 +337,7 @@ export class Client extends EventEmitter {
 	}
 	/**
 	 * Send a chat message to a channel on Twitch.
-	 * 
+	 *
 	 * @param channel Channel to send the message to.
 	 * @param message Message to send.
 	 */
