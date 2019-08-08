@@ -41,7 +41,7 @@ export class User {
 		this.login = login;
 		this.id = tags.get('user-id');
 		this.channel = channel;
-		this.displayName = tags.get('display-name');
+		this.displayName = tags.get('display-name') || login;
 		this.badges = tags.get('badges');
 		this.badgeInfo = tags.get('badge-info');
 		this.color = tags.get('color');
