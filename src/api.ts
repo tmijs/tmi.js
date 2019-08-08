@@ -3,29 +3,30 @@ import { request as req } from 'https';
 
 import { User } from './user';
 
-export interface FetchOptions {
+export interface AskOptions {
 	url: string;
-	baseURL: string;
+	baseURL?: string;
 	method?: string;
 	headers?: ({ [key: string]: string });
 	json?: boolean;
 }
 
-export interface FetchResponse extends IncomingMessage {
+export interface AskResponse extends IncomingMessage {
 	rawBody: string;
 	body: any;
 }
 
 /**
+ * Make a simple HTTP request.
  * 
  * @param options Options for the request.
  */
-export function fetch(options: Partial<FetchOptions>): Promise<FetchResponse> {
+export function ask(options: Partial<AskOptions>): Promise<AskResponse> {
 	return new Promise((resolve, reject) => {
 		let data = '';
 		let error: Error = null;
 		let request: ClientRequest;
-		let response: FetchResponse;
+		let response: AskResponse;
 		const onResponseEnd = () => {
 			if(error) {
 				return reject(error);
@@ -45,7 +46,7 @@ export function fetch(options: Partial<FetchOptions>): Promise<FetchResponse> {
 			resolve(response);
 		};
 		const onResponse = (res: IncomingMessage) => {
-			response = res as FetchResponse;
+			response = res as AskResponse;
 			response.on('data', chunk => data += chunk);
 			response.on('end', onResponseEnd);
 		};
@@ -62,11 +63,11 @@ export function fetch(options: Partial<FetchOptions>): Promise<FetchResponse> {
 	});
 }
 
-export function kraken(options: Partial<FetchOptions>) {
+export function kraken(options: Partial<AskOptions>) {
 	const headers = {
 		Accept: 'application/vnd.twitchtv.v5+json'
 	};
-	return fetch({
+	return ask({
 		...options,
 		baseURL: 'https://api.twitch.tv/kraken/',
 		json: true,
@@ -78,7 +79,7 @@ export function kraken(options: Partial<FetchOptions>) {
 }
 
 export function validateToken(token: string) {
-	return fetch({
+	return ask({
 		url: 'https://id.twitch.tv/oauth2/validate',
 		headers: {
 			Authorization: `OAuth ${token}`
