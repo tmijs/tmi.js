@@ -8,7 +8,8 @@ import {
 	Connection,
 	DisconnectEvent,
 	JoinEvent,
-	PartEvent
+	PartEvent,
+	GlobalUserStateEvent
 } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
@@ -42,9 +43,16 @@ export interface Client {
 	on(event: 'part', listener: (data: PartEvent) => void): this;
 	/** Received a chat message. */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
-	/** Received a GLOBALUSERSTATE command. */
-	on(event: 'globaluserstate', listener: (user: User) => void): this;
-	/** Received a ROOMSTATE command. */
+	/**
+	 * Received a GLOBALUSERSTATE command.
+	 */
+	on(
+		event: 'globaluserstate',
+		listener: (data: GlobalUserStateEvent) => void
+	): this;
+	/**
+	 * Received a ROOMSTATE command.
+	 */
 	on(event: 'roomstate', listener: (data: MessageData) => void): this;
 
 	emit(event: string, data?: any);
@@ -54,7 +62,7 @@ export interface Client {
 	emit(event: 'disconnected', data: DisconnectEvent);
 	emit(event: 'join', data: JoinEvent);
 	emit(event: 'part', data: PartEvent);
-	emit(event: 'globaluserstate', data: User);
+	emit(event: 'globaluserstate', data: GlobalUserStateEvent);
 	emit(event: 'roomstate', data: MessageData);
 }
 
@@ -215,7 +223,7 @@ export class Client extends EventEmitter {
 				}
 			const channel = new DummyChannel(this, name, tags);
 			this.user = new ClientUser(tags, channel);
-			this.emit('globaluserstate', this.user);
+			this.emit('globaluserstate', { user: this.user });
 		}
 			else if(command === 'ROOMSTATE') {
 				this.emit('roomstate', data);

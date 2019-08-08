@@ -48,3 +48,7 @@ export interface PartEvent {
 	channel: Channel;
 	user: UserOrClientUser;
 }
+
+export interface GlobalUserStateEvent {
+	user: ClientUser;
+}
