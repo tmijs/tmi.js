@@ -4,7 +4,7 @@ const { describe } = require('mocha');
 const tmi = require('../lib/index');
 
 describe('Events', function() {
-	it('emits "privmsg"', function(done) {
+	it('emits "message"', function(done) {
 		const client = new tmi.Client();
 
 		/** @param {import("../lib/message").ChatMessage} data */
@@ -22,7 +22,7 @@ describe('Events', function() {
 			data.messageData
 		];
 
-		client.on('privmsg', data => {
+		client.on('message', data => {
 			for(const test of tests(data)) {
 				assert.ok(test);
 			}
@@ -34,7 +34,7 @@ describe('Events', function() {
 			'@badge-info=;badges=;color=;display-name=Alca;emotes=;flags=;id=;mod=0;room-id=;tmi-sent-ts=1560000000000;user-id=7676884; :alca!alca@alca.tmi.twitch.tv PRIVMSG #alca :Test message'
 		);
 	});
-	it('privmsg is parsed correctly', function(done) {
+	it('PRIVMSG is parsed correctly', function(done) {
 		const client = new tmi.Client();
 
 		const raw = '@badge-info=subscriber/25;badges=broadcaster/1,subscriber/12,overwatch-league-insider_2019A/1;color=#177DE3;display-name=Alca;emotes=25:13-17,29-33/70433:19-27;flags=;id=b2e3d732-353a-436e-95ca-354cad588260;mod=0;room-id=7676884;subscriber=1;tmi-sent-ts=1564648902618;turbo=0;user-id=7676884;user-type= :alca!alca@alca.tmi.twitch.tv PRIVMSG #alca :Test message Kappa KappaRoss Kappa';
@@ -111,7 +111,7 @@ describe('Events', function() {
 			}
 		];
 
-		client.on('privmsg', data => {
+		client.on('message', data => {
 			assert.ok(data.messageData);
 
 			for(const test of tests(data)) {
