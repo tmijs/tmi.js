@@ -18,7 +18,7 @@ const defaultTMIHost = 'irc.chat.twitch.tv';
 const defaultTMIPort = 6697;
 
 const noopIRCCommands = [
-	'CAP', '002', '003', '004', '375', '372', '376'
+	'CAP', '002', '003', '004', '353', '366', '375', '372', '376'
 ];
 
 export interface Client {
