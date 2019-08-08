@@ -1,4 +1,4 @@
-const assert = require('assert');
+const assert = require('assert').strict;
 const { describe } = require('mocha');
 
 const tmi = require('../lib/index');
