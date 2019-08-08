@@ -13,10 +13,12 @@ export class Channel {
 	roomUUID: string;
 	/** Whether or not the room is a chat room. */
 	isChatRoom: boolean;
+	isDummy: boolean;
 
 	constructor(client: Client, name: string, tags: Tags) {
 		this.client = client;
 		this.name = name;
+		this.isDummy = false;
 		if(name.startsWith('#chatrooms:') && name.includes(':', 11)) {
 			// #chatrooms:<channel ID>:<room UUID>
 			const [ , channelID, roomUUID ] = name.split(':');
