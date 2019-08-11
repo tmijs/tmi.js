@@ -10,7 +10,8 @@ import {
 	JoinEvent,
 	PartEvent,
 	GlobalUserStateEvent,
-	UserStateEvent
+	UserStateEvent,
+	TekkoMessage
 } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
@@ -195,7 +196,8 @@ export class Client extends EventEmitter {
 	 * @param message IRC message from the TMI servers.
 	 */
 	_handleMessage(message: string) {
-		const parsedData = tekko.parse(message);
+		const parsedData = tekko.parse(message) as TekkoMessage;
+		parsedData.raw = message;
 		const { command } = parsedData;
 		if(command === 'PING') {
 			this.sendRaw('PONG :tmi.twitch.tv');
@@ -221,7 +223,7 @@ export class Client extends EventEmitter {
 		else if(noopIRCCommands.includes(command)) {
 			return;
 		}
-		const data = new MessageData(this, parsedData, message);
+		const data = new MessageData(this, parsedData);
 		const { params, prefix, tags } = data;
 		const [ channelName ] = params;
 		let channel: Channel = null;
@@ -233,8 +235,8 @@ export class Client extends EventEmitter {
 		}
 		const isSelf = this.user && prefix.name === this.user.login;
 		if(command === 'PRIVMSG') {
-			const data = new ChatMessage(this, parsedData, message);
-			this.emit('message', data);
+			const messageEvent = new ChatMessage(this, data);
+			this.emit('message', messageEvent);
 		}
 		else if(command === 'JOIN') {
 			this.channels.set(channelName, channel);

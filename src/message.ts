@@ -4,6 +4,7 @@ import { Client } from './client';
 import { MessageTags, ChatMessageTags } from './tags';
 import { Channel } from './channel';
 import { User } from './user';
+import { TekkoMessage } from './types';
 
 /**
  * Parsed data from the message.
@@ -38,11 +39,10 @@ export class MessageData {
 	/**
 	 * @param client A tmi.js Client instance.
 	 * @param data Parsed data for the message.
-	 * @param raw Raw IRC string that was parsed.
 	 */
-	constructor(client: Client, data: tekko.Message, raw: string) {
+	constructor(client: Client, data: TekkoMessage) {
 		this.client = client;
-		this.raw = raw;
+		this.raw = data.raw;
 		this.command = data.command;
 		this.tags = new MessageTags(data.tags);
 		this.params = data.middle;
@@ -59,11 +59,7 @@ export class ChatMessage {
 	/**
 	 * Parse message data.
 	 */
-	messageData: tekko.Message;
-	/**
-	 * The raw IRC string that was parsed.
-	 */
-	raw: string;
+	messageData: MessageData;
 	/**
 	 * Channel that the message came from.
 	 */
@@ -92,15 +88,13 @@ export class ChatMessage {
 	/**
 	 * @param client A tmi.js Client instance.
 	 * @param data Parsed IRC data.
-	 * @param raw Raw IRC message.
 	 */
-	constructor(client: Client, data: tekko.Message, raw: string) {
+	constructor(client: Client, data: MessageData) {
 		this.client = client;
 		this.messageData = data;
-		this.raw = raw;
 		this.tags = data.tags;
 		this.channel = new Channel(client, data.params[0], this.tags);
-		const msg = data.params[1];
+		const msg = data.trailing;
 		this.message = msg;
 		this.isAction = false;
 		if(msg.startsWith('\u0001ACTION ') && msg.endsWith('\u0001')) {
@@ -108,8 +102,7 @@ export class ChatMessage {
 			this.message = msg.slice(8, -1);
 		}
 		this.isCheer = this.tags.has('bits');
-		const { name } = data.prefix;
-		this.user = new User(name, this.tags, this.channel);
+		this.user = new User(data.prefix.name, this.tags, this.channel);
 	}
 	/**
 	 * Send a message back to the same channel that the chat message was sent

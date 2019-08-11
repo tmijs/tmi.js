@@ -18,6 +18,13 @@ export type Tags = MessageTags | ChatMessageTags;
 /**
  * Tekko's message object with the raw IRC string added.
  */
+export interface TekkoMessage extends tekko.Message {
+	/**
+	 * Raw IRC string that was parsed.
+	 */
+	raw: string;
+}
+
 /**
  * The indexes of emotes in the message.
  */
