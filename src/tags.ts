@@ -188,9 +188,11 @@ export interface ChatMessageTags {
 	 */
 	get(key: 'display-name'): string;
 	/**
-	 * TODO: WRITE THIS.
+	 * Twitch emotes used in the user's message. The ID of the emote is the key
+	 * in the Map which contains an array of the indexes, start and end, of
+	 * the emotes.
 	 */
-	get(key: 'emotes'): MessageEmotes | undefined;
+	get(key: 'emotes'): MessageEmotes;
 	/**
 	 * Unused?
 	 */
