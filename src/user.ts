@@ -146,7 +146,7 @@ export class ClientUser extends User {
 	 */
 	constructor(client: Client, name: string, tags: MessageTags) {
 		const channel = new DummyChannel(client, name, tags);
-		super(channel.client.user.login, tags, channel);
+		super(name, tags, channel);
 		this.isClientUser = true;
 		this.states = new Map();
 	}
