@@ -163,7 +163,7 @@ export class MessageTags extends Map<string, any> {
  *
  * @see https://dev.twitch.tv/docs/irc/tags#privmsg-twitch-tags
  */
-export interface ChatMessageTags {
+export interface ChatMessageTags extends MessageTags {
 	get(key: string): any;
 	/**
 	 * Badges that the user has set for display.
@@ -217,12 +217,6 @@ export interface ChatMessageTags {
 	 * The ID of the user from the chat message.
 	 */
 	get(key: 'user-id'): string;
-}
-
-export class ChatMessageTags extends MessageTags {
-	// constructor(data: tekko.MessageTags) {
-	// 	super(data);
-	// }
 }
 
 /**

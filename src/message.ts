@@ -98,7 +98,7 @@ export class ChatMessage {
 		this.client = client;
 		this.messageData = data;
 		this.raw = raw;
-		this.tags = new ChatMessageTags(data.tags);
+		this.tags = data.tags;
 		this.channel = new Channel(client, data.params[0], this.tags);
 		const msg = data.params[1];
 		this.message = msg;
