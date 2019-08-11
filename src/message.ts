@@ -23,11 +23,11 @@ export class MessageData {
 	 */
 	tags: MessageTags;
 	/**
-	 * Text parameters from the message, like channel name and user messages.
+	 * Text parameters from the message, like channel name.
 	 */
 	params: string[];
 	/**
-	 * Trailing parameters.
+	 * Trailing parameters, like a user message.
 	 */
 	trailing: string;
 	/**
@@ -116,6 +116,7 @@ export class ChatMessage {
 	 * from.
 	 */
 	reply(message: string) {
+		// TODO: Handler whisper replies.
 		this.channel.say(message);
 	}
 }
