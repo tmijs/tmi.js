@@ -13,7 +13,7 @@ import {
 	UserStateEvent,
 	TekkoMessage
 } from './types';
-import { Channel, DummyChannel } from './channel';
+import { Channel } from './channel';
 import { MessageData, ChatMessage } from './message';
 import { User, ClientUser, UserState } from './user';
 
@@ -321,21 +321,49 @@ export class Client extends EventEmitter {
 		// TODO:
 		return Promise.resolve();
 	}
-	getChannel(name: string | Channel | User): Channel {
-		if(name instanceof User) {
-			name = name.login;
-		}
-		else if(name instanceof Channel) {
-			return name;
-		}
-		if(!name) {
-			return null;
-		}
-		const channel = this.channels.find(chan => chan.login);
-		if(channel) {
-			return channel;
-		}
-		return null;
+	/**
+	 * Send a command to a channel on Twitch.
+	 *
+	 * @param channel Channel to send the message to.
+	 * @param command Command to send.
+	 * @param params Params to send.
+	 */
+	sendCommand(
+		channel: string | Channel,
+		command: string,
+		params: string | string[]
+	) {
+		const commandParams = Array.isArray(params) ? params.join(' ') : params;
+		const ircMessage = tekko.format({
+			command: 'PRIVMSG',
+			middle: [ channel.toString() ],
+			trailing: `/${command} ${commandParams}`
+		});
+		this.sendRaw(ircMessage);
+	}
+	/**
+	 * Join a room.
+	 *
+	 * @param roomName Name of the channel to join.
+	 */
+	join(roomName: string) {
+		const ircMessage = tekko.format({
+			command: 'JOIN',
+			middle: [ roomName ]
+		});
+		this.sendRaw(ircMessage);
+	}
+	/**
+	 * Part a room.
+	 *
+	 * @param roomName Name of the channel to part.
+	 */
+	part(roomName: string) {
+		const ircMessage = tekko.format({
+			command: 'PART',
+			middle: [ roomName ]
+		});
+		this.sendRaw(ircMessage);
 	}
 	/**
 	 * Send a chat message to a channel on Twitch.
