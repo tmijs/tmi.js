@@ -39,11 +39,13 @@ export class Channel {
 	constructor(client: Client, name: string, tags: Tags) {
 		this.client = client;
 		this.name = name;
+		this.id = null;
+		this.login = null;
+		this.roomUUID = null;
 		this.isDummy = false;
 		if(name.startsWith('#chatrooms:') && name.includes(':', 11)) {
 			// #chatrooms:<channel ID>:<room UUID>
 			const [ , channelID, roomUUID ] = name.split(':');
-			this.login = null;
 			this.id = channelID;
 			this.roomUUID = roomUUID;
 			this.isChatRoom = true;
@@ -51,7 +53,6 @@ export class Channel {
 		else {
 			this.login = name.startsWith('#') ? name.slice(1) : name;
 			this.id = tags.get('room-id');
-			this.roomUUID = null;
 			this.isChatRoom = false;
 		}
 	}
