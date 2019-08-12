@@ -273,6 +273,7 @@ export class Client extends EventEmitter {
 				state.update(tags);
 			}
 			else {
+				tags.set('user-id', this.user.id);
 				state = new UserState(tags, channel);
 				this.user.states.set(channelName, state);
 			}
