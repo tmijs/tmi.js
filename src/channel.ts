@@ -93,6 +93,7 @@ export class DummyChannel extends Channel {
 	 * @param tags The tags of the dummy channel.
 	 */
 	constructor(client: Client, name: string, tags: Tags) {
+		tags.set('room-id', tags.get('user-id'));
 		super(client, name, tags);
 		this.isDummy = true;
 	}
