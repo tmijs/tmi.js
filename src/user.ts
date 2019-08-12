@@ -63,6 +63,25 @@ export class User {
 		this.isClientUser = false;
 	}
 	/**
+	 * Update the values of the user.
+	 *
+	 * @param tags Updated tags for the user.
+	 */
+	update(tags: ChatMessageTags) {
+		const keyMapping = {
+			'badge-info': 'badgeInfo',
+			'display-name': 'displayName',
+			'emote-sets': 'emoteSets',
+			'user-id': 'id'
+		};
+		for(const [ key, val ] of tags.entries()) {
+			const prop = keyMapping[key] || key;
+			if(this.hasOwnProperty(prop)) {
+				this[prop] = val;
+			}
+		}
+	}
+	/**
 	 * Check that the user has the "broadcaster" badge.
 	 */
 	isBroadcaster(): boolean {
@@ -111,14 +130,6 @@ export class UserState extends User {
 	constructor(tags: MessageTags, channel: Channel) {
 		super(channel.client.user.login, tags, channel);
 		this.isClientUser = true;
-	}
-	/**
-	 * Update the state of the user.
-	 *
-	 * @param tags Updated tags for the state.
-	 */
-	update(tags: MessageTags) {
-		// TODO
 	}
 }
 
