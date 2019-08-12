@@ -375,7 +375,8 @@ export class Client extends EventEmitter {
 		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
 		const ircMessage = tekko.format({
 			command: 'PRIVMSG',
-			params: [ channel.toString(), message ]
+			middle: [ channel.toString() ],
+			trailing: message
 		});
 		this.sendRaw(ircMessage);
 	}
