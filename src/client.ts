@@ -238,6 +238,19 @@ export class Client extends EventEmitter {
 			const messageEvent = new ChatMessage(this, data);
 			this.emit('message', messageEvent);
 		}
+		else if(command === 'USERSTATE') {
+			let state: UserState;
+			if(this.user.states.has(channelName)) {
+				state = this.user.states.get(channelName);
+				state.update(tags);
+			}
+			else {
+				tags.set('user-id', this.user.id);
+				state = new UserState(tags, channel);
+				this.user.states.set(channelName, state);
+			}
+			this.emit('userstate', { state });
+		}
 		else if(command === 'JOIN') {
 			this.channels.set(channelName, channel);
 			let user = this.user as UserOrClientUser;
@@ -258,6 +271,9 @@ export class Client extends EventEmitter {
 			}
 			this.emit('part', { channel, user });
 		}
+		else if(command === 'ROOMSTATE') {
+			this.emit('roomstate', data);
+		}
 		else if(command === 'GLOBALUSERSTATE') {
 			let name = null;
 			if(this.options.identity) {
@@ -265,22 +281,6 @@ export class Client extends EventEmitter {
 			}
 			this.user = new ClientUser(this, name, tags);
 			this.emit('globaluserstate', { user: this.user });
-		}
-		else if(command === 'USERSTATE') {
-			let state: UserState;
-			if(this.user.states.has(channelName)) {
-				state = this.user.states.get(channelName);
-				state.update(tags);
-			}
-			else {
-				tags.set('user-id', this.user.id);
-				state = new UserState(tags, channel);
-				this.user.states.set(channelName, state);
-			}
-			this.emit('userstate', { state });
-		}
-		else if(command === 'ROOMSTATE') {
-			this.emit('roomstate', data);
 		}
 		else {
 			this.emit('unhandled-command', data);
