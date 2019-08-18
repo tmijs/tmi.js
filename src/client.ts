@@ -81,7 +81,7 @@ export interface Client {
 	 */
 	on(event: 'roomstate', listener: (data: MessageData) => void): this;
 
-	emit(event: string, data?: any);
+	emit(event: string, ...data: any);
 	emit(event: 'error', error: Error);
 	emit(event: 'ping');
 	emit(event: 'connected');
