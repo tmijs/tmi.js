@@ -24,6 +24,10 @@ const noopIRCCommands = [
 	'CAP', '002', '003', '004', '353', '366', '375', '372', '376'
 ];
 
+const internalEvents = {
+	JOIN: '_join'
+};
+
 /**
  * The tmi.js chat client.
  */
@@ -261,7 +265,7 @@ export class Client extends EventEmitter {
 				eventData.user = new User(prefix.name, tags, channel);
 			}
 			else {
-				this.emit('_join', null, eventData);
+				this.emit(internalEvents.JOIN, null, eventData);
 			}
 			this.emit('join', eventData);
 		}
@@ -424,7 +428,7 @@ export class Client extends EventEmitter {
 			return isChannel && errOrIsClient;
 		};
 		const errorArg = { channel: _channel, user: this.user };
-		return this.raceEvent('_join', validator, errorArg)
+		return this.raceEvent(internalEvents.JOIN, validator, errorArg)
 		.catch(() => {
 			throw 'Could not join channel: ' + _channel.toIRC();
 		});
