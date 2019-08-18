@@ -343,6 +343,41 @@ export class Client extends EventEmitter {
 		this.sendRaw(ircMessage);
 	}
 	/**
+	 * Race an event listener against a timeout.
+	 *
+	 * @param eventName The name of the event to listen to.
+	 * @param validator A function to validate that the event data is tied to the
+	 * input.
+	 * @param getErrorArgs Argument that the validator will pass in order to call
+	 * the error.
+	 */
+	raceEvent(
+		eventName: string,
+		validator: (err: Error | string, eventData: any) => boolean,
+		errorArg: any
+	): Promise<any> {
+		let listener, timeout;
+		let isFulfilled = false;
+		const createListener = (res, rej) => (err, eventData) => {
+			const isValid = validator(err, eventData);
+			if(isValid) {
+				err && console.log({ err });
+				isFulfilled = true;
+				clearTimeout(timeout);
+				this.off(eventName, listener);
+				!err ? res(eventData) : rej(err);
+			}
+		};
+		return new Promise((res, rej) => {
+			timeout = setTimeout(() => {
+				if(!isFulfilled) {
+					listener('Event timed out', errorArg);
+				}
+			}, 2000);
+			listener = createListener(res, rej);
+			this.on(eventName, listener);
+		});
+	}
 	 * Join a room.
 	 *
 	 * @param roomName Name of the channel to join.
