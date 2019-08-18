@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter, once } from 'events';
 import * as tls from 'tls';
 import * as tekko from 'tekko';
 
@@ -13,7 +13,7 @@ import {
 	UserStateEvent,
 	TekkoMessage
 } from './types';
-import { Channel } from './channel';
+import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
 import { User, ClientUser, UserState } from './user';
 
@@ -253,23 +253,32 @@ export class Client extends EventEmitter {
 		}
 		else if(command === 'JOIN') {
 			this.channels.set(channelName, channel);
-			let user = this.user as UserOrClientUser;
+			const eventData = {
+				channel,
+				user: this.user as UserOrClientUser
+			};
 			if(!isSelf) {
-				user = new User(prefix.name, tags, channel);
+				eventData.user = new User(prefix.name, tags, channel);
 			}
-			this.emit('join', { channel, user });
+			else {
+				this.emit('_join', null, eventData);
+			}
+			this.emit('join', eventData);
 		}
 		else if(command === 'PART') {
 			const wasJoined = this.channels.delete(channelName);
 			const hadState = this.user.states.delete(channelName);
+			const eventData = {
+				channel,
+				user: this.user as UserOrClientUser
+			};
 			if(!channel) {
-				channel = new Channel(this, channelName, tags);
+				eventData.channel = new Channel(this, channelName, tags);
 			}
-			let user = this.user as UserOrClientUser;
 			if(!isSelf) {
-				user = new User(prefix.name, tags, channel);
+				eventData.user = new User(prefix.name, tags, channel);
 			}
-			this.emit('part', { channel, user });
+			this.emit('part', eventData);
 		}
 		else if(command === 'ROOMSTATE') {
 			this.emit('roomstate', data);
@@ -361,7 +370,6 @@ export class Client extends EventEmitter {
 		const createListener = (res, rej) => (err, eventData) => {
 			const isValid = validator(err, eventData);
 			if(isValid) {
-				err && console.log({ err });
 				isFulfilled = true;
 				clearTimeout(timeout);
 				this.off(eventName, listener);
@@ -378,28 +386,61 @@ export class Client extends EventEmitter {
 			this.on(eventName, listener);
 		});
 	}
+	/**
 	 * Join a room.
 	 *
 	 * @param roomName Name of the channel to join.
 	 */
-	join(roomName: string) {
+	join(roomName: string): Promise<JoinEvent> {
+		if(!this.user) {
+			return once(this, 'globaluserstate')
+			.then(() => this.join(roomName));
+		}
+		const _channel = new DummyChannel(this, roomName);
 		const ircMessage = tekko.format({
 			command: 'JOIN',
-			middle: [ roomName ]
+			middle: [ _channel.toIRC() ]
 		});
 		this.sendRaw(ircMessage);
+		const validator = (err, eventData) => {
+			const { user, channel } = eventData;
+			const isChannel = channel.name === _channel.name;
+			const errOrIsClient = err || user.isClientUser;
+			return isChannel && errOrIsClient;
+		};
+		const errorArg = { channel: _channel, user: this.user };
+		return this.raceEvent('_join', validator, errorArg)
+		.catch(() => {
+			throw 'Could not join channel: ' + _channel.toIRC();
+		});
 	}
 	/**
 	 * Part a room.
 	 *
 	 * @param roomName Name of the channel to part.
 	 */
-	part(roomName: string) {
+	part(roomName: string): Promise<PartEvent> {
+		if(!this.user) {
+			return once(this, 'globaluserstate')
+			.then(() => this.part(roomName));
+		}
+		const _channel = new DummyChannel(this, roomName);
 		const ircMessage = tekko.format({
 			command: 'PART',
-			middle: [ roomName ]
+			middle: [ _channel.toIRC() ]
 		});
 		this.sendRaw(ircMessage);
+		const validator = (err, eventData) => {
+			const { user, channel } = eventData;
+			const isChannel = channel.name === _channel.name;
+			const errOrIsClient = err || user.isClientUser;
+			return isChannel && errOrIsClient;
+		};
+		const errorArg = { channel: _channel, user: this.user };
+		return this.raceEvent('_part', validator, errorArg)
+		.catch(() => {
+			throw 'Could not part channel: ' + _channel.toIRC();
+		});;
 	}
 	/**
 	 * Send a chat message to a channel on Twitch.
