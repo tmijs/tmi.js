@@ -193,11 +193,11 @@ export class Client extends EventEmitter {
 	 * Handle a single line of the message data from the TMI connection in IRC
 	 * format.
 	 *
-	 * @param message IRC message from the TMI servers.
+	 * @param raw IRC message from the TMI servers.
 	 */
-	_handleMessage(message: string) {
-		const parsedData = tekko.parse(message) as TekkoMessage;
-		parsedData.raw = message;
+	_handleMessage(raw: string) {
+		const parsedData = tekko.parse(raw) as TekkoMessage;
+		parsedData.raw = raw;
 		const { command } = parsedData;
 		if(command === 'PING') {
 			this.sendRaw('PONG :tmi.twitch.tv');
