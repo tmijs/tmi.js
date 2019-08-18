@@ -36,8 +36,11 @@ export class Channel {
 	 * @param name The raw IRC channel name.
 	 * @param tags Tags to be applied to the channel.
 	 */
-	constructor(client: Client, name: string, tags: Tags) {
+	constructor(client: Client, name: string | Channel, tags?: Tags) {
 		this.client = client;
+		if(name instanceof Channel) {
+			name = name.name;
+		}
 		this.name = name;
 		this.id = null;
 		this.login = null;
@@ -51,8 +54,14 @@ export class Channel {
 			this.isChatRoom = true;
 		}
 		else {
-			this.login = name.startsWith('#') ? name.slice(1) : name;
-			this.id = tags.get('room-id');
+			if(name.startsWith('#')) {
+				this.login = name.slice(1);
+			}
+			else {
+				this.login = name;
+				this.name = '#' + name;
+			}
+			this.id = tags && tags.get('room-id');
 			this.isChatRoom = false;
 		}
 	}
@@ -93,8 +102,10 @@ export class DummyChannel extends Channel {
 	 * @param name The name of the dummy channel.
 	 * @param tags The tags of the dummy channel.
 	 */
-	constructor(client: Client, name: string, tags: Tags) {
-		tags.set('room-id', tags.get('user-id'));
+	constructor(client: Client, name: string | Channel, tags?: Tags) {
+		if(tags) {
+			tags.set('room-id', tags.get('user-id'));
+		}
 		super(client, name, tags);
 		this.isDummy = true;
 	}
