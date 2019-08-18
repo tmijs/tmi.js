@@ -332,6 +332,21 @@ export class Client extends EventEmitter {
 		return Promise.resolve();
 	}
 	/**
+	 * Send a chat message to a channel on Twitch.
+	 *
+	 * @param channel Channel to send the message to.
+	 * @param message Message to send.
+	 */
+	say(channel: string | Channel, message: string) {
+		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
+		const ircMessage = tekko.format({
+			command: 'PRIVMSG',
+			middle: [ channel.toString() ],
+			trailing: message
+		});
+		this.sendRaw(ircMessage);
+	}
+	/**
 	 * Send a command to a channel on Twitch.
 	 *
 	 * @param channel Channel to send the message to.
@@ -440,22 +455,7 @@ export class Client extends EventEmitter {
 		return this.raceEvent('_part', validator, errorArg)
 		.catch(() => {
 			throw 'Could not part channel: ' + _channel.toIRC();
-		});;
-	}
-	/**
-	 * Send a chat message to a channel on Twitch.
-	 *
-	 * @param channel Channel to send the message to.
-	 * @param message Message to send.
-	 */
-	say(channel: string | Channel, message: string) {
-		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
-		const ircMessage = tekko.format({
-			command: 'PRIVMSG',
-			middle: [ channel.toString() ],
-			trailing: message
 		});
-		this.sendRaw(ircMessage);
 	}
 }
 
