@@ -75,8 +75,11 @@ export class Channel {
 		else if(this.isChatRoom) {
 			return `#chatrooms:${this.id}:${this.roomUUID}`;
 		}
-		else {
+		else if(this.login) {
 			return `#${this.login}`;
+		}
+		else {
+			throw `Could not form a channel name, missing information`;
 		}
 	}
 	toString() {
