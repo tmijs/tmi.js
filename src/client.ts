@@ -430,7 +430,7 @@ export class Client extends EventEmitter {
 		const errorArg = { channel: _channel, user: this.user };
 		return this.raceEvent(internalEvents.JOIN, validator, errorArg)
 		.catch(() => {
-			throw 'Could not join channel: ' + _channel.toIRC();
+			throw 'Could not join channel: ' + _channel;
 		});
 	}
 	/**
@@ -458,40 +458,7 @@ export class Client extends EventEmitter {
 		const errorArg = { channel: _channel, user: this.user };
 		return this.raceEvent('_part', validator, errorArg)
 		.catch(() => {
-			throw 'Could not part channel: ' + _channel.toIRC();
+			throw 'Could not part channel: ' + _channel;
 		});
 	}
 }
-
-// export class IRCCommandHandler {
-// 	client: Client;
-
-// 	constructor(client: Client) {
-// 		this.client = client;
-// 	}
-// 	emit(event: string, ...args: any[]): boolean {
-// 		return this.client.emit(event, ...args);
-// 	}
-// 	CAP(data: MessageData) {
-// 	}
-// 	'001'(data: MessageData) {
-// 	}
-// 	'002'(data: MessageData) {
-// 	}
-// 	'003'(data: MessageData) {
-// 	}
-// 	'004'(data: MessageData) {
-// 	}
-// 	353(data: MessageData) {
-// 	}
-// 	366(data: MessageData) {
-// 	}
-// 	372(data: MessageData) {
-// 	}
-// 	375(data: MessageData) {
-// 	}
-// 	376(data: MessageData) {
-// 	}
-// 	PRIVMSG() {
-// 	}
-// }
