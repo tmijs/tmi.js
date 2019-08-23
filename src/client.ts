@@ -3,15 +3,15 @@ import * as tls from 'tls';
 import * as tekko from 'tekko';
 
 import {
+	TekkoMessage,
 	ClientOptions,
-	UserOrClientUser,
 	Connection,
+	UserOrClientUser,
 	DisconnectEvent,
+	GlobalUserStateEvent,
 	JoinEvent,
 	PartEvent,
-	GlobalUserStateEvent,
-	UserStateEvent,
-	TekkoMessage
+	UserStateEvent
 } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
