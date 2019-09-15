@@ -89,7 +89,7 @@ export class Channel {
 	 * Send a message to the channel.
 	 */
 	say(message: string) {
-		this.client.say(this.toIRC(), message);
+		this.client.say(this, message);
 	}
 }
 

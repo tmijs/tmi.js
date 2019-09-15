@@ -197,7 +197,7 @@ export class Client extends EventEmitter {
 		}
 
 		function triggerConnection() {
-			if (auth.substr(0, 6) !== 'oauth:') {
+			if (!auth.startsWith('oauth:')) {
 				auth = 'oauth:' + auth;
 			}
 
@@ -395,6 +395,9 @@ export class Client extends EventEmitter {
 	 * @param message Message to send.
 	 */
 	say(channel: string | Channel, message: string) {
+		if (typeof channel === 'string') {
+			channel = new Channel(this, channel);
+		}
 		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
 		const ircMessage = tekko.format({
 			command: 'PRIVMSG',
