@@ -33,39 +33,48 @@ const internalEvents = {
  */
 export interface Client {
 	on(event: string, listener: Function): this;
+
 	/**
 	 * Received some unfiltered data from the TMI servers.
 	 * TODO: REMOVE
 	 */
 	on(event: 'unhandled-command', listener: (data: MessageData) => void): this;
+
 	/**
 	 * An error occurred.
 	 */
 	on(event: 'error', listener: (error: Error) => void): this;
+
 	/**
 	 * Received a PING command from the TMI servers.
 	 */
 	on(event: 'ping', listener: () => void): this;
+
 	/**
 	 * Client connected to the TMI servers.
 	 */
 	on(event: 'connected', listener: () => void): this;
+
 	/**
 	 * Client disconnected from the TMI servers.
 	 */
 	on(event: 'disconnected', listener: (data: DisconnectEvent) => void): this;
+
 	/**
 	 * Client joined or another user joined a channel.
 	 */
 	on(event: 'join', listener: (data: JoinEvent) => void): this;
+
 	/**
 	 * Client parted or another user parted a channel.
 	 */
 	on(event: 'part', listener: (data: PartEvent) => void): this;
+
 	/**
 	 * Received a chat message.
 	 */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
+
 	/**
 	 * Received a GLOBALUSERSTATE command.
 	 */
@@ -73,6 +82,7 @@ export interface Client {
 		event: 'globaluserstate',
 		listener: (data: GlobalUserStateEvent) => void
 	): this;
+
 	/**
 	 * Received a USERSTATE command.
 	 */
@@ -80,6 +90,7 @@ export interface Client {
 		event: 'userstate',
 		listener: (data: UserStateEvent) => void
 	): this;
+
 	/**
 	 * Received a ROOMSTATE command.
 	 */
@@ -89,15 +100,25 @@ export interface Client {
 	 * Received a NOTICE command
 	 */
 	on(event: 'notice', listener: (data: string) => void): this;
+
 	emit(event: string, ...data: any);
+
 	emit(event: 'error', error: Error);
+
 	emit(event: 'ping');
+
 	emit(event: 'connected');
+
 	emit(event: 'disconnected', data: DisconnectEvent);
+
 	emit(event: 'join', data: JoinEvent);
+
 	emit(event: 'part', data: PartEvent);
+
 	emit(event: 'globaluserstate', data: GlobalUserStateEvent);
+
 	emit(event: 'roomstate', data: MessageData);
+
 	emit(event: 'notice', data: string);
 }
 
@@ -130,14 +151,14 @@ export class Client extends EventEmitter {
 	/**
 	 * @param opts Options for the CLient.
 	 */
-	constructor(opts: ClientOptions = {}) {
+	constructor(opts: ClientOptions) {
 		super();
 		this.socket = null;
 		// this.ircCommandHandler = new IRCCommandHandler(this);
 		this.channels = new Map();
-		this.options = opts || {};
+		this.options = opts;
 		this.user = null;
-		const { connection: connectionOpts = {} } = opts;
+		const {connection: connectionOpts = {}} = opts;
 		this.connection = {
 			host: connectionOpts.host === undefined ? defaultTMIHost :
 				connectionOpts.host,
@@ -145,13 +166,32 @@ export class Client extends EventEmitter {
 				connectionOpts.port
 		};
 	}
+
 	/**
 	 * Connected to the TMI servers, send the capability requests and login
 	 * information.
 	 */
 	_onConnect() {
 		const name = this.options.identity.name;
-		const auth = `oauth:${this.options.identity.auth}`;
+		let auth: string;
+		if (typeof this.options.identity.auth === 'function') {
+			let tempAuth = this.options.identity.auth(this);
+			if (typeof tempAuth === 'string') {
+				auth = tempAuth;
+			}
+			else {
+				// TODO: Test with actual promise, auth might stay undefined
+				tempAuth.then((promise) => {
+					auth = promise;
+				})
+			}
+		} else {
+			auth = this.options.identity.auth;
+		}
+		if (auth.substr(0,6) !== 'oauth:') {
+			auth = 'oauth:' + auth;
+		}
+
 		this.sendRawArray([
 			'CAP REQ :twitch.tv/tags twitch.tv/commands',
 			`PASS ${auth}`,
@@ -161,6 +201,7 @@ export class Client extends EventEmitter {
 		// this.sendRawArray([ 'PASS a', 'NICK justinfan1' ]);
 		this.emit('connected');
 	}
+
 	/**
 	 * Connection to the TMI servers closed.
 	 *
@@ -168,11 +209,12 @@ export class Client extends EventEmitter {
 	 */
 	_onClose(hadError: boolean) {
 		const willReconnect = false;
-		this.emit('disconnected', { willReconnect, hadError });
-		if(willReconnect) {
+		this.emit('disconnected', {willReconnect, hadError});
+		if (willReconnect) {
 			this.connect();
 		}
 	}
+
 	/**
 	 * Emitted when an error occurs with the connection. The 'close' event will
 	 * be called directly following this event.
@@ -182,6 +224,7 @@ export class Client extends EventEmitter {
 	_onError(error: Error) {
 		this.emit('error', error);
 	}
+
 	/**
 	 * Receieved data on the connection to the TMI servers.
 	 *
@@ -189,15 +232,15 @@ export class Client extends EventEmitter {
 	 */
 	_onData(rawData: string) {
 		const data = rawData.trim().split('\r\n');
-		if(data.length === 1) {
+		if (data.length === 1) {
 			this._handleMessage(data[0]);
-		}
-		else {
-			for(const line of data) {
+		} else {
+			for (const line of data) {
 				this._handleMessage(line);
 			}
 		}
 	}
+
 	/**
 	 * Handle a single line of the message data from the TMI connection in IRC
 	 * format.
@@ -207,104 +250,95 @@ export class Client extends EventEmitter {
 	_handleMessage(raw: string) {
 		const parsedData = tekko.parse(raw) as TekkoMessage;
 		parsedData.raw = raw;
-		const { command } = parsedData;
-		if(command === 'PING') {
+		const {command} = parsedData;
+		if (command === 'PING') {
 			this.sendRaw('PONG :tmi.twitch.tv');
 			this.emit('ping');
 			return;
-		}
-		else if(parsedData.prefix && parsedData.prefix.user === 'jtv') {
+		} else if (parsedData.prefix && parsedData.prefix.user === 'jtv') {
 			console.log('JTV');
 			console.log(parsedData);
 			return;
-		}
-		else if(command === '001') {
+		} else if (command === '001') {
 			const name = parsedData.params[0];
-			if(!this.options.identity) {
-				this.options.identity = { name, auth: null };
-			}
-			else {
+			if (!this.options.identity) {
+				this.options.identity = {name, auth: null};
+			} else {
 				this.options.identity.name = name;
 			}
 			return;
 		}
 		// noop
-		else if(noopIRCCommands.includes(command)) {
+		else if (noopIRCCommands.includes(command)) {
 			return;
 		}
 		const data = new MessageData(this, parsedData);
-		const { params, prefix, tags } = data;
-		const [ channelName ] = params;
+		const {params, prefix, tags} = data;
+		const [channelName] = params;
 		let channel: Channel = null;
-		if(channelName) {
+		if (channelName) {
 			channel = this.channels.get(channelName);
-			if(!channel) {
+			if (!channel) {
 				channel = new Channel(this, channelName, tags);
 			}
 		}
 		const isSelf = this.user && prefix.name === this.user.login;
-		if(command === 'PRIVMSG') {
+		if (command === 'PRIVMSG') {
 			const messageEvent = new ChatMessage(this, data);
 			this.emit('message', messageEvent);
-		}
-		else if(command === 'USERSTATE') {
+		} else if (command === 'USERSTATE') {
 			let state: UserState;
-			if(this.user.states.has(channelName)) {
+			if (this.user.states.has(channelName)) {
 				state = this.user.states.get(channelName);
 				state.update(tags);
-			}
-			else {
+			} else {
 				tags.set('user-id', this.user.id);
 				state = new UserState(tags, channel);
 				this.user.states.set(channelName, state);
 			}
-			this.emit('userstate', { state });
-		}
-		else if(command === 'JOIN') {
+			this.emit('userstate', {state});
+		} else if (command === 'JOIN') {
 			this.channels.set(channelName, channel);
 			const eventData = {
 				channel,
 				user: this.user as UserOrClientUser
 			};
-			if(!isSelf) {
+			if (!isSelf) {
 				eventData.user = new User(prefix.name, tags, channel);
-			}
-			else {
+			} else {
 				this.emit(internalEvents.JOIN, null, eventData);
 			}
 			this.emit('join', eventData);
-		}
-		else if(command === 'PART') {
+		} else if (command === 'PART') {
 			const wasJoined = this.channels.delete(channelName);
 			const hadState = this.user.states.delete(channelName);
 			const eventData = {
 				channel,
 				user: this.user as UserOrClientUser
 			};
-			if(!channel) {
+			if (!channel) {
 				eventData.channel = new Channel(this, channelName, tags);
 			}
-			if(!isSelf) {
+			if (!isSelf) {
 				eventData.user = new User(prefix.name, tags, channel);
 			}
 			this.emit('part', eventData);
-		}
-		else if(command === 'ROOMSTATE') {
+		} else if (command === 'ROOMSTATE') {
 			this.emit('roomstate', data);
-		}
-		else if(command === 'GLOBALUSERSTATE') {
+		} else if (command === 'GLOBALUSERSTATE') {
 			let name = null;
-			if(this.options.identity) {
+			if (this.options.identity) {
 				name = this.options.identity.name;
 			}
 			this.user = new ClientUser(this, name, tags);
-			this.emit('globaluserstate', { user: this.user });
+			this.emit('globaluserstate', {user: this.user});
 		} else if (command === 'NOTICE') {
 			this.emit('notice', data.trailing);
 		} else {
 			this.emit('unhandled-command', data);
 		}
 	}
+
 	/**
 	 * Send a raw IRC message to the TMI servers.
 	 *
@@ -312,11 +346,12 @@ export class Client extends EventEmitter {
 	 */
 	sendRaw(message: string) {
 		this.socket.write(message + '\r\n', err => {
-			if(err) {
+			if (err) {
 				this.emit('error', err);
 			}
 		});
 	}
+
 	/**
 	 * Send multiple raw IRC messages to the TMI servers.
 	 *
@@ -325,12 +360,13 @@ export class Client extends EventEmitter {
 	sendRawArray(messages: string[]) {
 		return this.sendRaw(messages.join('\r\n'));
 	}
+
 	/**
 	 * Connect to the TMI servers.
 	 */
 	connect(): Promise<any> {
-		const { host, port } = this.connection;
-		this.socket = tls.connect({ host, port });
+		const {host, port} = this.connection;
+		this.socket = tls.connect({host, port});
 		const socket = this.socket;
 		socket.setEncoding('utf8');
 		socket.on('secureConnect', () => this._onConnect());
@@ -341,6 +377,7 @@ export class Client extends EventEmitter {
 		// TODO:
 		return Promise.resolve();
 	}
+
 	/**
 	 * Send a chat message to a channel on Twitch.
 	 *
@@ -351,11 +388,12 @@ export class Client extends EventEmitter {
 		// this.sendRaw(`PRIVMSG ${channel} :${message}`);
 		const ircMessage = tekko.format({
 			command: 'PRIVMSG',
-			middle: [ channel.toString() ],
+			middle: [channel.toString()],
 			trailing: message
 		});
 		this.sendRaw(ircMessage);
 	}
+
 	/**
 	 * Send a command to a channel on Twitch.
 	 *
@@ -371,11 +409,12 @@ export class Client extends EventEmitter {
 		const commandParams = Array.isArray(params) ? params.join(' ') : params;
 		const ircMessage = tekko.format({
 			command: 'PRIVMSG',
-			middle: [ channel.toString() ],
+			middle: [channel.toString()],
 			trailing: `/${command} ${commandParams}`
 		});
 		this.sendRaw(ircMessage);
 	}
+
 	/**
 	 * Race an event listener against a timeout.
 	 *
@@ -394,7 +433,7 @@ export class Client extends EventEmitter {
 		let isFulfilled = false;
 		const createListener = (res, rej) => (err, eventData) => {
 			const isValid = validator(err, eventData);
-			if(isValid) {
+			if (isValid) {
 				isFulfilled = true;
 				clearTimeout(timeout);
 				this.off(eventName, listener);
@@ -403,7 +442,7 @@ export class Client extends EventEmitter {
 		};
 		return new Promise((res, rej) => {
 			timeout = setTimeout(() => {
-				if(!isFulfilled) {
+				if (!isFulfilled) {
 					listener('Event timed out', errorArg);
 				}
 			}, 2000);
@@ -411,60 +450,62 @@ export class Client extends EventEmitter {
 			this.on(eventName, listener);
 		});
 	}
+
 	/**
 	 * Join a room.
 	 *
 	 * @param roomName Name of the channel to join.
 	 */
 	join(roomName: string): Promise<JoinEvent> {
-		if(!this.user) {
+		if (!this.user) {
 			return once(this, 'globaluserstate')
-			.then(() => this.join(roomName));
+				.then(() => this.join(roomName));
 		}
 		const _channel = new DummyChannel(this, roomName);
 		const ircMessage = tekko.format({
 			command: 'JOIN',
-			middle: [ _channel.toIRC() ]
+			middle: [_channel.toIRC()]
 		});
 		this.sendRaw(ircMessage);
 		const validator = (err, eventData) => {
-			const { user, channel } = eventData;
+			const {user, channel} = eventData;
 			const isChannel = channel.name === _channel.name;
 			const errOrIsClient = err || user.isClientUser;
 			return isChannel && errOrIsClient;
 		};
-		const errorArg = { channel: _channel, user: this.user };
+		const errorArg = {channel: _channel, user: this.user};
 		return this.raceEvent(internalEvents.JOIN, validator, errorArg)
-		.catch(() => {
-			throw 'Could not join channel: ' + _channel;
-		});
+			.catch(() => {
+				throw 'Could not join channel: ' + _channel;
+			});
 	}
+
 	/**
 	 * Part a room.
 	 *
 	 * @param roomName Name of the channel to part.
 	 */
 	part(roomName: string): Promise<PartEvent> {
-		if(!this.user) {
+		if (!this.user) {
 			return once(this, 'globaluserstate')
-			.then(() => this.part(roomName));
+				.then(() => this.part(roomName));
 		}
 		const _channel = new DummyChannel(this, roomName);
 		const ircMessage = tekko.format({
 			command: 'PART',
-			middle: [ _channel.toIRC() ]
+			middle: [_channel.toIRC()]
 		});
 		this.sendRaw(ircMessage);
 		const validator = (err, eventData) => {
-			const { user, channel } = eventData;
+			const {user, channel} = eventData;
 			const isChannel = channel.name === _channel.name;
 			const errOrIsClient = err || user.isClientUser;
 			return isChannel && errOrIsClient;
 		};
-		const errorArg = { channel: _channel, user: this.user };
+		const errorArg = {channel: _channel, user: this.user};
 		return this.raceEvent('_part', validator, errorArg)
-		.catch(() => {
-			throw 'Could not part channel: ' + _channel;
-		});
+			.catch(() => {
+				throw 'Could not part channel: ' + _channel;
+			});
 	}
 }

@@ -85,7 +85,7 @@ export interface ClientOptions {
 	/**
 	 * Options for the identity of the user that the client will login as.
 	 */
-	identity?: IdentityOptions;
+	identity: IdentityOptions;
 }
 
 /**
