@@ -467,14 +467,14 @@ export class Client extends EventEmitter {
 	/**
 	 * Join a room.
 	 *
-	 * @param {string} roomName Name of the channel to join.
+	 * @param {string|channel} channel The channel to join.
 	 */
-	join(roomName: string): Promise<JoinEvent> {
+	join(channel: string | Channel): Promise<JoinEvent> {
 		if (!this.user) {
 			return once(this, 'globaluserstate')
-				.then(() => this.join(roomName));
+				.then(() => this.join(channel));
 		}
-		const _channel = new DummyChannel(this, roomName);
+		const _channel = new DummyChannel(this, channel);
 		const ircMessage = tekko.format({
 			command: 'JOIN',
 			middle: [_channel.toIRC()]
