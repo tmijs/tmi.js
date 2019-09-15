@@ -117,24 +117,21 @@ export class MessageTags extends Map<string, any> {
 			}
 			else if(key === 'followers-only') {
 				let followersOnly: boolean | number = false;
-				if(val === '-1') {
-					followersOnly = false;
-				}
-				else if(val === '0') {
-					followersOnly = true;
-				}
-				else if(typeof val === 'string') {
-					followersOnly = parseInt(val);
+				if (val !== '-1') {
+					if (val === '0') {
+						followersOnly = true;
+					} else if (typeof val === 'string') {
+						followersOnly = parseInt(val);
+					}
 				}
 				this.set(key, followersOnly);
 			}
 			else if(key === 'slow') {
 				let slow: boolean | number = false;
-				if(val === '0') {
-					slow = false;
-				}
-				else if(typeof val === 'string') {
-					slow = parseInt(val);
+				if (val !== '0') {
+					if (typeof val === 'string') {
+						slow = parseInt(val);
+					}
 				}
 				this.set(key, slow);
 			}
