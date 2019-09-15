@@ -496,14 +496,14 @@ export class Client extends EventEmitter {
 	/**
 	 * Part a room.
 	 *
-	 * @param roomName Name of the channel to part.
+	 * @param channel The channel to part.
 	 */
-	part(roomName: string): Promise<PartEvent> {
+	part(channel: string | Channel): Promise<PartEvent> {
 		if (!this.user) {
 			return once(this, 'globaluserstate')
-				.then(() => this.part(roomName));
+				.then(() => this.part(channel));
 		}
-		const _channel = new DummyChannel(this, roomName);
+		const _channel = new DummyChannel(this, channel);
 		const ircMessage = tekko.format({
 			command: 'PART',
 			middle: [_channel.toIRC()]
