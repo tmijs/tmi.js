@@ -178,28 +178,38 @@ export class Client extends EventEmitter {
 			let tempAuth = this.options.identity.auth(this);
 			if (typeof tempAuth === 'string') {
 				auth = tempAuth;
+				triggerConnection.call(this);
 			}
 			else {
-				// TODO: Test with actual promise, auth might stay undefined
-				tempAuth.then((promise) => {
-					auth = promise;
-				})
+				tempAuth.then((value) => {
+					auth = value;
+					triggerConnection.call(this);
+				}).catch((reason => {
+					this.emit('error', {
+						name: 'Connection error',
+						message: reason
+					});
+				}))
 			}
 		} else {
 			auth = this.options.identity.auth;
-		}
-		if (auth.substr(0,6) !== 'oauth:') {
-			auth = 'oauth:' + auth;
+			triggerConnection.call(this);
 		}
 
-		this.sendRawArray([
-			'CAP REQ :twitch.tv/tags twitch.tv/commands',
-			`PASS ${auth}`,
-			`NICK ${name}`
-		]);
-		// this.sendRaw('CAP REQ :twitch.tv/tags twitch.tv/commands');
-		// this.sendRawArray([ 'PASS a', 'NICK justinfan1' ]);
-		this.emit('connected');
+		function triggerConnection() {
+			if (auth.substr(0, 6) !== 'oauth:') {
+				auth = 'oauth:' + auth;
+			}
+
+			this.sendRawArray([
+				'CAP REQ :twitch.tv/tags twitch.tv/commands',
+				`PASS ${auth}`,
+				`NICK ${name}`
+			]);
+			// this.sendRaw('CAP REQ :twitch.tv/tags twitch.tv/commands');
+			// this.sendRawArray([ 'PASS a', 'NICK justinfan1' ]);
+			this.emit('connected');
+		}
 	}
 
 	/**
