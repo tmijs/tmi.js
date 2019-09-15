@@ -47,9 +47,9 @@ export class User {
 	isClientUser: boolean;
 
 	/**
-	 * @param login The login name for the user.
-	 * @param tags The tags for the user.
-	 * @param channel The channel from the originating message.
+	 * @param {string} login The login name for the user.
+	 * @param {ChatMessageTags} tags The tags for the user.
+	 * @param {Channel} channel The channel from the originating message.
 	 */
 	constructor(login: string, tags: ChatMessageTags, channel: Channel) {
 		this.client = channel.client;
@@ -65,7 +65,7 @@ export class User {
 	/**
 	 * Update the values of the user.
 	 *
-	 * @param tags Updated tags for the user.
+	 * @param {ChatMessageTags} tags Updated tags for the user.
 	 */
 	update(tags: ChatMessageTags) {
 		const keyMapping = {
@@ -81,26 +81,31 @@ export class User {
 			}
 		}
 	}
+
 	/**
 	 * Check that the user has the "broadcaster" badge.
+	 * @returns {boolean}
 	 */
 	isBroadcaster(): boolean {
 		return this.badges.has('broadcaster');
 	}
 	/**
 	 * Check that the user has the "moderator" badge.
+	 * @returns {boolean}
 	 */
 	isMod(): boolean {
 		return this.badges.has('moderator');
 	}
 	/**
 	 * Check that the user has the "subscriber" badge.
+	 * @returns {boolean}
 	 */
 	isSub(): boolean {
 		return this.badges.has('subscriber');
 	}
 	/**
 	 * Check that the user has the "vip" badge.
+	 * @returns {boolean}
 	 */
 	isVIP(): boolean {
 		return this.badges.has('vip');
@@ -109,6 +114,7 @@ export class User {
 	 * Get how long a user has been subscribed in months. Will be `0` if they
 	 * have never subscribed, is not currently subscribed, or for some other
 	 * reason the badge is not being displayed.
+	 * @returns {number}
 	 */
 	monthsSubbed(): number {
 		const subbed = this.badgeInfo.get('subscriber');
@@ -124,8 +130,8 @@ export class User {
  */
 export class UserState extends User {
 	/**
-	 * @param tags Tags for the user in the channel.
-	 * @param channel Channel for the user state.
+	 * @param {MessageTags} tags Tags for the user in the channel.
+	 * @param {Channel} channel Channel for the user state.
 	 */
 	constructor(tags: MessageTags, channel: Channel) {
 		super(channel.client.user.login, tags, channel);
@@ -151,9 +157,9 @@ export class ClientUser extends User {
 	states: Map<string, UserState>;
 
 	/**
-	 * @param client A tmi.js Client instance.
-	 * @param name The name of the client user.
-	 * @param tags Tags for the user.
+	 * @param {Client} client A tmi.js Client instance.
+	 * @param {string} name The name of the client user.
+	 * @param {MessageTags} tags Tags for the user.
 	 */
 	constructor(client: Client, name: string, tags: MessageTags) {
 		const channel = new DummyChannel(client, name, tags);

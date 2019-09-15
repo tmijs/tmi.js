@@ -41,7 +41,8 @@ export interface AskResponse extends IncomingMessage {
 /**
  * Make a simple HTTP request.
  *
- * @param options Options for the request.
+ * @param {Partial<AskOptions>} options Options for the request.
+ * @returns {Promise<AskResponse>}
  */
 export function ask(options: Partial<AskOptions>): Promise<AskResponse> {
 	return new Promise((resolve, reject) => {
@@ -88,7 +89,7 @@ export function ask(options: Partial<AskOptions>): Promise<AskResponse> {
 /**
  * Make a request to the kraken API. Adds the base URL and v5 headers.
  *
- * @param options Options for the request.
+ * @param {Partial<AskOptions>} options Options for the request.
  */
 export function kraken(options: Partial<AskOptions>) {
 	const headers = {
@@ -108,7 +109,7 @@ export function kraken(options: Partial<AskOptions>) {
 /**
  * Validate a user token.
  *
- * @param token A user token.
+ * @param {string} token A user token.
  */
 export function validateToken(token: string) {
 	return ask({
@@ -123,7 +124,7 @@ export function validateToken(token: string) {
 /**
  * Get the emotes for a user.
  *
- * @param userID A User or a user ID to look up.
+ * @param {string|User} userID A User or a user ID to look up.
  */
 export function getEmotes(userID: string | User) {
 	if(userID instanceof User) {

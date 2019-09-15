@@ -28,7 +28,7 @@ export interface TekkoMessage extends tekko.Message {
 /**
  * The indexes of emotes in the message.
  */
-export interface EmoteIndexes {
+export interface EmoteIndex {
 	/**
 	 * The start index of the emote.
 	 */

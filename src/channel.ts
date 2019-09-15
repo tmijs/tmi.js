@@ -32,9 +32,9 @@ export class Channel {
 	isDummy: boolean;
 
 	/**
-	 * @param client A tmi.js Client instance.
-	 * @param name The raw IRC channel name.
-	 * @param tags Tags to be applied to the channel.
+	 * @param {Client} client A tmi.js Client instance.
+	 * @param {string|Channel} name The raw IRC channel name.
+	 * @param {Tags} tags Tags to be applied to the channel.
 	 */
 	constructor(client: Client, name: string | Channel, tags?: Tags) {
 		this.client = client;
@@ -101,9 +101,10 @@ export class DummyChannel extends Channel {
 	isDummy: true;
 
 	/**
-	 * @param client A tmi.js Client instance.
-	 * @param name The name of the dummy channel.
-	 * @param tags The tags of the dummy channel.
+	 * @constructor
+	 * @param {Client} client A tmi.js Client instance.
+	 * @param {string|Channel} name The name of the dummy channel.
+	 * @param {Tags} tags The tags of the dummy channel.
 	 */
 	constructor(client: Client, name: string | Channel, tags?: Tags) {
 		if(tags) {

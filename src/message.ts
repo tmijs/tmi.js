@@ -37,8 +37,8 @@ export class MessageData {
 	prefix: tekko.MessagePrefix;
 
 	/**
-	 * @param client A tmi.js Client instance.
-	 * @param data Parsed data for the message.
+	 * @param {Client} client A tmi.js Client instance.
+	 * @param {TekkoMessage} data Parsed data for the message.
 	 */
 	constructor(client: Client, data: TekkoMessage) {
 		this.client = client;
@@ -86,8 +86,8 @@ export class ChatMessage {
 	isCheer: boolean;
 
 	/**
-	 * @param client A tmi.js Client instance.
-	 * @param data Parsed IRC data.
+	 * @param {Client} client A tmi.js Client instance.
+	 * @param {MessageData} data Parsed IRC data.
 	 */
 	constructor(client: Client, data: MessageData) {
 		this.client = client;
@@ -104,9 +104,11 @@ export class ChatMessage {
 		this.isCheer = this.tags.has('bits');
 		this.user = new User(data.prefix.name, this.tags, this.channel);
 	}
+
 	/**
 	 * Send a message back to the same channel that the chat message was sent
 	 * from.
+	 * @param {string} message
 	 */
 	reply(message: string) {
 		// TODO: Handler whisper replies.

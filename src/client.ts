@@ -391,8 +391,8 @@ export class Client extends EventEmitter {
 	/**
 	 * Send a chat message to a channel on Twitch.
 	 *
-	 * @param channel Channel to send the message to.
-	 * @param message Message to send.
+	 * @param {string|Channel} channel Channel to send the message to.
+	 * @param {string} message Message to send.
 	 */
 	say(channel: string | Channel, message: string) {
 		if (typeof channel === 'string') {
@@ -410,9 +410,9 @@ export class Client extends EventEmitter {
 	/**
 	 * Send a command to a channel on Twitch.
 	 *
-	 * @param channel Channel to send the message to.
-	 * @param command Command to send.
-	 * @param params Params to send.
+	 * @param {string|Channel} channel Channel to send the message to.
+	 * @param {string} command Command to send.
+	 * @param {string|[string]} params Params to send.
 	 */
 	sendCommand(
 		channel: string | Channel,
@@ -431,10 +431,10 @@ export class Client extends EventEmitter {
 	/**
 	 * Race an event listener against a timeout.
 	 *
-	 * @param eventName The name of the event to listen to.
-	 * @param validator A function to validate that the event data is tied to the
+	 * @param {string} eventName The name of the event to listen to.
+	 * @param {function(err:Error|String,eventData:*):boolean} validator A function to validate that the event data is tied to the
 	 * input.
-	 * @param getErrorArgs Argument that the validator will pass in order to call
+	 * @param {*} getErrorArgs Argument that the validator will pass in order to call
 	 * the error.
 	 */
 	raceEvent(
@@ -467,7 +467,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Join a room.
 	 *
-	 * @param roomName Name of the channel to join.
+	 * @param {string} roomName Name of the channel to join.
 	 */
 	join(roomName: string): Promise<JoinEvent> {
 		if (!this.user) {
@@ -496,7 +496,7 @@ export class Client extends EventEmitter {
 	/**
 	 * Part a room.
 	 *
-	 * @param channel The channel to part.
+	 * @param {string|Channel} channel The channel to part.
 	 */
 	part(channel: string | Channel): Promise<PartEvent> {
 		if (!this.user) {
