@@ -27,7 +27,9 @@
     "url": "git://github.com/tmijs/tmi.js-v2.git"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.2",
     "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "typescript": "^3.5.3"

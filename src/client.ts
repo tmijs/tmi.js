@@ -149,7 +149,7 @@ export class Client extends EventEmitter {
 	channels: Map<string, Channel>;
 
 	/**
-	 * @param opts Options for the CLient.
+	 * @param {ClientOptions} opts Options for the CLient.
 	 */
 	constructor(opts: ClientOptions) {
 		super();
