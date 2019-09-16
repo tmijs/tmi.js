@@ -86,6 +86,11 @@ export class ChatMessage {
 	isCheer: boolean;
 
 	/**
+	 * If the message is a whisper
+	 */
+	isWhisper: boolean;
+
+	/**
 	 * @param {Client} client A tmi.js Client instance.
 	 * @param {MessageData} data Parsed IRC data.
 	 */
@@ -102,6 +107,7 @@ export class ChatMessage {
 			this.message = msg.slice(8, -1);
 		}
 		this.isCheer = this.tags.has('bits');
+		this.isWhisper = data.command === 'WHISPER';
 		this.user = new User(data.prefix.name, this.tags, this.channel);
 	}
 
@@ -111,7 +117,11 @@ export class ChatMessage {
 	 * @param {string} message
 	 */
 	reply(message: string) {
-		// TODO: Handler whisper replies.
-		this.channel.say(message);
+		if (this.isWhisper) {
+			// TODO: Whisper
+		}
+		else {
+			this.channel.say(message);
+		}
 	}
 }
