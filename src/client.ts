@@ -101,6 +101,11 @@ export interface Client {
 	 */
 	on(event: 'notice', listener: (data: string) => void): this;
 
+	/**
+	 * Received a WHISPER command
+	 */
+	on(event: 'whisper', listener: (data: ChatMessage) => void): this;
+
 	emit(event: string, ...data: any);
 
 	emit(event: 'error', error: Error);
@@ -120,6 +125,8 @@ export interface Client {
 	emit(event: 'roomstate', data: MessageData);
 
 	emit(event: 'notice', data: string);
+
+	emit(event: 'whisper', data: ChatMessage);
 }
 
 export class Client extends EventEmitter {
@@ -353,6 +360,12 @@ export class Client extends EventEmitter {
 			this.emit('globaluserstate', {user: this.user});
 		} else if (command === 'NOTICE') {
 			this.emit('notice', data.trailing);
+		} if (command === 'WHISPER') {
+			const whisperEvent = new ChatMessage(this, data);
+			if (this.options.settings && this.options.settings.logToConsole) {
+				console.log(`[WHISPER] ${whisperEvent.channel.name} - ${whisperEvent.user.displayName}: ${whisperEvent.message}`);
+			}
+			this.emit('whisper', whisperEvent);
 		} else {
 			this.emit('unhandled-command', data);
 		}
