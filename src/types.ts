@@ -128,11 +128,11 @@ export interface JoinEvent {
  */
 export interface PartEvent {
 	/**
-	 * The channel that the user joined.
+	 * The channel that the user parted.
 	 */
 	channel: Channel;
 	/**
-	 * A user or the client user that joined the channel.
+	 * A user or the client user that parted the channel.
 	 */
 	user: UserOrClientUser;
 }
@@ -155,4 +155,14 @@ export interface UserStateEvent {
 	 * The user state that was created or updated with this event.
 	 */
 	state: UserState;
+}
+
+/**
+ * Received a NOTICE command.
+ */
+export interface NoticeEvent {
+	/**
+	 * The message.
+	 */
+	message: string;
 }
