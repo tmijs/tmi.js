@@ -296,7 +296,7 @@ export class Client extends EventEmitter {
 		if (command === 'PRIVMSG') {
 			const messageEvent = new ChatMessage(this, data);
 			if (this.options.settings && this.options.settings.logToConsole) {
-				console.log(`${messageEvent.channel.name} - ${messageEvent.user.displayName}: ${messageEvent.message}`);
+				console.log(`[PRIVMSG] ${messageEvent.channel.name} - ${messageEvent.user.displayName}: ${messageEvent.message}`);
 			}
 			this.emit('message', messageEvent);
 		} else if (command === 'USERSTATE') {
@@ -316,6 +316,9 @@ export class Client extends EventEmitter {
 				channel,
 				user: this.user as UserOrClientUser
 			};
+			if (this.options.settings && this.options.settings.logToConsole) {
+				console.log(`[JOIN] ${eventData.channel.name} - ${eventData.user.displayName}`);
+			}
 			if (!isSelf) {
 				eventData.user = new User(prefix.name, tags, channel);
 			} else {
@@ -329,6 +332,9 @@ export class Client extends EventEmitter {
 				channel,
 				user: this.user as UserOrClientUser
 			};
+			if (this.options.settings && this.options.settings.logToConsole) {
+				console.log(`[PART] ${eventData.channel.name} - ${eventData.user.displayName}`);
+			}
 			if (!channel) {
 				eventData.channel = new Channel(this, channelName, tags);
 			}
