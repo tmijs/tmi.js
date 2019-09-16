@@ -34,7 +34,6 @@
       <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true" />
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="TypeScript">
@@ -50,7 +49,6 @@
       <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true" />
       </indentOptions>
     </codeStyleSettings>
   </code_scheme>
