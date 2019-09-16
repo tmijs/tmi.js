@@ -344,18 +344,29 @@ export class Client extends EventEmitter {
 	/**
 	 * Connect to the TMI servers.
 	 */
-	connect(): Promise<any> {
+	connect(): Promise<string> {
 		const { host, port } = this.connection;
 		this.socket = tls.connect({ host, port });
 		const socket = this.socket;
 		socket.setEncoding('utf8');
-		socket.on('secureConnect', () => this._onConnect());
-		socket.on('close', (hadError: boolean) => this._onClose(hadError));
-		socket.on('error', (error: Error) => this._onError(error));
-		socket.on('data', (data: string) => this._onData(data));
-
-		// TODO:
-		return Promise.resolve();
+		return new Promise((resolve, reject) => {
+			socket.on('secureConnect', () => {
+				this._onConnect();
+				resolve();
+			});
+			socket.on('close', (hadError: boolean) => {
+				this._onClose(hadError);
+				reject('Socket closed with ' + (hadError ? 'an error' : 'no error reported'));
+			});
+			socket.on('error', (error: Error) => {
+				this._onError(error);
+				reject(error.message);
+			});
+			socket.on('data', (data: string) => {
+				this._onData(data);
+				resolve(data);
+			});
+		});
 	}
 	/**
 	 * Send a chat message to a channel on Twitch.
