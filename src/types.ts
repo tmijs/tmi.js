@@ -74,6 +74,16 @@ export interface IdentityOptions {
 }
 
 /**
+ *
+ */
+export interface ClientSettings {
+	/**
+	 * Disabled by default. If set to true, chat will be logged to console using console.log
+	 */
+	logToConsole?: boolean;
+}
+
+/**
  * tmi.Client class instantiation options.
  */
 export interface ClientOptions {
@@ -86,6 +96,10 @@ export interface ClientOptions {
 	 * Options for the identity of the user that the client will login as.
 	 */
 	identity: IdentityOptions;
+	/**
+	 *
+	 */
+	settings?: ClientSettings;
 }
 
 /**

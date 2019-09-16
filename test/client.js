@@ -1,5 +1,5 @@
 const expect     = require('chai').expect;
-const {describe} = require('mocha');
+const {before, beforeEach, describe, it} = require('mocha');
 
 const tmi           = require('../lib/index');
 /**

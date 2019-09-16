@@ -295,6 +295,9 @@ export class Client extends EventEmitter {
 		const isSelf = this.user && prefix.name === this.user.login;
 		if (command === 'PRIVMSG') {
 			const messageEvent = new ChatMessage(this, data);
+			if (this.options.settings && this.options.settings.logToConsole) {
+				console.log(`${messageEvent.channel.name} - ${messageEvent.user.displayName}: ${messageEvent.message}`);
+			}
 			this.emit('message', messageEvent);
 		} else if (command === 'USERSTATE') {
 			let state: UserState;
