@@ -91,6 +91,12 @@ export class Channel {
 	say(message: string) {
 		this.client.say(this.toIRC(), message);
 	}
+	/**
+	 * Send a whisper to the channel
+	 */
+	whisper(message: string) {
+		this.client.whisper(this, message);
+	}
 }
 
 /**

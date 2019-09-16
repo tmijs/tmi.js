@@ -351,6 +351,22 @@ export class Client extends EventEmitter {
 		this.sendRaw(ircMessage);
 	}
 	/**
+	 * Send a whisper to a channel on Twitch.
+	 *
+	 * @param {string|Channel} channel Channel to send the whisper message to.
+	 * @param {string} message Whisper message to send.
+	 */
+	whisper(channel: string | Channel, message: string) {
+		if (typeof channel === 'string') {
+			channel = new Channel(this, channel);
+		}
+		//this.sendRaw(`PRIVMSG #jtv :/w ${channel.login} ${message}`);
+		const ircMessage = tekko.format({
+			command: 'PRIVMSG', middle: ['#jtv'], trailing: `/w ${channel.login} ${message}`
+		});
+		this.sendRaw(ircMessage);
+	}
+	/**
 	 * Send a command to a channel on Twitch.
 	 *
 	 * @param channel Channel to send the message to.
