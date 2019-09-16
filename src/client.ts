@@ -146,15 +146,37 @@ export class Client extends EventEmitter {
 	 */
 	_onConnect() {
 		const name = this.options.identity.name;
-		const auth = `oauth:${this.options.identity.auth}`;
-		this.sendRawArray([
-			'CAP REQ :twitch.tv/tags twitch.tv/commands',
-			`PASS ${auth}`,
-			`NICK ${name}`
-		]);
-		// this.sendRaw('CAP REQ :twitch.tv/tags twitch.tv/commands');
-		// this.sendRawArray([ 'PASS a', 'NICK justinfan1' ]);
-		this.emit('connected');
+		let auth;
+		if(typeof this.options.identity.auth === 'string') {
+			auth = this.options.identity.auth;
+			login.call(this);
+		}
+		else {
+			const tempAuth = this.options.identity.auth(this);
+			if(typeof tempAuth === 'string') {
+				auth = tempAuth;
+				login.call(this);
+			}
+			else {
+				tempAuth.then((value) => {
+					auth = value;
+					login.call(this);
+				}).catch((reason) => {
+					throw new Error(reason);
+				})
+			}
+		}
+		function login() {
+			auth = `oauth:${/^(oauth:)?(.*)$/i.exec(auth)[2]}`;
+			this.sendRawArray([
+				'CAP REQ :twitch.tv/tags twitch.tv/commands',
+				`PASS ${auth}`,
+				`NICK ${name}`
+			]);
+			// this.sendRaw('CAP REQ :twitch.tv/tags twitch.tv/commands');
+			// this.sendRawArray([ 'PASS a', 'NICK justinfan1' ]);
+			this.emit('connected');
+		}
 	}
 	/**
 	 * Connection to the TMI servers closed.
