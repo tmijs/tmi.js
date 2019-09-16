@@ -67,6 +67,10 @@ export interface Client {
 	 */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/**
+	 * Received a whisper.
+	 */
+	on(event: 'whisper', listener: (data: ChatMessage) => void): this;
+	/**
 	 * Received a GLOBALUSERSTATE command.
 	 */
 	on(
@@ -92,6 +96,8 @@ export interface Client {
 	emit(event: 'disconnected', data: DisconnectEvent);
 	emit(event: 'join', data: JoinEvent);
 	emit(event: 'part', data: PartEvent);
+	emit(event: 'message', data: ChatMessage);
+	emit(event: 'whisper', data: ChatMessage);
 	emit(event: 'globaluserstate', data: GlobalUserStateEvent);
 	emit(event: 'roomstate', data: MessageData);
 }
@@ -241,6 +247,10 @@ export class Client extends EventEmitter {
 		if(command === 'PRIVMSG') {
 			const messageEvent = new ChatMessage(this, data);
 			this.emit('message', messageEvent);
+		}
+		else if (command === 'WHISPER') {
+			const messageEvent = new ChatMessage(this, data);
+			this.emit('whisper', messageEvent);
 		}
 		else if(command === 'USERSTATE') {
 			let state: UserState;
