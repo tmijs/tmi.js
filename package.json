@@ -27,12 +27,6 @@
     "node": ">=7.10.1"
   },
   "author": "Schmoopiie",
-  "contributors": [
-    {
-      "name": "celluj34",
-      "email": "celluj34@gmail.com"
-    }
-  ],
   "scripts": {
     "test": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --exit",
     "build": "npm-run-all --sequential build:*",
