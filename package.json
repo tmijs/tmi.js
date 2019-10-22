@@ -28,12 +28,12 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "mocha": "^6.2.0",
+    "@types/node": "^12.11.2",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.4"
   },
   "dependencies": {
-    "@types/node": "^12.6.8",
-    "tekko": "^2.3.0"
+    "tekko": "^2.4.0"
   }
 }
