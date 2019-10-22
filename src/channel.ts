@@ -19,14 +19,6 @@ export class Channel {
 	 */
 	id: string;
 	/**
-	 * The room UUID if it's a chat room.
-	 */
-	roomUUID: string;
-	/**
-	 * The room is a chat room and not the main channel chat.
-	 */
-	isChatRoom: boolean;
-	/**
 	 * The room is a DummyChannel.
 	 */
 	isDummy: boolean;
@@ -44,15 +36,8 @@ export class Channel {
 		this.name = name;
 		this.id = null;
 		this.login = null;
-		this.roomUUID = null;
 		this.isDummy = false;
-		if(name.startsWith('#chatrooms:') && name.includes(':', 11)) {
-			// #chatrooms:<channel ID>:<room UUID>
-			const [ , channelID, roomUUID ] = name.split(':');
-			this.id = channelID;
-			this.roomUUID = roomUUID;
-			this.isChatRoom = true;
-		}
+		if(typeof name !== 'string') {}
 		else {
 			if(name.startsWith('#')) {
 				this.login = name.slice(1);
@@ -62,7 +47,6 @@ export class Channel {
 				this.name = '#' + name;
 			}
 			this.id = tags && tags.get('room-id');
-			this.isChatRoom = false;
 		}
 	}
 	/**
@@ -71,9 +55,6 @@ export class Channel {
 	toIRC() {
 		if(this.name) {
 			return this.name;
-		}
-		else if(this.isChatRoom) {
-			return `#chatrooms:${this.id}:${this.roomUUID}`;
 		}
 		else if(this.login) {
 			return `#${this.login}`;

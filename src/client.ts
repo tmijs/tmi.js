@@ -374,10 +374,10 @@ export class Client extends EventEmitter {
 	 * Race an event listener against a timeout.
 	 *
 	 * @param eventName The name of the event to listen to.
-	 * @param validator A function to validate that the event data is tied to the
-	 * input.
-	 * @param getErrorArgs Argument that the validator will pass in order to call
-	 * the error.
+	 * @param validator A function to validate that the event data is tied to
+	 * the input.
+	 * @param getErrorArgs Argument that the validator will pass in order to
+	 * call the error.
 	 */
 	raceEvent(
 		eventName: string,
