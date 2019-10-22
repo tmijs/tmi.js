@@ -1,6 +1,7 @@
 <!--
 Thanks for reporting issues back to tmi.js!
-This is the issue tracker of tmi.js, if you have any support question please check out https://www.tmijs.org/forums/
+This is the issue tracker of tmi.js, please use the "Twitch API" Discord "#tmi"
+channel for support questions. Check the README "Community" section for links.
 -->
 
 **Actual behaviour:**
