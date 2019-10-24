@@ -84,6 +84,10 @@ export class ChatMessage {
 	 * If the message includes Bits.
 	 */
 	isCheer: boolean;
+	/**
+	 * If the message is a whisper.
+	 */
+	isWhisper: boolean;
 
 	/**
 	 * @param client A tmi.js Client instance.
@@ -102,6 +106,7 @@ export class ChatMessage {
 			this.message = msg.slice(8, -1);
 		}
 		this.isCheer = this.tags.has('bits');
+		this.isWhisper = data.command === 'WHISPER';
 		this.user = new User(data.prefix.name, this.tags, this.channel);
 	}
 	/**
@@ -109,7 +114,11 @@ export class ChatMessage {
 	 * from.
 	 */
 	reply(message: string) {
-		// TODO: Handler whisper replies.
-		this.channel.say(message);
+		if (this.isWhisper) {
+			this.channel.whisper(message);
+		}
+		else {
+			this.channel.say(message);
+		}
 	}
 }

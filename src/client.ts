@@ -67,6 +67,10 @@ export interface Client {
 	 */
 	on(event: 'message', listener: (data: ChatMessage) => void): this;
 	/**
+	 * Received a whisper.
+	 */
+	on(event: 'whisper', listener: (data: ChatMessage) => void): this;
+	/**
 	 * Received a GLOBALUSERSTATE command.
 	 */
 	on(
@@ -92,6 +96,8 @@ export interface Client {
 	emit(event: 'disconnected', data: DisconnectEvent);
 	emit(event: 'join', data: JoinEvent);
 	emit(event: 'part', data: PartEvent);
+	emit(event: 'message', data: ChatMessage);
+	emit(event: 'whisper', data: ChatMessage);
 	emit(event: 'globaluserstate', data: GlobalUserStateEvent);
 	emit(event: 'roomstate', data: MessageData);
 }
@@ -242,6 +248,10 @@ export class Client extends EventEmitter {
 			const messageEvent = new ChatMessage(this, data);
 			this.emit('message', messageEvent);
 		}
+		else if (command === 'WHISPER') {
+			const messageEvent = new ChatMessage(this, data);
+			this.emit('whisper', messageEvent);
+		}
 		else if(command === 'USERSTATE') {
 			let state: UserState;
 			if(this.user.states.has(channelName)) {
@@ -347,6 +357,22 @@ export class Client extends EventEmitter {
 			command: 'PRIVMSG',
 			middle: [ channel.toString() ],
 			trailing: message
+		});
+		this.sendRaw(ircMessage);
+	}
+	/**
+	 * Send a whisper to a channel on Twitch.
+	 *
+	 * @param {string|Channel} channel Channel to send the whisper message to.
+	 * @param {string} message Whisper message to send.
+	 */
+	whisper(channel: string | Channel, message: string) {
+		if (typeof channel === 'string') {
+			channel = new Channel(this, channel);
+		}
+		//this.sendRaw(`PRIVMSG #jtv :/w ${channel.login} ${message}`);
+		const ircMessage = tekko.format({
+			command: 'PRIVMSG', middle: ['#jtv'], trailing: `/w ${channel.login} ${message}`
 		});
 		this.sendRaw(ircMessage);
 	}
