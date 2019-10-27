@@ -11,7 +11,8 @@ import {
 	GlobalUserStateEvent,
 	JoinEvent,
 	PartEvent,
-	UserStateEvent
+	UserStateEvent,
+	NoticeEvent
 } from './types';
 import { Channel, DummyChannel } from './channel';
 import { MessageData, ChatMessage } from './message';
@@ -84,6 +85,10 @@ export interface Client {
 	 * Received a ROOMSTATE command.
 	 */
 	on(event: 'roomstate', listener: (data: MessageData) => void): this;
+	/**
+	 * Received a NOTICE command.
+	 */
+	on(event: 'notice', listener: (data: NoticeEvent) => void): this;
 
 	emit(event: string, ...data: any);
 	emit(event: 'error', error: Error);
@@ -94,6 +99,7 @@ export interface Client {
 	emit(event: 'part', data: PartEvent);
 	emit(event: 'globaluserstate', data: GlobalUserStateEvent);
 	emit(event: 'roomstate', data: MessageData);
+	emit(event: 'notice', data: NoticeEvent);
 }
 
 export class Client extends EventEmitter {
@@ -294,6 +300,11 @@ export class Client extends EventEmitter {
 			}
 			this.user = new ClientUser(this, name, tags);
 			this.emit('globaluserstate', { user: this.user });
+		}
+		else if(command === 'NOTICE') {
+			this.emit('notice', {
+				message: data.trailing
+			});
 		}
 		else {
 			this.emit('unhandled-command', data);

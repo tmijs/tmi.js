@@ -87,6 +87,9 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+# Jetbrains Configuration
+.idea/*
+!.idea/codeStyles
 
 # Specific to the tmi.js project
 
