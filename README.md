@@ -24,7 +24,7 @@ npm i tmi.js
 const tmi = require('tmi.js');
 const client = new tmi.Client({
 	options: { debug: true },
-	connections: {
+	connection: {
 		reconnect: true,
 		secure: true
 	},
