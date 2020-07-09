@@ -216,6 +216,39 @@ var events = [{
 		false
 	]
 }, {
+	name: 'raided',
+	data: '@badges=bits/100;color=#FF0000;display-name=Raider;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=raider;mod=0;msg-id=raid;msg-param-displayName=Raider;msg-param-login=raider;msg-param-profileImageURL=https://static-cdn.jtvnw.net/jtv_user_pictures/IMAGE_ID-profile_image-70x70.png;msg-param-viewerCount=6;room-id=987654321;subscriber=0;system-msg=6\\sraiders\\sfrom\\sraider\\shave\\sjoined\\n!;tmi-sent-ts=1500000000000;turbo=0;user-id=123456789;user-type= :tmi.twitch.tv USERNOTICE #channel',
+	expected: [
+		"#channel",
+		"Raider",
+		6,
+		{
+			badges: { bits: '100' },
+			'badges-raw': 'bits/100',
+			color: '#FF0000',
+			'display-name': 'Raider',
+			emotes: null,
+			'emotes-raw': null,
+			flags: null,
+			id: '00000000-0000-0000-0000-000000000000',
+			login: 'raider',
+			'message-type': 'raid',
+			mod: false,
+			'msg-id': 'raid',
+			'msg-param-displayName': 'Raider',
+			'msg-param-login': 'raider',
+			'msg-param-profileImageURL': 'https://static-cdn.jtvnw.net/jtv_user_pictures/IMAGE_ID-profile_image-70x70.png',
+			'msg-param-viewerCount': '6',
+			'room-id': '987654321',
+			subscriber: false,
+			'system-msg': '6 raiders from raider have joined!',
+			'tmi-sent-ts': '1500000000000',
+			turbo: false,
+			'user-id': '123456789',
+			'user-type': null
+		}
+	]
+}, {
 	name: 'roomstate',
 	data: '@broadcaster-lang=;r9k=0;slow=0;subs-only=0 :tmi.twitch.tv ROOMSTATE #schmoopiie',
 	expected: [
