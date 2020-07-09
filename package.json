@@ -4,18 +4,17 @@
   "description": "Javascript library for the Twitch Messaging Interface.",
   "keywords": [
     "tmi",
+    "tmijs",
     "twitch",
     "twitch.tv",
     "stream",
-    "broadcast",
+    "chat",
     "message",
     "messaging",
     "interface",
-    "subscriber",
     "websocket",
     "ws",
-    "bot",
-    "robot"
+    "bot"
   ],
   "main": "index.js",
   "files": [
