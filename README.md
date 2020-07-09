@@ -10,7 +10,7 @@
 
 [Website](https://tmijs.com/) |
 [Documentation currently at tmijs/docs](https://github.com/tmijs/docs/tree/gh-pages/_posts) |
-Changelog on the [release page](https://github.com/tmijs/tmi.js/releases)
+[Changelog on the release page](https://github.com/tmijs/tmi.js/releases)
 
 ## Install
 
@@ -49,6 +49,12 @@ Available as "`tmi`" on `window`.
 
 ```html
 <script src="/scripts/tmi.min.js"></script>
+```
+```html
+<script>
+const client = new tmi.Client({ /* ... */ });
+client.connect();
+</script>
 ```
 
 #### Prebuilt Browser Releases
