@@ -3,7 +3,7 @@ var tmi = require('../index.js');
 
 var events = [{
 	name: 'action',
-	data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001",
+	data: '@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001',
 	expected: [
 		'#schmoopiie',
 		{
@@ -26,7 +26,7 @@ var events = [{
 	]
 }, {
 	name: 'automod',
-	data: "@msg-id=msg_rejected :tmi.twitch.tv NOTICE #schmoopiie :Hey! Your message is being checked by mods and has not been sent.",
+	data: '@msg-id=msg_rejected :tmi.twitch.tv NOTICE #schmoopiie :Hey! Your message is being checked by mods and has not been sent.',
 	expected: [
 		'#schmoopiie',
 		'msg_rejected',
@@ -34,11 +34,11 @@ var events = [{
 	]
 }, {
 	name: 'automod',
-	data: "@msg-id=msg_rejected_mandatory :tmi.twitch.tv NOTICE #schmoopiie :Your message wasn't posted due to conflicts with the channel's moderation settings.",
+	data: '@msg-id=msg_rejected_mandatory :tmi.twitch.tv NOTICE #schmoopiie :Your message wasn\'t posted due to conflicts with the channel\'s moderation settings.',
 	expected: [
 		'#schmoopiie',
 		'msg_rejected_mandatory',
-		"Your message wasn't posted due to conflicts with the channel's moderation settings."
+		'Your message wasn\'t posted due to conflicts with the channel\'s moderation settings.'
 	]
 }, {
 	name: 'ban',
@@ -54,8 +54,8 @@ var events = [{
 	]
 }, {
 	name: 'chat',
-	// data: "@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)",
-	data: "@badge-info=subscriber/21;badges=broadcaster/1,subscriber/12,overwatch-league-insider_2019A/1;color=#177DE3;display-name=Alca;emotes=499:3-4;flags=;id=c5ddcb05-85ae-4a60-91bc-7704c7031257;mod=0;room-id=7676884;subscriber=1;tmi-sent-ts=1554296462753;turbo=0;user-id=7676884;user-type= :alca!alca@alca.tmi.twitch.tv PRIVMSG #alca :Hi :)",
+	// data: '@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :Hello :)',
+	data: '@badge-info=subscriber/21;badges=broadcaster/1,subscriber/12,overwatch-league-insider_2019A/1;color=#177DE3;display-name=Alca;emotes=499:3-4;flags=;id=c5ddcb05-85ae-4a60-91bc-7704c7031257;mod=0;room-id=7676884;subscriber=1;tmi-sent-ts=1554296462753;turbo=0;user-id=7676884;user-type= :alca!alca@alca.tmi.twitch.tv PRIVMSG #alca :Hi :)',
 	expected: [
 		'#alca',
 		{
@@ -144,7 +144,7 @@ var events = [{
 	]
 }, {
 	name: 'hosted',
-	data: ":jtv!~jtv@jtv.tmi.twitch.tv PRIVMSG #schmoopiie :Username is now hosting you for 11 viewers.",
+	data: ':jtv!~jtv@jtv.tmi.twitch.tv PRIVMSG #schmoopiie :Username is now hosting you for 11 viewers.',
 	expected: [
 		'#schmoopiie',
 		'username',
@@ -180,7 +180,7 @@ var events = [{
 		'#schmoopiie',
 		['user1', 'user2', 'user3']
 	]
-},  {
+}, {
 	name: 'mods',
 	data: '@msg-id=no_mods :tmi.twitch.tv NOTICE #schmoopiie :There are no moderators of this channel.',
 	expected: [
@@ -219,8 +219,8 @@ var events = [{
 	name: 'raided',
 	data: '@badges=bits/100;color=#FF0000;display-name=Raider;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=raider;mod=0;msg-id=raid;msg-param-displayName=Raider;msg-param-login=raider;msg-param-profileImageURL=https://static-cdn.jtvnw.net/jtv_user_pictures/IMAGE_ID-profile_image-70x70.png;msg-param-viewerCount=6;room-id=987654321;subscriber=0;system-msg=6\\sraiders\\sfrom\\sraider\\shave\\sjoined\\n!;tmi-sent-ts=1500000000000;turbo=0;user-id=123456789;user-type= :tmi.twitch.tv USERNOTICE #channel',
 	expected: [
-		"#channel",
-		"Raider",
+		'#channel',
+		'Raider',
 		6,
 		{
 			badges: { bits: '100' },
@@ -311,9 +311,9 @@ var events = [{
 			'user-type': 'staff'
 		},
 		{
-		  prime: true,
-		  plan: 'Prime',
-		  planName: 'Channel Subscription (Schmoopiie)'
+			prime: true,
+			plan: 'Prime',
+			planName: 'Channel Subscription (Schmoopiie)'
 		}
 	]
 }, {
@@ -351,9 +351,9 @@ var events = [{
 			'user-type': 'staff'
 		},
 		{
-		  prime: true,
-		  plan: 'Prime',
-		  planName: 'Channel Subscription (Schmoopiie)'
+			prime: true,
+			plan: 'Prime',
+			planName: 'Channel Subscription (Schmoopiie)'
 		}
 	]
 }, {
@@ -377,9 +377,9 @@ var events = [{
 		'#schmoopiie',
 		'Schmoopiie',
 		{
-		  'prime': true,
-		  'plan': 'Prime',
-		  'planName': 'Channel Subscription (Schmoopiie)'
+			'prime': true,
+			'plan': 'Prime',
+			'planName': 'Channel Subscription (Schmoopiie)'
 		},
 		'Great stream -- keep it up!',
 		{
@@ -401,6 +401,110 @@ var events = [{
 			turbo: true,
 			'user-id': '20624989',
 			'user-type': 'staff'
+		}
+	]
+}, {
+	name: 'giftpaidupgrade',
+	data: '@badge-info=subscriber/1;badges=subscriber/0;color=;display-name=SubscriberName;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=subscribername;mod=0;msg-id=giftpaidupgrade;msg-param-sender-login=sendername;msg-param-sender-name=SenderName;room-id=123456789;subscriber=1;system-msg=SubscriberName\\sis\\scontinuing\\sthe\\sGift\\sSub\\sthey\\sgot\\sfrom\\sSenderName!;tmi-sent-ts=1590000000000;user-id=987654321;user-type= :tmi.twitch.tv USERNOTICE #channelname',
+	expected: [
+		'#channelname',
+		'SubscriberName',
+		'SenderName',
+		{
+			'badge-info': { subscriber: '1' },
+			'badge-info-raw': 'subscriber/1',
+			badges: { subscriber: '0' },
+			'badges-raw': 'subscriber/0',
+			color: null,
+			'display-name': 'SubscriberName',
+			emotes: null,
+			'emotes-raw': null,
+			flags: null,
+			id: '00000000-0000-0000-0000-000000000000',
+			login: 'subscribername',
+			'message-type': 'giftpaidupgrade',
+			mod: false,
+			'msg-id': 'giftpaidupgrade',
+			'msg-param-sender-login': 'sendername',
+			'msg-param-sender-name': 'SenderName',
+			'room-id': '123456789',
+			subscriber: true,
+			'system-msg': 'SubscriberName is continuing the Gift Sub they got from SenderName!',
+			'tmi-sent-ts': '1590000000000',
+			'user-id': '987654321',
+			'user-type': null
+		}
+	]
+}, {
+	name: 'anongiftpaidupgrade',
+	data: '@badge-info=subscriber/1;badges=vip/1,subscriber/0,premium/1;color=#D2691E;display-name=SubscriberName;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=subscribername;mod=0;msg-id=anongiftpaidupgrade;room-id=123456789;subscriber=1;system-msg=SubscriberName\sis\scontinuing\sthe\sGift\sSub\sthey\sgot\sfrom\san\sanonymous\suser!;tmi-sent-ts=1590000000000;user-id=987654321;user-type= :tmi.twitch.tv USERNOTICE #channelname',
+	expected: [
+		// channel, username, userstate
+		'#channelname',
+		'SubscriberName',
+		{
+			'badge-info': {
+				'subscriber': '1'
+			},
+			'badge-info-raw': 'subscriber/1',
+			badges: {
+				premium: '1',
+				subscriber: '0',
+				vip: '1'
+			},
+			'badges-raw': 'vip/1,subscriber/0,premium/1',
+			color: '#D2691E',
+			'display-name': 'SubscriberName',
+			emotes: null,
+			'emotes-raw': null,
+			flags: null,
+			id: '00000000-0000-0000-0000-000000000000',
+			login: 'subscribername',
+			'message-type': 'anongiftpaidupgrade',
+			mod: false,
+			'msg-id': 'anongiftpaidupgrade',
+			'room-id': '123456789',
+			subscriber: true,
+			'system-msg': 'SubscriberNamesisscontinuingsthesGiftsSubstheysgotsfromsansanonymoussuser!',
+			'tmi-sent-ts': '1590000000000',
+			'user-id': '987654321',
+			'user-type': null
+		}
+	]
+}, {
+	name: 'primepaidupgrade',
+	data: '@badge-info=subscriber/2;badges=subscriber/0,premium/1;color=;display-name=SubscriberName;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=subscribername;mod=0;msg-id=primepaidupgrade;msg-param-sub-plan=1000;room-id=123456789;subscriber=1;system-msg=SubscriberName\\sconverted\\sfrom\\sa\\sTwitch\\sPrime\\ssub\\sto\\sa\\sTier\\s1\\ssub!;tmi-sent-ts=1590000000000;user-id=987654321;user-type= :tmi.twitch.tv USERNOTICE #channelname',
+	expected: [
+		// channel, username, methods, userstate
+		'#channelname',
+		'SubscriberName',
+		{
+			plan: '1000',
+			planName: null,
+			prime: false
+		},
+		{
+			'badge-info': { subscriber: '2' },
+			'badge-info-raw': 'subscriber/2',
+			badges: { premium: '1', subscriber: '0' },
+			'badges-raw': 'subscriber/0,premium/1',
+			color: null,
+			'display-name': 'SubscriberName',
+			emotes: null,
+			'emotes-raw': null,
+			flags: null,
+			id: '00000000-0000-0000-0000-000000000000',
+			login: 'subscribername',
+			'message-type': 'primepaidupgrade',
+			mod: false,
+			'msg-id': 'primepaidupgrade',
+			'msg-param-sub-plan': '1000',
+			'room-id': '123456789',
+			subscriber: true,
+			'system-msg': 'SubscriberName converted from a Twitch Prime sub to a Tier 1 sub!',
+			'tmi-sent-ts': '1590000000000',
+			'user-id': '987654321',
+			'user-type': null
 		}
 	]
 }, {
@@ -480,8 +584,8 @@ describe('client events', function() {
 	it('emits disconnected', function(cb) {
 		var client = new tmi.client();
 
-		client.on("disconnected", function(reason) {
-			reason.should.be.exactly("Connection closed.").and.be.a.String();
+		client.on('disconnected', function(reason) {
+			reason.should.be.exactly('Connection closed.').and.be.a.String();
 			cb();
 		});
 
