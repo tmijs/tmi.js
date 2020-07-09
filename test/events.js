@@ -96,6 +96,28 @@ var events = [{
 			color: '#0D4200',
 			'display-name': 'Schmoopiie',
 			emotes: null,
+			'message-type': 'chat',
+			subscriber: false,
+			turbo: true,
+			'user-type': 'global_mod',
+			'emotes-raw': null,
+			'badges-raw': 'broadcaster/1,warcraft/horde',
+			username: 'schmoopiie'
+		},
+		'cheer100 Hello :)'
+	]
+}, {
+	name: 'cheer',
+	data: '@badges=broadcaster/1,warcraft/horde;color=#0D4200;bits=100;display-name=Schmoopiie;emotes=;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION cheer100 Hello :)\u0001',
+	expected: [
+		'#schmoopiie',
+		{
+			badges: { broadcaster: '1', warcraft: 'horde' },
+			bits: '100',
+			color: '#0D4200',
+			'display-name': 'Schmoopiie',
+			emotes: null,
+			'message-type': 'action',
 			subscriber: false,
 			turbo: true,
 			'user-type': 'global_mod',
