@@ -34,7 +34,7 @@ const client = new tmi.Client({
 	},
 	channels: [ 'my-channel' ]
 });
-client.connect();
+client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
 	if(self) return;
 	if(message.toLowerCase() === '!hello') {
@@ -53,7 +53,7 @@ Available as "`tmi`" on `window`.
 ```html
 <script>
 const client = new tmi.Client({ /* ... */ });
-client.connect();
+client.connect().catch(console.error);
 </script>
 ```
 
