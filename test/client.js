@@ -25,6 +25,20 @@ describe("client()", function() {
 		};
 		var client = new tmi.client({logger: logger, connection: {random: 'main'}});
 	});
+	it("should default secure to true when opts.connection.server and opts.connection.port not set", () => {
+		var client = new tmi.client();
+		client.secure.should.eql(true);
+		client = new tmi.client({connection: {}});
+		client.secure.should.eql(true);
+	});
+	it("should default secure to false when opts.connection.server or opts.connection.port set", () => {
+		var client = new tmi.client({connection: {server: "localhost"}});
+		client.secure.should.eql(false);
+		client = new tmi.client({connection: {port: 1}});
+		client.secure.should.eql(false);
+		client = new tmi.client({connection: {server: "localhost", port: 1}});
+		client.secure.should.eql(false);
+	});
 });
 
 describe("client getters", function() {
