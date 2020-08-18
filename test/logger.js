@@ -30,7 +30,7 @@ describe("log()", function() {
 		log.setLevel('info');
 		log.info('foobar');
 
-		unhook();
+		unhook.unhook();
 
 		var expected = out.trim();
 		expected.should.containEql('info: foobar');
