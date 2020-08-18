@@ -77,7 +77,7 @@ npm i -D @types/tmi.js
 
 ## Community
 
-- Follow [@AlcaMagic on Twitter](https://twitter.com/AlcaMagic), [Alca on Twitch](https://www.twitch.tv/alca).
+- Follow [@AlcaMagic on Twitter](https://twitter.com/AlcaMagic), [Alca on Twitch](https://twitch.tv/alca).
 - Follow [@Schmoopiie on Twitter](https://twitter.com/Schmoopiie).
 - Found a bug: [submit an issue.](https://github.com/tmijs/tmi.js/issues/new)
 - Discussion and help about tmi.js: [Twitch API Discord Server](https://discord.gg/8NXaEyV)
