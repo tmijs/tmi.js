@@ -1,4 +1,5 @@
+var client = require("./lib/client");
 module.exports = {
-	client: require("./lib/client"),
-	Client: require("./lib/client")
+	client,
+	Client: client
 };
