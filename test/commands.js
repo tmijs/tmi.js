@@ -398,7 +398,10 @@ var tests = [{
 	inputParams: ['moddymcmodface', 'You got unmodded! D:'],
 	returnedParams: ['moddymcmodface', 'You got unmodded! D:'],
 	serverTest: '/w',
-	serverCommand: ':tmi.twitch.tv WHISPER moddymcmodface :You got unmodded! D:'
+	serverCommand: ':tmi.twitch.tv WHISPER moddymcmodface :You got unmodded! D:',
+	errorCommands: [
+		no_permission,
+	]
 }];
 
 describe('commands (justinfan)', function() {
