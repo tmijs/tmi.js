@@ -13,7 +13,7 @@ describe('invalid server events', function() {
 		it(`treat "${test}" as invalid`, function() {
 			var client = new tmi.client({
 				logger: {
-					warn: function(message) {
+					warn(message) {
 						message.includes('Could not parse').should.be.ok;
 					}
 				}

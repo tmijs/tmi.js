@@ -18,8 +18,8 @@ describe("client()", function() {
 
 	it("warn when random is specified (deprecated)", function() {
 		var logger = {
-			setLevel: function() {},
-			warn: function (message) {
+			setLevel() {},
+			warn(message) {
 				message.should.be.ok();
 			}
 		};

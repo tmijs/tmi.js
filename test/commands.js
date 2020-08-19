@@ -121,7 +121,7 @@ var tests = [{
 	inputParams: ['#local7000'],
 	returnedParams: ['#local7000'],
 	serverTest: 'PART',
-	serverCommand: function(client, ws) {
+	serverCommand(client, ws) {
 		var user = client.getUsername();
 		ws.send(`:${user}! PART #local7000`);
 	},
@@ -159,7 +159,7 @@ var tests = [{
 	inputParams: ['#local7000'],
 	returnedParams: ['#local7000'],
 	serverTest: 'PART',
-	serverCommand: function(client, ws) {
+	serverCommand(client, ws) {
 		var user = client.getUsername();
 		ws.send(`:${user}! PART #local7000`);
 	},
