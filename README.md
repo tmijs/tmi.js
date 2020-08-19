@@ -17,7 +17,7 @@
 ### Node
 
 ```bash
-npm i tmi.js
+$ npm i tmi.js
 ```
 
 ```js
@@ -72,7 +72,7 @@ $ npm run build
 ### Type Definitions
 
 ```bash
-npm i -D @types/tmi.js
+$ npm i -D @types/tmi.js
 ```
 
 ## Community
