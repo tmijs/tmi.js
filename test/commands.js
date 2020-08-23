@@ -1,5 +1,6 @@
 var WebSocketServer = require('ws').Server;
-var tmi = require('../index.js');
+var tmi = require('../index');
+var parse = require('../lib/parser');
 
 var noop = function() {};
 var catchConnectError = err => {
@@ -597,20 +598,17 @@ describe('commands (identity)', function() {
 
 	it(`should handle action`, function(cb) {
 		var client = this.client;
-		var server = this.server;
-
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
-				if(~message.indexOf('Hello')) {
-					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :\u0001ACTION Hello :)\u0001');
-				}
-			});
-		});
+		var channel = '#local7000';
+		var baseMsg = 'Hello';
+		var encodedMsg = `\u0001ACTION ${baseMsg}\u0001`;
+		
+		echoClientNonce.call(this, channel, baseMsg);
 
 		client.on('logon', function() {
-			client.action('#local7000', 'Hello').then(function (data) {
-				data[0].should.eql('#local7000');
-				data[1].should.eql('\u0001ACTION Hello\u0001');
+			client.action(channel, baseMsg).then(function(data) {
+				data[0].should.eql(channel);
+				data[1].should.eql(encodedMsg);
+				data[2].should.be.Object();
 				client.disconnect();
 				cb();
 			});
@@ -621,21 +619,50 @@ describe('commands (identity)', function() {
 
 	it(`should handle say`, function(cb) {
 		var client = this.client;
+		var channel = '#local7000';
+		var msg =  'Hello';
+
+		echoClientNonce.call(this, channel, msg);
+
+		client.on('logon', function() {
+			client.say(channel, msg).then(function(data) {
+				data[0].should.eql(channel);
+				data[1].should.eql(msg);
+				client.disconnect();
+				cb();
+			});
+		});
+
+		client.connect().catch(catchConnectError);
+	});
+
+	it(`should handle say with additional tags`, function(cb) {
+		var client = this.client;
 		var server = this.server;
+		var channel = '#local7000';
+		var msg =  'Hello';
+		var tagKey = 'key';
+		var tagValue = 'value test';
+		var tagValueEncoded = 'value\\stest';
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
-				if(~message.indexOf('Hello')) {
-					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
+				if(~message.indexOf(msg)) {
+					var { tags } = parse.msg(message);
+					tags.should.have.property(tagKey);
+					tags.key.should.eql(tagValueEncoded);
+					ws.send(`@client-nonce=${tags['client-nonce']} :tmi.twitch.tv USERSTATE ${channel}`);
 				}
 			});
 		});
 
 		client.on('logon', function() {
-			client.say('#local7000', 'Hello').then(function (data) {
-				data[0].should.eql('#local7000');
-				data[1].should.eql('Hello');
-				client.disconnect();
+			var tags = { [tagKey]: tagValue };
+
+			client.say(channel, msg, tags).then(function(data) {
+				data[0].should.eql(channel);
+				data[1].should.eql(msg);
+				data[2].should.eql(tags);
 				cb();
 			});
 		});
@@ -713,20 +740,19 @@ describe('commands (identity)', function() {
 	['/me', '\\me', '.me'].forEach(function(me) {
 		it(`should handle ${me} say`, function(cb) {
 			var client = this.client;
-			var server = this.server;
+			var channel = '#local7000';
+			var baseMsg = 'Hello';
+			var msg = `${me} ${baseMsg}`;
+			var encodedMsg = `\u0001ACTION ${baseMsg}\u0001`;
 
-			server.on('connection', function(ws) {
-				ws.on('message', function(message) {
-					if(~message.indexOf('Hello')) {
-						ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
-					}
-				});
-			});
+			echoClientNonce.call(this, channel, baseMsg);
 
 			client.on('logon', function() {
-				client.say('#local7000', `${me} Hello`).then(function (data) {
-					data[0].should.eql('#local7000');
-					data[1].should.eql('\u0001ACTION Hello\u0001');
+				client.say(channel, msg).then(function(data) {
+					data[0].should.eql(channel);
+					data[1].should.eql(encodedMsg);
+					data[2].should.be.Object();
+					data.length.should.eql(4);
 					client.disconnect();
 					cb();
 				});
@@ -741,7 +767,7 @@ describe('commands (identity)', function() {
 			var client = this.client;
 
 			client.on('logon', function() {
-				client.say('#local7000', `${prefix}FOO`).then(function (data) {
+				client.say('#local7000', `${prefix}FOO`).then(function(data) {
 					data[0].should.eql('#local7000');
 					data.length.should.eql(2);
 					client.disconnect();
@@ -756,12 +782,17 @@ describe('commands (identity)', function() {
 	['..'].forEach(function(prefix) {
 		it(`should handle ${prefix}message say`, function(cb) {
 			var client = this.client;
+			var channel = '#local7000';
+			var msg = `${prefix}FOO`;
+
+			echoClientNonce.call(this, channel, msg);
 
 			client.on('logon', function() {
-				client.say('#local7000', `${prefix}FOO`).then(function (data) {
-					data[0].should.eql('#local7000');
-					data[1].should.eql(`${prefix}FOO`);
-					data.length.should.eql(2);
+				client.say(channel, msg).then(function(data) {
+					data[0].should.eql(channel);
+					data[1].should.eql(msg);
+					data[2].should.be.Object();
+					data.length.should.eql(4);
 					client.disconnect();
 					cb();
 				});
@@ -771,3 +802,15 @@ describe('commands (identity)', function() {
 		});
 	});
 });
+
+function echoClientNonce(channel, msg) {
+	this.server.on('connection', function(ws) {
+		ws.on('message', function(message) {
+			if(~message.indexOf(msg)) {
+				var { tags } = parse.msg(message);
+				tags.should.have.property('client-nonce');
+				ws.send(`@client-nonce=${tags['client-nonce']} :tmi.twitch.tv USERSTATE ${channel}`);
+			}
+		});
+	});
+}
