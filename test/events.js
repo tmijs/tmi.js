@@ -553,6 +553,37 @@ var events = [{
 		'Hello! ;-)',
 		false
 	]
+}, {
+	name: 'newchatter',
+	data: '@badge-info=;badges=;color=;display-name=MurdocTurner;emotes=64138:0-8;flags=;id=00000000-0000-0000-0000-000000000000;login=murdocturner;mod=0;msg-id=ritual;msg-param-ritual-name=new_chatter;room-id=123456789;subscriber=0;system-msg=MurdocTurner\\sis\\snew\\shere.\\sSay\\shello!;tmi-sent-ts=1500000000000;user-id=89983882;user-type= :tmi.twitch.tv USERNOTICE #channel :SeemsGood',
+	expected: [
+		'#channel',
+		'MurdocTurner',
+		{
+			'badge-info': null,
+			badges: null,
+			color: null,
+			'display-name': 'MurdocTurner',
+			emotes: { '64138': [ '0-8' ] },
+			flags: null,
+			id: '00000000-0000-0000-0000-000000000000',
+			login: 'murdocturner',
+			mod: false,
+			'msg-id': 'ritual',
+			'message-type': 'ritual',
+			'msg-param-ritual-name': 'new_chatter',
+			'room-id': '123456789',
+			subscriber: false,
+			'system-msg': 'MurdocTurner is new here. Say hello!',
+			'tmi-sent-ts': '1500000000000',
+			'user-id': '89983882',
+			'user-type': null,
+			'emotes-raw': '64138:0-8',
+			'badge-info-raw': null,
+			'badges-raw': null,
+		},
+		'SeemsGood'
+	]
 }];
 
 describe('client events', function() {
