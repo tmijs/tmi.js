@@ -566,7 +566,6 @@ describe('client events', function() {
 			client.on(name, function(...args) {
 				'Reach this callback'.should.be.ok();
 				expected && expected.forEach(function(data, index) {
-					// console.log({ a: args[index], data });
 					if(data === null) {
 						should.not.exist(args[index]);
 					}
