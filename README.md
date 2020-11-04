@@ -23,7 +23,7 @@ $ npm i tmi.js
 ```js
 const tmi = require('tmi.js');
 const client = new tmi.Client({
-	options: { debug: true },
+	options: { debug: true, messagesLogLevel: "info" },
 	connection: {
 		reconnect: true,
 		secure: true
