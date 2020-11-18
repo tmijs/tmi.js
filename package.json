@@ -46,22 +46,22 @@
     "url": "https://github.com/tmijs/tmi.js/issues"
   },
   "dependencies": {
-    "node-fetch": "2.6.0",
-    "ws": "7.3.1"
+    "node-fetch": "2.6.1",
+    "ws": "7.4.0"
   },
   "devDependencies": {
     "@types/node-fetch": "2.5.7",
     "babel-preset-env": "1.7.0",
     "babelify": "10.0.0",
-    "browserify": "16.5.2",
+    "browserify": "17.0.0",
     "hook-std": "2.0.0",
     "mkdirp": "1.0.4",
-    "mocha": "8.1.1",
+    "mocha": "8.2.1",
     "npm-run-all": "4.1.5",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "should": "13.2.3",
-    "uglify-js": "3.10.1"
+    "uglify-js": "3.11.6"
   },
   "browser": {
     "ws": false,
