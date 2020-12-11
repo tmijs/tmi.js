@@ -616,6 +616,95 @@ var events = [{
 		},
 		'SeemsGood'
 	]
+}, {
+	name: 'redeem',
+	data: '@badge-info=;color=#0FC7D1;custom-reward-id=27c8e486-a386-40cc-9a4b-dbb5cf01e439;display-name=MurdocTurner;emotes=;flags=;id=702b9546-f0fe-41cb-b35b-fba5f8315909;mod=1;room-id=7676884;subscriber=0;tmi-sent-ts=1607582291194;turbo=0;user-id=89983882;user-type=mod :murdocturner!murdocturner@murdocturner.tmi.twitch.tv PRIVMSG #channel :lol',
+	expected: [
+		'#channel',
+		'murdocturner',
+		'27c8e486-a386-40cc-9a4b-dbb5cf01e439',
+		{
+			'badge-info': null,
+			color: '#0FC7D1',
+			'custom-reward-id': '27c8e486-a386-40cc-9a4b-dbb5cf01e439',
+			'display-name': 'MurdocTurner',
+			emotes: null,
+			flags: null,
+			id: '702b9546-f0fe-41cb-b35b-fba5f8315909',
+			mod: true,
+			'room-id': '7676884',
+			subscriber: false,
+			'tmi-sent-ts': '1607582291194',
+			turbo: false,
+			'message-type': 'chat',
+			'user-id': '89983882',
+			'user-type': 'mod',
+			'badge-info-raw': null,
+			'emotes-raw': null,
+			'username': 'murdocturner'
+		},
+		'lol'
+	]
+}, {
+	name: 'redeem',
+	data: '@badge-info=;badges=;color=#9ACD32;display-name=MurdocTurner;emotes=;flags=;id=da38bdb9-2d50-4961-8da3-ca2737132773;mod=0;msg-id=skip-subs-mode-message;room-id=121476331;subscriber=0;tmi-sent-ts=1607586320639;turbo=0;user-id=89983882;user-type= :murdocturner!murdocturner@murdocturner.tmi.twitch.tv PRIVMSG #channel :test',
+	expected: [
+		'#channel',
+		'murdocturner',
+		'skip-subs-mode-message',
+		{
+			'badge-info': null,
+			badges: null,
+			color: '#9ACD32',
+			'display-name': 'MurdocTurner',
+			emotes: null,
+			flags: null,
+			id: 'da38bdb9-2d50-4961-8da3-ca2737132773',
+			mod: false,
+			'msg-id': 'skip-subs-mode-message',
+			'room-id': '121476331',
+			subscriber: false,
+			'tmi-sent-ts': '1607586320639',
+			turbo: false,
+			'message-type': 'chat',
+			'user-id': '89983882',
+			'user-type': null,
+			'badge-info-raw': null,
+			'badges-raw': null,
+			'emotes-raw': null,
+			'username': 'murdocturner'
+		},
+		'test'
+	]
+}, {
+	name: 'redeem',
+	data: '@badge-info=;color=#0FC7D1;display-name=MurdocTurner;emotes=;flags=;id=3da15282-3268-402e-8fc7-d736d7093077;mod=1;msg-id=highlighted-message;room-id=121476331;subscriber=0;tmi-sent-ts=1607586921729;turbo=0;user-id=89983882;user-type=mod :murdocturner!murdocturner@murdocturner.tmi.twitch.tv PRIVMSG #channel :test123',
+	expected: [
+		'#channel',
+		'murdocturner',
+		'highlighted-message',
+		{
+			'badge-info': null,
+			color: '#0FC7D1',
+			'display-name': 'MurdocTurner',
+			emotes: null,
+			flags: null,
+			id: '3da15282-3268-402e-8fc7-d736d7093077',
+			mod: true,
+			'msg-id': 'highlighted-message',
+			'room-id': '121476331',
+			subscriber: false,
+			'tmi-sent-ts': '1607586921729',
+			turbo: false,
+			'message-type': 'chat',
+			'user-id': '89983882',
+			'user-type': 'mod',
+			'badge-info-raw': null,
+			'emotes-raw': null,
+			'username': 'murdocturner'
+		},
+		'test123'
+	]
 }];
 
 describe('client events', function() {
