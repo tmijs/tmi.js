@@ -5,7 +5,7 @@ var tests = [
 	':tmi.twitch.tv 003',
 	':tmi.twitch.tv 004',
 	':tmi.twitch.tv 375',
-	':tmi.twitch.tv 376',
+	':tmi.twitch.tv 372 schmoopiie :You are in a maze of twisty passages.',
 	':tmi.twitch.tv CAP',
 	'@msg-id=host_on :tmi.twitch.tv NOTICE #schmoopiie',
 	'@msg-id=host_off :tmi.twitch.tv NOTICE #schmoopiie',

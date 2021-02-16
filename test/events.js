@@ -135,7 +135,7 @@ var events = [{
 	]
 }, {
 	name: 'connected',
-	data: ':tmi.twitch.tv 372 schmoopiie :You are in a maze of twisty passages, all alike.'
+	data: ':tmi.twitch.tv 376 schmoopiie :>'
 }, {
 	name: 'emotesets',
 	data: '@color=#1E90FF;display-name=Schmoopiie;emote-sets=0;turbo=0;user-type= :tmi.twitch.tv GLOBALUSERSTATE',
