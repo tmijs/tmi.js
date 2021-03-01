@@ -143,6 +143,22 @@ var events = [{
 		'0'
 	]
 }, {
+	name: 'globaluserstate',
+	data: '@badge-info=;badges=glitchcon2020/1;color=#177DE3;display-name=Alca;emote-sets=0;user-id=7676884;user-type= :tmi.twitch.tv GLOBALUSERSTATE',
+	expected: [
+		{
+			'badge-info': null,
+			'badge-info-raw': null,
+			badges: { glitchcon2020: '1' },
+			'badges-raw': 'glitchcon2020/1',
+			color: '#177DE3',
+			'display-name': 'Alca',
+			'emote-sets': '0',
+			'user-id': '7676884',
+			'user-type': null
+		}
+	]
+}, {
 	name: 'hosted',
 	data: ':jtv!~jtv@jtv.tmi.twitch.tv PRIVMSG #schmoopiie :Username is now hosting you for 11 viewers.',
 	expected: [
