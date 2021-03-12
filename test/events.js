@@ -453,7 +453,7 @@ var events = [{
 	]
 }, {
 	name: 'anongiftpaidupgrade',
-	data: '@badge-info=subscriber/1;badges=vip/1,subscriber/0,premium/1;color=#D2691E;display-name=SubscriberName;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=subscribername;mod=0;msg-id=anongiftpaidupgrade;room-id=123456789;subscriber=1;system-msg=SubscriberName\sis\scontinuing\sthe\sGift\sSub\sthey\sgot\sfrom\san\sanonymous\suser!;tmi-sent-ts=1590000000000;user-id=987654321;user-type= :tmi.twitch.tv USERNOTICE #channelname',
+	data: '@badge-info=subscriber/1;badges=vip/1,subscriber/0,premium/1;color=#D2691E;display-name=SubscriberName;emotes=;flags=;id=00000000-0000-0000-0000-000000000000;login=subscribername;mod=0;msg-id=anongiftpaidupgrade;room-id=123456789;subscriber=1;system-msg=SubscriberName\\sis\\scontinuing\\sthe\\sGift\\sSub\\sthey\\sgot\\sfrom\\san\\sanonymous\\suser!;tmi-sent-ts=1590000000000;user-id=987654321;user-type= :tmi.twitch.tv USERNOTICE #channelname',
 	expected: [
 		// channel, username, userstate
 		'#channelname',
@@ -481,7 +481,7 @@ var events = [{
 			'msg-id': 'anongiftpaidupgrade',
 			'room-id': '123456789',
 			subscriber: true,
-			'system-msg': 'SubscriberNamesisscontinuingsthesGiftsSubstheysgotsfromsansanonymoussuser!',
+			'system-msg': 'SubscriberName is continuing the Gift Sub they got from an anonymous user!',
 			'tmi-sent-ts': '1590000000000',
 			'user-id': '987654321',
 			'user-type': null
