@@ -19,7 +19,7 @@ describe('invalid server events', function() {
 				}
 			});
 
-			client._onMessage({data: test});
+			client._onMessage({ data: test });
 		});
 	});
 });

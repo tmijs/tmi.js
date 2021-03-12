@@ -25,6 +25,7 @@
   "scripts": {
     "test": "run-s eslint test:*",
     "eslint": "eslint index.js lib/* test/*",
+    "eslint-fix": "eslint --fix index.js lib/* test/*",
     "test:mocha": "nyc mocha -- --require should --exit",
     "build": "run-s build:*",
     "build:rimraf": "rimraf ./build",

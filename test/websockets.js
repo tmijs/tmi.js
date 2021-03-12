@@ -10,7 +10,7 @@ var catchConnectError = err => {
 describe('websockets', function() {
 	before(function() {
 		// Initialize websocket server
-		this.server = new WebSocketServer({port: 7000});
+		this.server = new WebSocketServer({ port: 7000 });
 		this.client = new tmi.client({
 			connection: {
 				server: 'localhost',
@@ -57,7 +57,7 @@ describe('websockets', function() {
 describe('server crashed, with reconnect: false (default)', function() {
 	before(function() {
 		// Initialize websocket server
-		this.server = new WebSocketServer({port: 7000});
+		this.server = new WebSocketServer({ port: 7000 });
 		this.client = new tmi.client({
 			connection: {
 				server: 'localhost',
@@ -88,7 +88,7 @@ describe('server crashed, with reconnect: false (default)', function() {
 describe('server crashed, with reconnect: true', function() {
 	before(function() {
 		// Initialize websocket server
-		this.server = new WebSocketServer({port: 7000});
+		this.server = new WebSocketServer({ port: 7000 });
 		this.client = new tmi.client({
 			connection: {
 				server: 'localhost',

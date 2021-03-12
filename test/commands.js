@@ -407,7 +407,7 @@ var tests = [ {
 describe('commands (justinfan)', function() {
 	beforeEach(function() {
 		// Initialize websocket server
-		this.server = new WebSocketServer({port: 7000});
+		this.server = new WebSocketServer({ port: 7000 });
 		this.client = new tmi.client({
 			connection: {
 				server: 'localhost',
@@ -577,7 +577,7 @@ describe('commands (justinfan)', function() {
 describe('commands (identity)', function() {
 	beforeEach(function() {
 		// Initialize websocket server
-		this.server = new WebSocketServer({port: 7000});
+		this.server = new WebSocketServer({ port: 7000 });
 		this.client = new tmi.client({
 			connection: {
 				server: 'localhost',

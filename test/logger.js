@@ -23,7 +23,7 @@ describe("log()", function() {
 	it("logs to the console", function() {
 		var out = '';
 
-		var unhook = hookStd.stdout({silent: true}, function(output) {
+		var unhook = hookStd.stdout({ silent: true }, function(output) {
 			out += output;
 		});
 

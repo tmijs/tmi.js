@@ -744,7 +744,7 @@ describe('client events', function() {
 				cb();
 			});
 
-			client._onMessage({data: data});
+			client._onMessage({ data: data });
 		});
 	});
 
