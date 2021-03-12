@@ -10,6 +10,7 @@
         "array-bracket-spacing": [ 2, "always" ],
         "object-curly-spacing": [ 2, "always" ],
         "comma-dangle": [ 2, "never" ],
+        "comma-spacing": 2,
         "constructor-super": 2,
         "for-direction": 2,
         "getter-return": 2,
