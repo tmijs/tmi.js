@@ -5,6 +5,7 @@
         "ecmaFeatures": {}
     },
     "rules": {
+        "semi": 2,
         "constructor-super": 2,
         "for-direction": 2,
         "getter-return": 2,
