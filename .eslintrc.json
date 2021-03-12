@@ -9,6 +9,7 @@
         "indent": [ 2, "tab", { "MemberExpression": 0, "SwitchCase": 1 } ],
         "array-bracket-spacing": [ 2, "always" ],
         "object-curly-spacing": [ 2, "always" ],
+        "comma-dangle": [ 2, "never" ],
         "constructor-super": 2,
         "for-direction": 2,
         "getter-return": 2,

@@ -106,7 +106,7 @@ var tests = [ {
 		'@msg-id=bad_host_hosting :tmi.twitch.tv NOTICE #local7000 :This channel is already hosting that channel.',
 		'@msg-id=bad_host_rate_exceeded :tmi.twitch.tv NOTICE #local7000 :Host target cannot be changed more than 3 times every half hour.',
 		'@msg-id=usage_host :tmi.twitch.tv NOTICE #local7000 :Usage: "/host " - Host another channel.',
-		no_permission,
+		no_permission
 		// msg_channel_suspended
 	]
 }, {
@@ -347,7 +347,7 @@ var tests = [ {
 	errorCommands: [
 		'@msg-id=not_hosting :tmi.twitch.tv NOTICE #local7000 :No channel is currently being hosted.',
 		'@msg-id=usage_unhost :tmi.twitch.tv NOTICE #local7000 :Usage: "/unhost"',
-		no_permission,
+		no_permission
 		// msg_channel_suspended
 	]
 }, {
@@ -400,7 +400,7 @@ var tests = [ {
 	serverTest: '/w',
 	serverCommand: ':tmi.twitch.tv WHISPER moddymcmodface :You got unmodded! D:',
 	errorCommands: [
-		no_permission,
+		no_permission
 	]
 } ];
 

@@ -596,7 +596,7 @@ var events = [ {
 			'user-type': null,
 			'emotes-raw': '64138:0-8',
 			'badge-info-raw': null,
-			'badges-raw': null,
+			'badges-raw': null
 		},
 		'SeemsGood'
 	]
@@ -628,7 +628,7 @@ var events = [ {
 			'user-type': null,
 			'emotes-raw': '64138:0-8',
 			'badge-info-raw': null,
-			'badges-raw': null,
+			'badges-raw': null
 		},
 		'SeemsGood'
 	]
