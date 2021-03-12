@@ -11,10 +11,10 @@ var catchConnectError = err => {
 var no_permission = '@msg-id=no_permission :tmi.twitch.tv NOTICE #local7000 :You don\'t have permission.';
 var msg_channel_suspended = '@msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #local7000 :This channel has been suspended.';
 
-var tests = [{
+var tests = [ {
 	command: 'ban',
-	inputParams: ['#local7000', 'baduser', 'some reason'],
-	returnedParams: ['#local7000', 'baduser', 'some reason'],
+	inputParams: [ '#local7000', 'baduser', 'some reason' ],
+	returnedParams: [ '#local7000', 'baduser', 'some reason' ],
 	serverTest: '/ban',
 	serverCommand: '@msg-id=ban_success :tmi.twitch.tv NOTICE #local7000 :baduser',
 	errorCommands: [
@@ -28,8 +28,8 @@ var tests = [{
 	]
 }, {
 	command: 'clear',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/clear',
 	serverCommand: ':tmi.twitch.tv CLEARCHAT',
 	errorCommands: [
@@ -39,8 +39,8 @@ var tests = [{
 	]
 }, {
 	command: 'color',
-	inputParams: ['#local7000', '#c0ffee'],
-	returnedParams: ['#c0ffee'],
+	inputParams: [ '#local7000', '#c0ffee' ],
+	returnedParams: [ '#c0ffee' ],
 	serverTest: '#c0ffee',
 	serverCommand: '@msg-id=color_changed :tmi.twitch.tv NOTICE #local7000 :#c0ffee',
 	errorCommands: [
@@ -49,14 +49,14 @@ var tests = [{
 	]
 }, {
 	command: 'color',
-	inputParams: ['#c0ffee'],
-	returnedParams: ['#c0ffee'],
+	inputParams: [ '#c0ffee' ],
+	returnedParams: [ '#c0ffee' ],
 	serverTest: '#c0ffee',
 	serverCommand: '@msg-id=color_changed :tmi.twitch.tv NOTICE #local7000 :#c0ffee'
 }, {
 	command: 'commercial',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000', 30],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000', 30 ],
 	serverTest: '/commercial',
 	serverCommand: '@msg-id=commercial_success :tmi.twitch.tv NOTICE #local7000 :30',
 	errorCommands: [
@@ -67,14 +67,14 @@ var tests = [{
 	]
 }, {
 	command: 'commercial',
-	inputParams: ['#local7000', 60],
-	returnedParams: ['#local7000', 60],
+	inputParams: [ '#local7000', 60 ],
+	returnedParams: [ '#local7000', 60 ],
 	serverTest: '/commercial',
 	serverCommand: '@msg-id=commercial_success :tmi.twitch.tv NOTICE #local7000 :60'
 }, {
 	command: 'emoteonly',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/emoteonly',
 	serverCommand: '@msg-id=emote_only_on :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -85,8 +85,8 @@ var tests = [{
 	]
 }, {
 	command: 'emoteonlyoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/emoteonlyoff',
 	serverCommand: '@msg-id=emote_only_off :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -97,8 +97,8 @@ var tests = [{
 	]
 }, {
 	command: 'host',
-	inputParams: ['#local7000', 'schmoopiie'],
-	returnedParams: ['#local7000', 'schmoopiie', 5],
+	inputParams: [ '#local7000', 'schmoopiie' ],
+	returnedParams: [ '#local7000', 'schmoopiie', 5 ],
 	serverTest: '/host',
 	serverCommand: '@msg-id=hosts_remaining :tmi.twitch.tv NOTICE #local7000 :5',
 	errorCommands: [
@@ -111,15 +111,15 @@ var tests = [{
 	]
 }, {
 	command: 'join',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: 'JOIN #local7000',
 	serverCommand: '@broadcaster-lang=;r9k=0;slow=300;subs-only=0 :tmi.twitch.tv ROOMSTATE #local7000',
 	testTimeout: true
 }, {
 	command: 'leave',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: 'PART',
 	serverCommand(client, ws) {
 		var user = client.getUsername();
@@ -128,8 +128,8 @@ var tests = [{
 	testTimeout: true
 }, {
 	command: 'mod',
-	inputParams: ['#local7000', 'schmoopiie'],
-	returnedParams: ['#local7000', 'schmoopiie'],
+	inputParams: [ '#local7000', 'schmoopiie' ],
+	returnedParams: [ '#local7000', 'schmoopiie' ],
 	serverTest: '/mod',
 	serverCommand: '@msg-id=mod_success :tmi.twitch.tv NOTICE #local7000 :schmoopiie',
 	errorCommands: [
@@ -141,8 +141,8 @@ var tests = [{
 	]
 }, {
 	command: 'mods',
-	inputParams: ['#local7000'],
-	returnedParams: ['barry', 'baz'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ 'barry', 'baz' ],
 	serverTest: '/mods',
 	serverCommand: '@msg-id=room_mods :tmi.twitch.tv NOTICE #local7000 :The moderators of this room are: barry, baz',
 	errorCommands: [
@@ -150,14 +150,14 @@ var tests = [{
 	]
 }, {
 	command: 'mods',
-	inputParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
 	returnedParams: [],
 	serverTest: '/mods',
 	serverCommand: '@msg-id=no_mods :tmi.twitch.tv NOTICE #local7000 :There are no moderators of this channel.'
 }, {
 	command: 'part',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: 'PART',
 	serverCommand(client, ws) {
 		var user = client.getUsername();
@@ -166,8 +166,8 @@ var tests = [{
 	testTimeout: true
 }, {
 	command: 'r9kbeta',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/r9kbeta',
 	serverCommand: '@msg-id=r9k_on :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -178,8 +178,8 @@ var tests = [{
 	]
 }, {
 	command: 'r9kbetaoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/r9kbetaoff',
 	serverCommand: '@msg-id=r9k_off :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -190,8 +190,8 @@ var tests = [{
 	]
 }, {
 	command: 'r9kmode',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/r9kbeta',
 	serverCommand: '@msg-id=r9k_on :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -202,8 +202,8 @@ var tests = [{
 	]
 }, {
 	command: 'r9kmodeoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/r9kbetaoff',
 	serverCommand: '@msg-id=r9k_off :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -214,14 +214,14 @@ var tests = [{
 	]
 }, {
 	command: 'raw',
-	inputParams: ['/slowoff'],
-	returnedParams: ['/slowoff'],
+	inputParams: [ '/slowoff' ],
+	returnedParams: [ '/slowoff' ],
 	serverTest: '/slowoff',
 	serverCommand: '@slow=0 :tmi.twitch.tv ROOMSTATE'
 }, {
 	command: 'slow',
-	inputParams: ['#local7000', 150],
-	returnedParams: ['#local7000', 150],
+	inputParams: [ '#local7000', 150 ],
+	returnedParams: [ '#local7000', 150 ],
 	serverTest: '/slow',
 	serverCommand: '@slow=150 :tmi.twitch.tv ROOMSTATE',
 	errorCommands: [
@@ -231,14 +231,14 @@ var tests = [{
 	]
 }, {
 	command: 'slow',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000', 300],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000', 300 ],
 	serverTest: '/slow',
 	serverCommand: '@slow=300 :tmi.twitch.tv ROOMSTATE'
 }, {
 	command: 'slowoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/slowoff',
 	serverCommand: '@slow=0 :tmi.twitch.tv ROOMSTATE',
 	errorCommands: [
@@ -248,8 +248,8 @@ var tests = [{
 	]
 }, {
 	command: 'slowmode',
-	inputParams: ['#local7000', 150],
-	returnedParams: ['#local7000', 150],
+	inputParams: [ '#local7000', 150 ],
+	returnedParams: [ '#local7000', 150 ],
 	serverTest: '/slow',
 	serverCommand: '@slow=150 :tmi.twitch.tv ROOMSTATE',
 	errorCommands: [
@@ -259,14 +259,14 @@ var tests = [{
 	]
 }, {
 	command: 'slowmode',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000', 300],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000', 300 ],
 	serverTest: '/slow',
 	serverCommand: '@slow=300 :tmi.twitch.tv ROOMSTATE'
 }, {
 	command: 'slowmodeoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/slowoff',
 	serverCommand: '@slow=0 :tmi.twitch.tv ROOMSTATE',
 	errorCommands: [
@@ -276,8 +276,8 @@ var tests = [{
 	]
 }, {
 	command: 'subscribers',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/subscribers',
 	serverCommand: '@msg-id=subs_on :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -288,8 +288,8 @@ var tests = [{
 	]
 }, {
 	command: 'subscribersoff',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/subscribersoff',
 	serverCommand: '@msg-id=subs_off :tmi.twitch.tv NOTICE #local7000',
 	errorCommands: [
@@ -300,8 +300,8 @@ var tests = [{
 	]
 }, {
 	command: 'timeout',
-	inputParams: ['#local7000', 'baduser', 9000],
-	returnedParams: ['#local7000', 'baduser', 9000],
+	inputParams: [ '#local7000', 'baduser', 9000 ],
+	returnedParams: [ '#local7000', 'baduser', 9000 ],
 	serverTest: '/timeout',
 	serverCommand: '@msg-id=timeout_success :tmi.twitch.tv NOTICE #local7000 :9000',
 	errorCommands: [
@@ -316,14 +316,14 @@ var tests = [{
 	]
 }, {
 	command: 'timeout',
-	inputParams: ['#local7000', 'baduser'],
-	returnedParams: ['#local7000', 'baduser', 300],
+	inputParams: [ '#local7000', 'baduser' ],
+	returnedParams: [ '#local7000', 'baduser', 300 ],
 	serverTest: '/timeout',
 	serverCommand: '@msg-id=timeout_success :tmi.twitch.tv NOTICE #local7000 :300'
 }, {
 	command: 'unban',
-	inputParams: ['#local7000', 'baduser'],
-	returnedParams: ['#local7000', 'baduser'],
+	inputParams: [ '#local7000', 'baduser' ],
+	returnedParams: [ '#local7000', 'baduser' ],
 	serverTest: '/unban',
 	serverCommand: '@msg-id=unban_success :tmi.twitch.tv NOTICE #local7000 :baduser',
 	errorCommands: [
@@ -334,14 +334,14 @@ var tests = [{
 	]
 }, {
 	command: 'unban',
-	inputParams: ['#local7000', 'baduser'],
-	returnedParams: ['#local7000', 'baduser'],
+	inputParams: [ '#local7000', 'baduser' ],
+	returnedParams: [ '#local7000', 'baduser' ],
 	serverTest: '/unban',
 	serverCommand: '@msg-id=untimeout_success :tmi.twitch.tv NOTICE #local7000 :baduser'
 }, {
 	command: 'unhost',
-	inputParams: ['#local7000'],
-	returnedParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
+	returnedParams: [ '#local7000' ],
 	serverTest: '/unhost',
 	serverCommand: ':tmi.twitch.tv HOSTTARGET #local7000 :- 0',
 	errorCommands: [
@@ -352,8 +352,8 @@ var tests = [{
 	]
 }, {
 	command: 'unmod',
-	inputParams: ['#local7000', 'moddymcmodface'],
-	returnedParams: ['#local7000', 'moddymcmodface'],
+	inputParams: [ '#local7000', 'moddymcmodface' ],
+	returnedParams: [ '#local7000', 'moddymcmodface' ],
 	serverTest: '/unmod',
 	serverCommand: '@msg-id=unmod_success :tmi.twitch.tv NOTICE #local7000 :moddymcmodface',
 	errorCommands: [
@@ -364,8 +364,8 @@ var tests = [{
 	]
 }, {
 	command: 'vip',
-	inputParams: ['#local7000', 'schmoopiie'],
-	returnedParams: ['#local7000', 'schmoopiie'],
+	inputParams: [ '#local7000', 'schmoopiie' ],
+	returnedParams: [ '#local7000', 'schmoopiie' ],
 	serverTest: '/vip',
 	serverCommand: '@msg-id=vip_success :tmi.twitch.tv NOTICE #local7000 :You have added User as a vip of this channel.',
 	errorCommands: [
@@ -377,8 +377,8 @@ var tests = [{
 	]
 }, {
 	command: 'unvip',
-	inputParams: ['#local7000', 'schmoopiie'],
-	returnedParams: ['#local7000', 'schmoopiie'],
+	inputParams: [ '#local7000', 'schmoopiie' ],
+	returnedParams: [ '#local7000', 'schmoopiie' ],
 	serverTest: '/unvip',
 	serverCommand: '@msg-id=unvip_success :tmi.twitch.tv NOTICE #local7000 :You have removed User as a VIP of this channel..',
 	errorCommands: [
@@ -389,20 +389,20 @@ var tests = [{
 	]
 }, {
 	command: 'vips',
-	inputParams: ['#local7000'],
+	inputParams: [ '#local7000' ],
 	returnedParams: [],
 	serverTest: '/vips',
 	serverCommand: '@msg-id=no_vips :tmi.twitch.tv NOTICE #local7000 :This channel does not have any VIPs.'
 }, {
 	command: 'whisper',
-	inputParams: ['moddymcmodface', 'You got unmodded! D:'],
-	returnedParams: ['moddymcmodface', 'You got unmodded! D:'],
+	inputParams: [ 'moddymcmodface', 'You got unmodded! D:' ],
+	returnedParams: [ 'moddymcmodface', 'You got unmodded! D:' ],
 	serverTest: '/w',
 	serverCommand: ':tmi.twitch.tv WHISPER moddymcmodface :You got unmodded! D:',
 	errorCommands: [
 		no_permission,
 	]
-}];
+} ];
 
 describe('commands (justinfan)', function() {
 	beforeEach(function() {
@@ -710,7 +710,7 @@ describe('commands (identity)', function() {
 		client.connect().catch(catchConnectError);
 	});
 
-	['/me', '\\me', '.me'].forEach(function(me) {
+	[ '/me', '\\me', '.me' ].forEach(function(me) {
 		it(`should handle ${me} say`, function(cb) {
 			var client = this.client;
 			var server = this.server;
@@ -736,7 +736,7 @@ describe('commands (identity)', function() {
 		});
 	});
 
-	['.', '/', '\\'].forEach(function(prefix) {
+	[ '.', '/', '\\' ].forEach(function(prefix) {
 		it(`should handle ${prefix} say`, function(cb) {
 			var client = this.client;
 
@@ -753,7 +753,7 @@ describe('commands (identity)', function() {
 		});
 	});
 
-	['..'].forEach(function(prefix) {
+	[ '..' ].forEach(function(prefix) {
 		it(`should handle ${prefix}message say`, function(cb) {
 			var client = this.client;
 

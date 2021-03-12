@@ -36,7 +36,7 @@ describe('websockets', function() {
 		});
 
 		client.on('join', function() {
-			client.channels.should.eql(['#local7000']);
+			client.channels.should.eql([ '#local7000' ]);
 		});
 
 		client.on('part', function() {

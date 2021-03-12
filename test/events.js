@@ -1,7 +1,7 @@
 var should = require('should');
 var tmi = require('../index.js');
 
-var events = [{
+var events = [ {
 	name: 'action',
 	data: '@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001',
 	expected: [
@@ -11,8 +11,8 @@ var events = [{
 			color: '#0D4200',
 			'display-name': 'Schmoopiie',
 			emotes: {
-				'25': ['0-4', '12-16'],
-				'1902': ['6-10']
+				'25': [ '0-4', '12-16' ],
+				'1902': [ '6-10' ]
 			},
 			subscriber: false,
 			turbo: true,
@@ -194,7 +194,7 @@ var events = [{
 	data: '@msg-id=room_mods :tmi.twitch.tv NOTICE #schmoopiie :The moderators of this room are: user1, user2, user3',
 	expected: [
 		'#schmoopiie',
-		['user1', 'user2', 'user3']
+		[ 'user1', 'user2', 'user3' ]
 	]
 }, {
 	name: 'mods',
@@ -721,7 +721,7 @@ var events = [{
 		},
 		'test123'
 	]
-}];
+} ];
 
 describe('client events', function() {
 	events.forEach(function(e) {

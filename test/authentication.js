@@ -3,7 +3,7 @@ var tmi = require('../index.js');
 
 var noop = function() {};
 var catchConnectError = err => {
-	if(!['Connection closed.', 'Login unsuccessful.', 'Error logging in.', 'Invalid NICK.'].includes(err)) {
+	if(![ 'Connection closed.', 'Login unsuccessful.', 'Error logging in.', 'Invalid NICK.' ].includes(err)) {
 		console.error(err);
 	}
 };

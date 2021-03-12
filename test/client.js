@@ -12,8 +12,8 @@ describe("client()", function() {
 	});
 
 	it("normalize channel names", function() {
-		var client = new tmi.client({channels: ["avalonstar", "#dayvemsee"]});
-		client.opts.channels.should.eql(["#avalonstar", "#dayvemsee"]);
+		var client = new tmi.client({channels: [ "avalonstar", "#dayvemsee" ]});
+		client.opts.channels.should.eql([ "#avalonstar", "#dayvemsee" ]);
 	});
 
 	it("should default secure to true when opts.connection.server and opts.connection.port not set", () => {
