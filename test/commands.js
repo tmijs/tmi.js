@@ -458,7 +458,7 @@ describe('commands (justinfan)', function() {
 		var server = this.server;
 
 		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+			ws.on('message', function(_message) {
 				ws.send('dummy');
 			});
 		});

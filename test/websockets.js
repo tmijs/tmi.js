@@ -71,7 +71,7 @@ describe('server crashed, with reconnect: false (default)', function() {
 		var client = this.client;
 		var server = this.server;
 
-		server.on('connection', function(ws) {
+		server.on('connection', function(_ws) {
 			// Uh-oh, the server dies
 			server.close();
 		});
@@ -103,7 +103,7 @@ describe('server crashed, with reconnect: true', function() {
 		var client = this.client;
 		var server = this.server;
 
-		server.on('connection', function(ws) {
+		server.on('connection', function(_ws) {
 			// Uh-oh, the server dies
 			server.close();
 		});
