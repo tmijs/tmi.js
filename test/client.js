@@ -16,15 +16,6 @@ describe("client()", function() {
 		client.opts.channels.should.eql(["#avalonstar", "#dayvemsee"]);
 	});
 
-	it("warn when random is specified (deprecated)", function() {
-		var logger = {
-			setLevel() {},
-			warn(message) {
-				message.should.be.ok();
-			}
-		};
-		var client = new tmi.client({logger: logger, connection: {random: 'main'}});
-	});
 	it("should default secure to true when opts.connection.server and opts.connection.port not set", () => {
 		var client = new tmi.client();
 		client.secure.should.eql(true);
