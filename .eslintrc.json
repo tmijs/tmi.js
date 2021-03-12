@@ -6,6 +6,7 @@
     },
     "rules": {
         "semi": 2,
+        "indent": [ 2, "tab", { "MemberExpression": 0, "SwitchCase": 1 } ],
         "constructor-super": 2,
         "for-direction": 2,
         "getter-return": 2,
