@@ -15,6 +15,7 @@
         "yoda": 2,
         "quotes": [ 2, "single" ],
         "eol-last": 2,
+        "multiline-ternary": [ 2, "never" ],
         "constructor-super": "error",
         "for-direction": "error",
         "getter-return": "error",
