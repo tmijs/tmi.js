@@ -13,6 +13,8 @@
         "comma-spacing": "error",
         "max-depth": [ "error", 3 ],
         "yoda": 2,
+        "quotes": [ 2, "single" ],
+        "eol-last": 2,
         "constructor-super": "error",
         "for-direction": "error",
         "getter-return": "error",

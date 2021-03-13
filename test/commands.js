@@ -595,7 +595,7 @@ describe('commands (identity)', function() {
 		this.client = null;
 	});
 
-	it(`should handle action`, function(cb) {
+	it('should handle action', function(cb) {
 		var client = this.client;
 		var server = this.server;
 
@@ -619,7 +619,7 @@ describe('commands (identity)', function() {
 		client.connect().catch(catchConnectError);
 	});
 
-	it(`should handle say`, function(cb) {
+	it('should handle say', function(cb) {
 		var client = this.client;
 		var server = this.server;
 
@@ -643,14 +643,14 @@ describe('commands (identity)', function() {
 		client.connect().catch(catchConnectError);
 	});
 
-	it(`should handle say when disconnected`, function(cb) {
+	it('should handle say when disconnected', function(cb) {
 		this.client.say('#local7000', 'Hello!').then(noop, function(err) {
 			err.should.eql('Not connected to server.');
 			cb();
 		});
 	});
 
-	it(`should break up long messages (> 500 characters)`, function(cb) {
+	it('should break up long messages (> 500 characters)', function(cb) {
 		var client = this.client;
 		var server = this.server;
 		var lorem = 'lorem '.repeat(89) + 'ipsum';
@@ -680,7 +680,7 @@ describe('commands (identity)', function() {
 		client.connect().catch(catchConnectError);
 	});
 
-	it(`should break up long messages without spaces (> 500 characters)`, function(cb) {
+	it('should break up long messages without spaces (> 500 characters)', function(cb) {
 		var client = this.client;
 		var server = this.server;
 		var lorem = 'lorem'.repeat(100) + 'ipsum';
