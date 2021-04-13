@@ -1,6 +1,6 @@
-var tmi = require('../index.js');
+const tmi = require('../index.js');
 
-var tests = [
+const tests = [
 	'FOO',
 	':tmi.twitch.tv FOO',
 	':tmi.twitch.tv NOTICE #schmoopiie : FOO',
@@ -11,7 +11,7 @@ var tests = [
 describe('invalid server events', function() {
 	tests.forEach(function(test) {
 		it(`treat "${test}" as invalid`, function() {
-			var client = new tmi.client({
+			const client = new tmi.client({
 				logger: {
 					warn(message) {
 						message.includes('Could not parse').should.be.ok;

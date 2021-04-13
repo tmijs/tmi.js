@@ -1,17 +1,17 @@
-var WebSocketServer = require('ws').Server;
-var tmi = require('../index.js');
+const WebSocketServer = require('ws').Server;
+const tmi = require('../index.js');
 
-var noop = function() {};
-var catchConnectError = err => {
+const noop = function() {};
+const catchConnectError = err => {
 	if(err !== 'Connection closed.') {
 		console.error(err);
 	}
 };
 
-var no_permission = '@msg-id=no_permission :tmi.twitch.tv NOTICE #local7000 :You don\'t have permission.';
-var msg_channel_suspended = '@msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #local7000 :This channel has been suspended.';
+const no_permission = '@msg-id=no_permission :tmi.twitch.tv NOTICE #local7000 :You don\'t have permission.';
+const msg_channel_suspended = '@msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #local7000 :This channel has been suspended.';
 
-var tests = [ {
+const tests = [ {
 	command: 'ban',
 	inputParams: [ '#local7000', 'baduser', 'some reason' ],
 	returnedParams: [ '#local7000', 'baduser', 'some reason' ],
@@ -122,7 +122,7 @@ var tests = [ {
 	returnedParams: [ '#local7000' ],
 	serverTest: 'PART',
 	serverCommand(client, ws) {
-		var user = client.getUsername();
+		const user = client.getUsername();
 		ws.send(`:${user}! PART #local7000`);
 	},
 	testTimeout: true
@@ -160,7 +160,7 @@ var tests = [ {
 	returnedParams: [ '#local7000' ],
 	serverTest: 'PART',
 	serverCommand(client, ws) {
-		var user = client.getUsername();
+		const user = client.getUsername();
 		ws.send(`:${user}! PART #local7000`);
 	},
 	testTimeout: true
@@ -431,8 +431,8 @@ describe('commands (justinfan)', function() {
 	});
 
 	it('handles ping', function(cb) {
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -454,8 +454,8 @@ describe('commands (justinfan)', function() {
 	});
 
 	it('handles ping timeout', function(cb) {
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(_message) {
@@ -475,14 +475,14 @@ describe('commands (justinfan)', function() {
 
 	tests.forEach(function(test) {
 		it(`should handle ${test.command}`, function(cb) {
-			var client = this.client;
-			var server = this.server;
+			const client = this.client;
+			const server = this.server;
 
 			server.on('connection', function(ws) {
 				ws.on('message', function(message) {
 					// Ensure that the message starts with NICK
 					if(!message.indexOf('NICK')) {
-						var user = client.getUsername();
+						const user = client.getUsername();
 						ws.send(`:${user}! JOIN #local7000`);
 						return;
 					}
@@ -514,14 +514,14 @@ describe('commands (justinfan)', function() {
 		if(test.errorCommands) {
 			test.errorCommands.forEach(function(error) {
 				it(`should handle ${test.command} errors`, function(cb) {
-					var client = this.client;
-					var server = this.server;
+					const client = this.client;
+					const server = this.server;
 
 					server.on('connection', function(ws) {
 						ws.on('message', function(message) {
 							// Ensure that the message starts with NICK
 							if(!message.indexOf('NICK')) {
-								var user = client.getUsername();
+								const user = client.getUsername();
 								ws.send(`:${user}! JOIN #local7000`);
 								return;
 							}
@@ -547,8 +547,8 @@ describe('commands (justinfan)', function() {
 
 		if(test.testTimeout) {
 			it(`should handle ${test.command} timeout`, function(cb) {
-				var client = this.client;
-				var server = this.server;
+				const client = this.client;
+				const server = this.server;
 
 				server.on('connection', function(ws) {
 					ws.on('message', function(message) {
@@ -596,8 +596,8 @@ describe('commands (identity)', function() {
 	});
 
 	it('should handle action', function(cb) {
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -620,8 +620,8 @@ describe('commands (identity)', function() {
 	});
 
 	it('should handle say', function(cb) {
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -651,10 +651,10 @@ describe('commands (identity)', function() {
 	});
 
 	it('should break up long messages (> 500 characters)', function(cb) {
-		var client = this.client;
-		var server = this.server;
-		var lorem = 'lorem '.repeat(89) + 'ipsum';
-		var calls = 0;
+		const client = this.client;
+		const server = this.server;
+		const lorem = 'lorem '.repeat(89) + 'ipsum';
+		let calls = 0;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -681,10 +681,10 @@ describe('commands (identity)', function() {
 	});
 
 	it('should break up long messages without spaces (> 500 characters)', function(cb) {
-		var client = this.client;
-		var server = this.server;
-		var lorem = 'lorem'.repeat(100) + 'ipsum';
-		var calls = 0;
+		const client = this.client;
+		const server = this.server;
+		const lorem = 'lorem'.repeat(100) + 'ipsum';
+		let calls = 0;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -712,8 +712,8 @@ describe('commands (identity)', function() {
 
 	[ '/me', '\\me', '.me' ].forEach(function(me) {
 		it(`should handle ${me} say`, function(cb) {
-			var client = this.client;
-			var server = this.server;
+			const client = this.client;
+			const server = this.server;
 
 			server.on('connection', function(ws) {
 				ws.on('message', function(message) {
@@ -738,7 +738,7 @@ describe('commands (identity)', function() {
 
 	[ '.', '/', '\\' ].forEach(function(prefix) {
 		it(`should handle ${prefix} say`, function(cb) {
-			var client = this.client;
+			const client = this.client;
 
 			client.on('logon', function() {
 				client.say('#local7000', `${prefix}FOO`).then(function (data) {
@@ -755,7 +755,7 @@ describe('commands (identity)', function() {
 
 	[ '..' ].forEach(function(prefix) {
 		it(`should handle ${prefix}message say`, function(cb) {
-			var client = this.client;
+			const client = this.client;
 
 			client.on('logon', function() {
 				client.say('#local7000', `${prefix}FOO`).then(function (data) {

@@ -1,7 +1,7 @@
-var should = require('should');
-var tmi = require('../index.js');
+const should = require('should');
+const tmi = require('../index.js');
 
-var events = [ {
+const events = [ {
 	name: 'action',
 	data: '@badges=broadcaster/1,warcraft/horde;color=#0D4200;display-name=Schmoopiie;emotes=25:0-4,12-16/1902:6-10;subscriber=0;turbo=1;user-type=global_mod :schmoopiie!~schmoopiie@schmoopiie.tmi.twitch.tv PRIVMSG #schmoopiie :\u0001ACTION Hello :)\u0001',
 	expected: [
@@ -725,11 +725,11 @@ var events = [ {
 
 describe('client events', function() {
 	events.forEach(function(e) {
-		var name = e.name;
-		var data = e.data;
-		var expected = e.expected;
+		const name = e.name;
+		const data = e.data;
+		const expected = e.expected;
 		it(`emit ${name}`, function(cb) {
-			var client = new tmi.client();
+			const client = new tmi.client();
 
 			client.on(name, function(...args) {
 				'Reach this callback'.should.be.ok();
@@ -749,7 +749,7 @@ describe('client events', function() {
 	});
 
 	it('emits disconnected', function(cb) {
-		var client = new tmi.client();
+		const client = new tmi.client();
 
 		client.on('disconnected', function(reason) {
 			reason.should.be.exactly('Connection closed.').and.be.a.String();

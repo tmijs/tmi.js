@@ -1,17 +1,17 @@
-var hookStd = require('hook-std');
-var tmi = require('../index.js');
-var log = require('../lib/logger.js');
-var _ = require('../lib/utils.js');
+const hookStd = require('hook-std');
+const tmi = require('../index.js');
+const log = require('../lib/logger.js');
+const _ = require('../lib/utils.js');
 
 describe('client()', function() {
 	it('defaults to the stock logger', function() {
-		var client = new tmi.client();
+		const client = new tmi.client();
 
 		client.log.should.be.ok();
 	});
 
 	it('allows a custom logger', function() {
-		var client = new tmi.client({
+		const client = new tmi.client({
 			logger: console
 		});
 
@@ -21,9 +21,9 @@ describe('client()', function() {
 
 describe('log()', function() {
 	it('logs to the console', function() {
-		var out = '';
+		let out = '';
 
-		var unhook = hookStd.stdout({ silent: true }, function(output) {
+		const unhook = hookStd.stdout({ silent: true }, function(output) {
 			out += output;
 		});
 
@@ -32,7 +32,7 @@ describe('log()', function() {
 
 		unhook.unhook();
 
-		var expected = out.trim();
+		const expected = out.trim();
 		expected.should.containEql('info: foobar');
 	});
 });

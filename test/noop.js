@@ -1,6 +1,6 @@
-var tmi = require('../index.js');
+const tmi = require('../index.js');
 
-var tests = [
+const tests = [
 	':tmi.twitch.tv 002',
 	':tmi.twitch.tv 003',
 	':tmi.twitch.tv 004',
@@ -17,11 +17,11 @@ var tests = [
 describe('no-op server events', function() {
 	tests.forEach(function(test) {
 		it(`treat "${test}" as a no-op`, function() {
-			var stopTest = function() {
+			const stopTest = function() {
 				'Should not call this'.should.not.be.ok();
 			};
 
-			var client = new tmi.client({
+			const client = new tmi.client({
 				logger: {
 					trace: stopTest,
 					debug: stopTest,

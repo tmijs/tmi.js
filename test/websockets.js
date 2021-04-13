@@ -1,7 +1,7 @@
-var WebSocketServer = require('ws').Server;
-var tmi = require('../index.js');
+const WebSocketServer = require('ws').Server;
+const tmi = require('../index.js');
 
-var catchConnectError = err => {
+const catchConnectError = err => {
 	if(err !== 'Connection closed.') {
 		console.error(err);
 	}
@@ -20,8 +20,8 @@ describe('websockets', function() {
 	});
 
 	it('handles join & part commands', function(cb) {
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(ws) {
 			ws.on('message', function(message) {
@@ -29,7 +29,7 @@ describe('websockets', function() {
 				if(message.indexOf('NICK')) {
 					return;
 				}
-				var user = client.getUsername();
+				const user = client.getUsername();
 				ws.send(`:${user}! JOIN #local7000`);
 				ws.send(`:${user}! PART #local7000`);
 			});
@@ -68,8 +68,8 @@ describe('server crashed, with reconnect: false (default)', function() {
 
 	it('gracefully handle the error', function(cb) {
 		this.timeout(15000);
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(_ws) {
 			// Uh-oh, the server dies
@@ -100,8 +100,8 @@ describe('server crashed, with reconnect: true', function() {
 
 	it('attempt to reconnect', function(cb) {
 		this.timeout(15000);
-		var client = this.client;
-		var server = this.server;
+		const client = this.client;
+		const server = this.server;
 
 		server.on('connection', function(_ws) {
 			// Uh-oh, the server dies
