@@ -412,7 +412,8 @@ describe('commands (justinfan)', function() {
 			connection: {
 				server: 'localhost',
 				port: 7000,
-				timeout: 1
+				timeout: 1,
+				reconnect: false
 			}
 		});
 	});

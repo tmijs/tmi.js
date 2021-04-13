@@ -54,7 +54,7 @@ describe('websockets', function() {
 	});
 });
 
-describe('server crashed, with reconnect: false (default)', function() {
+describe('server crashed, with reconnect: true (default)', function() {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -62,38 +62,6 @@ describe('server crashed, with reconnect: false (default)', function() {
 			connection: {
 				server: 'localhost',
 				port: 7000
-			}
-		});
-	});
-
-	it('gracefully handle the error', function(cb) {
-		this.timeout(15000);
-		const client = this.client;
-		const server = this.server;
-
-		server.on('connection', function(_ws) {
-			// Uh-oh, the server dies
-			server.close();
-		});
-
-		client.on('disconnected', function() {
-			'Test that we reached this point'.should.be.ok();
-			cb();
-		});
-
-		client.connect().catch(catchConnectError);
-	});
-});
-
-describe('server crashed, with reconnect: true', function() {
-	before(function() {
-		// Initialize websocket server
-		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
-			connection: {
-				server: 'localhost',
-				port: 7000,
-				reconnect: true
 			}
 		});
 	});
@@ -113,6 +81,38 @@ describe('server crashed, with reconnect: true', function() {
 				'Test that we reached this point'.should.be.ok();
 				cb();
 			}, client.reconnectTimer);
+		});
+
+		client.connect().catch(catchConnectError);
+	});
+});
+
+describe('server crashed, with reconnect: false', function() {
+	before(function() {
+		// Initialize websocket server
+		this.server = new WebSocketServer({ port: 7000 });
+		this.client = new tmi.client({
+			connection: {
+				server: 'localhost',
+				port: 7000,
+				reconnect: false
+			}
+		});
+	});
+
+	it('gracefully handle the error', function(cb) {
+		this.timeout(15000);
+		const client = this.client;
+		const server = this.server;
+
+		server.on('connection', function(_ws) {
+			// Uh-oh, the server dies
+			server.close();
+		});
+
+		client.on('disconnected', function() {
+			'Test that we reached this point'.should.be.ok();
+			cb();
 		});
 
 		client.connect().catch(catchConnectError);
