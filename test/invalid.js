@@ -9,7 +9,7 @@ const tests = [
 ];
 
 describe('invalid server events', () => {
-	tests.forEach((test) => {
+	tests.forEach(test => {
 		it(`treat "${test}" as invalid`, () => {
 			const client = new tmi.client({
 				logger: {

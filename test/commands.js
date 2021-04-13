@@ -425,7 +425,7 @@ describe('commands (justinfan)', () => {
 	});
 
 	it('handles commands when disconnected', function(cb) {
-		this.client.subscribers('local7000').then(noop, (err) => {
+		this.client.subscribers('local7000').then(noop, err => {
 			err.should.eql('Not connected to server.');
 			cb();
 		});
@@ -434,8 +434,8 @@ describe('commands (justinfan)', () => {
 	it('handles ping', function(cb) {
 		const { client, server } = this;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				if(~message.indexOf('PING')) {
 					ws.send('PONG');
 				}
@@ -443,7 +443,7 @@ describe('commands (justinfan)', () => {
 		});
 
 		client.on('logon', () => {
-			client.ping().then((latency) => {
+			client.ping().then(latency => {
 				latency.should.be.ok();
 				client.disconnect();
 				cb();
@@ -456,14 +456,14 @@ describe('commands (justinfan)', () => {
 	it('handles ping timeout', function(cb) {
 		const { client, server } = this;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (_message) => {
+		server.on('connection', ws => {
+			ws.on('message', _message => {
 				ws.send('dummy');
 			});
 		});
 
 		client.on('logon', () => {
-			client.ping().then(noop, (err) => {
+			client.ping().then(noop, err => {
 				err.should.be.ok();
 				cb();
 			});
@@ -472,12 +472,12 @@ describe('commands (justinfan)', () => {
 		client.connect().catch(catchConnectError);
 	});
 
-	tests.forEach((test) => {
+	tests.forEach(test => {
 		it(`should handle ${test.command}`, function(cb) {
 			const { client, server } = this;
 
-			server.on('connection', (ws) => {
-				ws.on('message', (message) => {
+			server.on('connection', ws => {
+				ws.on('message', message => {
 					// Ensure that the message starts with NICK
 					if(!message.indexOf('NICK')) {
 						const user = client.getUsername();
@@ -497,7 +497,7 @@ describe('commands (justinfan)', () => {
 			});
 
 			client.on('join', function() {
-				client[test.command].apply(this, test.inputParams).then((data) => {
+				client[test.command].apply(this, test.inputParams).then(data => {
 					test.returnedParams.forEach((param, index) => {
 						data[index].should.eql(param);
 					});
@@ -510,12 +510,12 @@ describe('commands (justinfan)', () => {
 		});
 
 		if(test.errorCommands) {
-			test.errorCommands.forEach((error) => {
+			test.errorCommands.forEach(error => {
 				it(`should handle ${test.command} errors`, function(cb) {
 					const { client, server } = this;
 
-					server.on('connection', (ws) => {
-						ws.on('message', (message) => {
+					server.on('connection', ws => {
+						ws.on('message', message => {
 							// Ensure that the message starts with NICK
 							if(!message.indexOf('NICK')) {
 								const user = client.getUsername();
@@ -530,7 +530,7 @@ describe('commands (justinfan)', () => {
 					});
 
 					client.on('join', function() {
-						client[test.command].apply(this, test.inputParams).then(noop, (err) => {
+						client[test.command].apply(this, test.inputParams).then(noop, err => {
 							err.should.be.ok();
 							client.disconnect();
 							cb();
@@ -546,8 +546,8 @@ describe('commands (justinfan)', () => {
 			it(`should handle ${test.command} timeout`, function(cb) {
 				const { client, server } = this;
 
-				server.on('connection', (ws) => {
-					ws.on('message', (message) => {
+				server.on('connection', ws => {
+					ws.on('message', message => {
 						// Ensure that the message starts with NICK
 						if(!message.indexOf('NICK')) {
 							ws.send('dummy');
@@ -557,7 +557,7 @@ describe('commands (justinfan)', () => {
 				});
 
 				client.on('logon', function() {
-					client[test.command].apply(this, test.inputParams).then(noop, (err) => {
+					client[test.command].apply(this, test.inputParams).then(noop, err => {
 						err.should.be.ok();
 						client.disconnect();
 						cb();
@@ -594,8 +594,8 @@ describe('commands (identity)', () => {
 	it('should handle action', function(cb) {
 		const { client, server } = this;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				if(~message.indexOf('Hello')) {
 					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :\u0001ACTION Hello :)\u0001');
 				}
@@ -603,7 +603,7 @@ describe('commands (identity)', () => {
 		});
 
 		client.on('logon', () => {
-			client.action('#local7000', 'Hello').then((data) => {
+			client.action('#local7000', 'Hello').then(data => {
 				data[0].should.eql('#local7000');
 				data[1].should.eql('\u0001ACTION Hello\u0001');
 				client.disconnect();
@@ -617,8 +617,8 @@ describe('commands (identity)', () => {
 	it('should handle say', function(cb) {
 		const { client, server } = this;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				if(~message.indexOf('Hello')) {
 					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
 				}
@@ -626,7 +626,7 @@ describe('commands (identity)', () => {
 		});
 
 		client.on('logon', () => {
-			client.say('#local7000', 'Hello').then((data) => {
+			client.say('#local7000', 'Hello').then(data => {
 				data[0].should.eql('#local7000');
 				data[1].should.eql('Hello');
 				client.disconnect();
@@ -638,7 +638,7 @@ describe('commands (identity)', () => {
 	});
 
 	it('should handle say when disconnected', function(cb) {
-		this.client.say('#local7000', 'Hello!').then(noop, (err) => {
+		this.client.say('#local7000', 'Hello!').then(noop, err => {
 			err.should.eql('Not connected to server.');
 			cb();
 		});
@@ -649,8 +649,8 @@ describe('commands (identity)', () => {
 		const lorem = 'lorem '.repeat(89) + 'ipsum';
 		let calls = 0;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
@@ -678,8 +678,8 @@ describe('commands (identity)', () => {
 		const lorem = 'lorem'.repeat(100) + 'ipsum';
 		let calls = 0;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
@@ -702,12 +702,12 @@ describe('commands (identity)', () => {
 		client.connect().catch(catchConnectError);
 	});
 
-	[ '/me', '\\me', '.me' ].forEach((me) => {
+	[ '/me', '\\me', '.me' ].forEach(me => {
 		it(`should handle ${me} say`, function(cb) {
 			const { client, server } = this;
 
-			server.on('connection', (ws) => {
-				ws.on('message', (message) => {
+			server.on('connection', ws => {
+				ws.on('message', message => {
 					if(~message.indexOf('Hello')) {
 						ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
 					}
@@ -715,7 +715,7 @@ describe('commands (identity)', () => {
 			});
 
 			client.on('logon', () => {
-				client.say('#local7000', `${me} Hello`).then((data) => {
+				client.say('#local7000', `${me} Hello`).then(data => {
 					data[0].should.eql('#local7000');
 					data[1].should.eql('\u0001ACTION Hello\u0001');
 					client.disconnect();
@@ -727,12 +727,12 @@ describe('commands (identity)', () => {
 		});
 	});
 
-	[ '.', '/', '\\' ].forEach((prefix) => {
+	[ '.', '/', '\\' ].forEach(prefix => {
 		it(`should handle ${prefix} say`, function(cb) {
 			const { client } = this;
 
 			client.on('logon', () => {
-				client.say('#local7000', `${prefix}FOO`).then((data) => {
+				client.say('#local7000', `${prefix}FOO`).then(data => {
 					data[0].should.eql('#local7000');
 					data.length.should.eql(2);
 					client.disconnect();
@@ -744,12 +744,12 @@ describe('commands (identity)', () => {
 		});
 	});
 
-	[ '..' ].forEach((prefix) => {
+	[ '..' ].forEach(prefix => {
 		it(`should handle ${prefix}message say`, function(cb) {
 			const { client } = this;
 
 			client.on('logon', () => {
-				client.say('#local7000', `${prefix}FOO`).then((data) => {
+				client.say('#local7000', `${prefix}FOO`).then(data => {
 					data[0].should.eql('#local7000');
 					data[1].should.eql(`${prefix}FOO`);
 					data.length.should.eql(2);

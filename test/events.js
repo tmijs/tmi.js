@@ -724,9 +724,9 @@ const events = [ {
 } ];
 
 describe('client events', () => {
-	events.forEach((e) => {
+	events.forEach(e => {
 		const { name, data, expected } = e;
-		it(`emit ${name}`, (cb) => {
+		it(`emit ${name}`, cb => {
 			const client = new tmi.client();
 
 			client.on(name, (...args) => {
@@ -746,10 +746,10 @@ describe('client events', () => {
 		});
 	});
 
-	it('emits disconnected', (cb) => {
+	it('emits disconnected', cb => {
 		const client = new tmi.client();
 
-		client.on('disconnected', (reason) => {
+		client.on('disconnected', reason => {
 			reason.should.be.exactly('Connection closed.').and.be.a.String();
 			cb();
 		});

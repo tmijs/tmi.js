@@ -37,22 +37,22 @@ describe('handling authentication', () => {
 		this.client = null;
 	});
 
-	tests.forEach((test) => {
+	tests.forEach(test => {
 		it(`handle ${test}`, function(cb) {
 			const { client, server } = this;
 
 			const parts = test.split(':');
 			const message = parts[parts.length - 1].trim();
 
-			server.on('connection', (ws) => {
-				ws.on('message', (message) => {
+			server.on('connection', ws => {
+				ws.on('message', message => {
 					if(!message.indexOf('NICK')) {
 						ws.send(test);
 					}
 				});
 			});
 
-			client.on('disconnected', (reason) => {
+			client.on('disconnected', reason => {
 				reason.should.eql(message);
 				cb();
 			});

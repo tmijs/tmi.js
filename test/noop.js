@@ -15,7 +15,7 @@ const tests = [
 ];
 
 describe('no-op server events', () => {
-	tests.forEach((test) => {
+	tests.forEach(test => {
 		it(`treat "${test}" as a no-op`, () => {
 			const stopTest = function() {
 				'Should not call this'.should.not.be.ok();

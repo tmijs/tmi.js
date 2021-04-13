@@ -22,8 +22,8 @@ describe('websockets', () => {
 	it('handles join & part commands', function(cb) {
 		const { client, server } = this;
 
-		server.on('connection', (ws) => {
-			ws.on('message', (message) => {
+		server.on('connection', ws => {
+			ws.on('message', message => {
 				// Ensure that the message starts with NICK
 				if(message.indexOf('NICK')) {
 					return;
@@ -69,7 +69,7 @@ describe('server crashed, with reconnect: true (default)', () => {
 		this.timeout(15000);
 		const { client, server } = this;
 
-		server.on('connection', (_ws) => {
+		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
 		});
@@ -102,7 +102,7 @@ describe('server crashed, with reconnect: false', () => {
 		this.timeout(15000);
 		const { client, server } = this;
 
-		server.on('connection', (_ws) => {
+		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
 		});

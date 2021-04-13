@@ -23,7 +23,7 @@ describe('log()', () => {
 	it('logs to the console', () => {
 		let out = '';
 
-		const unhook = hookStd.stdout({ silent: true }, (output) => {
+		const unhook = hookStd.stdout({ silent: true }, output => {
 			out += output;
 		});
 
