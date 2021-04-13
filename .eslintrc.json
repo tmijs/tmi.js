@@ -24,8 +24,8 @@
             { "blankLine": "never", "prev": "*", "next": "return" }
         ],
         "prefer-arrow-callback": "error",
-        "prefer-spread": "error",
-        "prefer-destructuring": "error",
+        // "prefer-spread": "error",
+        // "prefer-destructuring": "error",
         "padded-blocks": [ "error", "never" ],
         "arrow-body-style": [ "error", "as-needed" ],
         "arrow-parens": [ "error", "as-needed" ],
