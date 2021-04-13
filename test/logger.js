@@ -3,14 +3,14 @@ const tmi = require('../index.js');
 const log = require('../lib/logger.js');
 const _ = require('../lib/utils.js');
 
-describe('client()', function() {
-	it('defaults to the stock logger', function() {
+describe('client()', () => {
+	it('defaults to the stock logger', () => {
 		const client = new tmi.client();
 
 		client.log.should.be.ok();
 	});
 
-	it('allows a custom logger', function() {
+	it('allows a custom logger', () => {
 		const client = new tmi.client({
 			logger: console
 		});
@@ -19,11 +19,11 @@ describe('client()', function() {
 	});
 });
 
-describe('log()', function() {
-	it('logs to the console', function() {
+describe('log()', () => {
+	it('logs to the console', () => {
 		let out = '';
 
-		const unhook = hookStd.stdout({ silent: true }, function(output) {
+		const unhook = hookStd.stdout({ silent: true }, (output) => {
 			out += output;
 		});
 
@@ -37,16 +37,16 @@ describe('log()', function() {
 	});
 });
 
-describe('_.formatDate()', function() {
-	it('formats 8am', function() {
+describe('_.formatDate()', () => {
+	it('formats 8am', () => {
 		_.formatDate(new Date('2015-01-01 8:00')).should.eql('08:00');
 	});
 
-	it('formats 8pm', function() {
+	it('formats 8pm', () => {
 		_.formatDate(new Date('2015-01-01 20:00')).should.eql('20:00');
 	});
 
-	it('formats 8.30pm', function() {
+	it('formats 8.30pm', () => {
 		_.formatDate(new Date('2015-01-01 20:30')).should.eql('20:30');
 	});
 });

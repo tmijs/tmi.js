@@ -14,9 +14,9 @@ const tests = [
 	':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv 366'
 ];
 
-describe('no-op server events', function() {
-	tests.forEach(function(test) {
-		it(`treat "${test}" as a no-op`, function() {
+describe('no-op server events', () => {
+	tests.forEach((test) => {
+		it(`treat "${test}" as a no-op`, () => {
 			const stopTest = function() {
 				'Should not call this'.should.not.be.ok();
 			};

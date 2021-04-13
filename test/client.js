@@ -1,12 +1,12 @@
 const tmi = require('../index.js');
 
-describe('client()', function() {
-	it('uses the \'info\' log when debug is set', function() {
+describe('client()', () => {
+	it('uses the \'info\' log when debug is set', () => {
 		const client = new tmi.client({ options: { debug: true } });
 		client.should.be.ok();
 	});
 
-	it('normalize channel names', function() {
+	it('normalize channel names', () => {
 		const client = new tmi.client({ channels: [ 'avalonstar', '#dayvemsee' ] });
 		client.opts.channels.should.eql([ '#avalonstar', '#dayvemsee' ]);
 	});
@@ -27,14 +27,14 @@ describe('client()', function() {
 	});
 });
 
-describe('client getters', function() {
-	it('gets options', function() {
+describe('client getters', () => {
+	it('gets options', () => {
 		const opts = { options: { debug: true } };
 		const client = new tmi.client(opts);
 		client.getOptions().should.eql(opts);
 	});
 
-	it('gets channels', function() {
+	it('gets channels', () => {
 		const client = new tmi.client();
 		client.getChannels().should.eql([]);
 	});

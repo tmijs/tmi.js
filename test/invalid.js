@@ -8,9 +8,9 @@ const tests = [
 	':schmoopiie!schmoopiie@schmoopiie.tmi.twitch.tv FOO'
 ];
 
-describe('invalid server events', function() {
-	tests.forEach(function(test) {
-		it(`treat "${test}" as invalid`, function() {
+describe('invalid server events', () => {
+	tests.forEach((test) => {
+		it(`treat "${test}" as invalid`, () => {
 			const client = new tmi.client({
 				logger: {
 					warn(message) {

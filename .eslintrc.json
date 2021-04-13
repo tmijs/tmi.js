@@ -23,6 +23,7 @@
             { "blankLine": "never", "prev": "*", "next": "break" },
             { "blankLine": "never", "prev": "*", "next": "return" }
         ],
+        "prefer-arrow-callback": 2,
         "eol-last": 2,
         "multiline-ternary": [ 2, "never" ],
         "constructor-super": "error",

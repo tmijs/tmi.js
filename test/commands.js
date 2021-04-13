@@ -404,7 +404,7 @@ const tests = [ {
 	]
 } ];
 
-describe('commands (justinfan)', function() {
+describe('commands (justinfan)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -425,7 +425,7 @@ describe('commands (justinfan)', function() {
 	});
 
 	it('handles commands when disconnected', function(cb) {
-		this.client.subscribers('local7000').then(noop, function(err) {
+		this.client.subscribers('local7000').then(noop, (err) => {
 			err.should.eql('Not connected to server.');
 			cb();
 		});
@@ -435,16 +435,16 @@ describe('commands (justinfan)', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				if(~message.indexOf('PING')) {
 					ws.send('PONG');
 				}
 			});
 		});
 
-		client.on('logon', function() {
-			client.ping().then(function(latency) {
+		client.on('logon', () => {
+			client.ping().then((latency) => {
 				latency.should.be.ok();
 				client.disconnect();
 				cb();
@@ -458,14 +458,14 @@ describe('commands (justinfan)', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(_message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (_message) => {
 				ws.send('dummy');
 			});
 		});
 
-		client.on('logon', function() {
-			client.ping().then(noop, function(err) {
+		client.on('logon', () => {
+			client.ping().then(noop, (err) => {
 				err.should.be.ok();
 				cb();
 			});
@@ -474,13 +474,13 @@ describe('commands (justinfan)', function() {
 		client.connect().catch(catchConnectError);
 	});
 
-	tests.forEach(function(test) {
+	tests.forEach((test) => {
 		it(`should handle ${test.command}`, function(cb) {
 			const client = this.client;
 			const server = this.server;
 
-			server.on('connection', function(ws) {
-				ws.on('message', function(message) {
+			server.on('connection', (ws) => {
+				ws.on('message', (message) => {
 					// Ensure that the message starts with NICK
 					if(!message.indexOf('NICK')) {
 						const user = client.getUsername();
@@ -500,8 +500,8 @@ describe('commands (justinfan)', function() {
 			});
 
 			client.on('join', function() {
-				client[test.command].apply(this, test.inputParams).then(function(data) {
-					test.returnedParams.forEach(function(param, index) {
+				client[test.command].apply(this, test.inputParams).then((data) => {
+					test.returnedParams.forEach((param, index) => {
 						data[index].should.eql(param);
 					});
 					client.disconnect();
@@ -513,13 +513,13 @@ describe('commands (justinfan)', function() {
 		});
 
 		if(test.errorCommands) {
-			test.errorCommands.forEach(function(error) {
+			test.errorCommands.forEach((error) => {
 				it(`should handle ${test.command} errors`, function(cb) {
 					const client = this.client;
 					const server = this.server;
 
-					server.on('connection', function(ws) {
-						ws.on('message', function(message) {
+					server.on('connection', (ws) => {
+						ws.on('message', (message) => {
 							// Ensure that the message starts with NICK
 							if(!message.indexOf('NICK')) {
 								const user = client.getUsername();
@@ -534,7 +534,7 @@ describe('commands (justinfan)', function() {
 					});
 
 					client.on('join', function() {
-						client[test.command].apply(this, test.inputParams).then(noop, function(err) {
+						client[test.command].apply(this, test.inputParams).then(noop, (err) => {
 							err.should.be.ok();
 							client.disconnect();
 							cb();
@@ -551,8 +551,8 @@ describe('commands (justinfan)', function() {
 				const client = this.client;
 				const server = this.server;
 
-				server.on('connection', function(ws) {
-					ws.on('message', function(message) {
+				server.on('connection', (ws) => {
+					ws.on('message', (message) => {
 						// Ensure that the message starts with NICK
 						if(!message.indexOf('NICK')) {
 							ws.send('dummy');
@@ -562,7 +562,7 @@ describe('commands (justinfan)', function() {
 				});
 
 				client.on('logon', function() {
-					client[test.command].apply(this, test.inputParams).then(noop, function(err) {
+					client[test.command].apply(this, test.inputParams).then(noop, (err) => {
 						err.should.be.ok();
 						client.disconnect();
 						cb();
@@ -575,7 +575,7 @@ describe('commands (justinfan)', function() {
 	});
 });
 
-describe('commands (identity)', function() {
+describe('commands (identity)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -600,16 +600,16 @@ describe('commands (identity)', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				if(~message.indexOf('Hello')) {
 					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :\u0001ACTION Hello :)\u0001');
 				}
 			});
 		});
 
-		client.on('logon', function() {
-			client.action('#local7000', 'Hello').then(function (data) {
+		client.on('logon', () => {
+			client.action('#local7000', 'Hello').then((data) => {
 				data[0].should.eql('#local7000');
 				data[1].should.eql('\u0001ACTION Hello\u0001');
 				client.disconnect();
@@ -624,16 +624,16 @@ describe('commands (identity)', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				if(~message.indexOf('Hello')) {
 					ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
 				}
 			});
 		});
 
-		client.on('logon', function() {
-			client.say('#local7000', 'Hello').then(function (data) {
+		client.on('logon', () => {
+			client.say('#local7000', 'Hello').then((data) => {
 				data[0].should.eql('#local7000');
 				data[1].should.eql('Hello');
 				client.disconnect();
@@ -645,7 +645,7 @@ describe('commands (identity)', function() {
 	});
 
 	it('should handle say when disconnected', function(cb) {
-		this.client.say('#local7000', 'Hello!').then(noop, function(err) {
+		this.client.say('#local7000', 'Hello!').then(noop, (err) => {
 			err.should.eql('Not connected to server.');
 			cb();
 		});
@@ -657,15 +657,15 @@ describe('commands (identity)', function() {
 		const lorem = 'lorem '.repeat(89) + 'ipsum';
 		let calls = 0;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
 			});
 		});
 
-		client.on('chat', function(channel, user, message) {
+		client.on('chat', (channel, user, message) => {
 			calls++;
 			if(calls > 1) {
 				message.should.containEql('ipsum');
@@ -674,7 +674,7 @@ describe('commands (identity)', function() {
 			}
 		});
 
-		client.on('logon', function() {
+		client.on('logon', () => {
 			client.say('#local7000', lorem);
 		});
 
@@ -687,15 +687,15 @@ describe('commands (identity)', function() {
 		const lorem = 'lorem'.repeat(100) + 'ipsum';
 		let calls = 0;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
 			});
 		});
 
-		client.on('chat', function(channel, user, message) {
+		client.on('chat', (channel, user, message) => {
 			calls++;
 			if(calls > 1) {
 				message.should.containEql('ipsum');
@@ -704,28 +704,28 @@ describe('commands (identity)', function() {
 			}
 		});
 
-		client.on('logon', function() {
+		client.on('logon', () => {
 			client.say('#local7000', lorem);
 		});
 
 		client.connect().catch(catchConnectError);
 	});
 
-	[ '/me', '\\me', '.me' ].forEach(function(me) {
+	[ '/me', '\\me', '.me' ].forEach((me) => {
 		it(`should handle ${me} say`, function(cb) {
 			const client = this.client;
 			const server = this.server;
 
-			server.on('connection', function(ws) {
-				ws.on('message', function(message) {
+			server.on('connection', (ws) => {
+				ws.on('message', (message) => {
 					if(~message.indexOf('Hello')) {
 						ws.send(':tmi.twitch.tv PRIVMSG #local7000 :Hello');
 					}
 				});
 			});
 
-			client.on('logon', function() {
-				client.say('#local7000', `${me} Hello`).then(function (data) {
+			client.on('logon', () => {
+				client.say('#local7000', `${me} Hello`).then((data) => {
 					data[0].should.eql('#local7000');
 					data[1].should.eql('\u0001ACTION Hello\u0001');
 					client.disconnect();
@@ -737,12 +737,12 @@ describe('commands (identity)', function() {
 		});
 	});
 
-	[ '.', '/', '\\' ].forEach(function(prefix) {
+	[ '.', '/', '\\' ].forEach((prefix) => {
 		it(`should handle ${prefix} say`, function(cb) {
 			const client = this.client;
 
-			client.on('logon', function() {
-				client.say('#local7000', `${prefix}FOO`).then(function (data) {
+			client.on('logon', () => {
+				client.say('#local7000', `${prefix}FOO`).then((data) => {
 					data[0].should.eql('#local7000');
 					data.length.should.eql(2);
 					client.disconnect();
@@ -754,12 +754,12 @@ describe('commands (identity)', function() {
 		});
 	});
 
-	[ '..' ].forEach(function(prefix) {
+	[ '..' ].forEach((prefix) => {
 		it(`should handle ${prefix}message say`, function(cb) {
 			const client = this.client;
 
-			client.on('logon', function() {
-				client.say('#local7000', `${prefix}FOO`).then(function (data) {
+			client.on('logon', () => {
+				client.say('#local7000', `${prefix}FOO`).then((data) => {
 					data[0].should.eql('#local7000');
 					data[1].should.eql(`${prefix}FOO`);
 					data.length.should.eql(2);

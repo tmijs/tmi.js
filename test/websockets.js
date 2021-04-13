@@ -7,7 +7,7 @@ const catchConnectError = err => {
 	}
 };
 
-describe('websockets', function() {
+describe('websockets', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -23,8 +23,8 @@ describe('websockets', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(ws) {
-			ws.on('message', function(message) {
+		server.on('connection', (ws) => {
+			ws.on('message', (message) => {
 				// Ensure that the message starts with NICK
 				if(message.indexOf('NICK')) {
 					return;
@@ -35,11 +35,11 @@ describe('websockets', function() {
 			});
 		});
 
-		client.on('join', function() {
+		client.on('join', () => {
 			client.channels.should.eql([ '#local7000' ]);
 		});
 
-		client.on('part', function() {
+		client.on('part', () => {
 			client.channels.should.eql([]);
 			client.disconnect();
 			cb();
@@ -54,7 +54,7 @@ describe('websockets', function() {
 	});
 });
 
-describe('server crashed, with reconnect: true (default)', function() {
+describe('server crashed, with reconnect: true (default)', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -71,13 +71,13 @@ describe('server crashed, with reconnect: true (default)', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(_ws) {
+		server.on('connection', (_ws) => {
 			// Uh-oh, the server dies
 			server.close();
 		});
 
-		client.on('disconnected', function() {
-			setTimeout(function() {
+		client.on('disconnected', () => {
+			setTimeout(() => {
 				'Test that we reached this point'.should.be.ok();
 				cb();
 			}, client.reconnectTimer);
@@ -87,7 +87,7 @@ describe('server crashed, with reconnect: true (default)', function() {
 	});
 });
 
-describe('server crashed, with reconnect: false', function() {
+describe('server crashed, with reconnect: false', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -105,12 +105,12 @@ describe('server crashed, with reconnect: false', function() {
 		const client = this.client;
 		const server = this.server;
 
-		server.on('connection', function(_ws) {
+		server.on('connection', (_ws) => {
 			// Uh-oh, the server dies
 			server.close();
 		});
 
-		client.on('disconnected', function() {
+		client.on('disconnected', () => {
 			'Test that we reached this point'.should.be.ok();
 			cb();
 		});

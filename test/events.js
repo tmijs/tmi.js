@@ -723,17 +723,17 @@ const events = [ {
 	]
 } ];
 
-describe('client events', function() {
-	events.forEach(function(e) {
+describe('client events', () => {
+	events.forEach((e) => {
 		const name = e.name;
 		const data = e.data;
 		const expected = e.expected;
-		it(`emit ${name}`, function(cb) {
+		it(`emit ${name}`, (cb) => {
 			const client = new tmi.client();
 
-			client.on(name, function(...args) {
+			client.on(name, (...args) => {
 				'Reach this callback'.should.be.ok();
-				expected && expected.forEach(function(data, index) {
+				expected && expected.forEach((data, index) => {
 					if(data === null) {
 						should.not.exist(args[index]);
 					}
@@ -748,10 +748,10 @@ describe('client events', function() {
 		});
 	});
 
-	it('emits disconnected', function(cb) {
+	it('emits disconnected', (cb) => {
 		const client = new tmi.client();
 
-		client.on('disconnected', function(reason) {
+		client.on('disconnected', (reason) => {
 			reason.should.be.exactly('Connection closed.').and.be.a.String();
 			cb();
 		});

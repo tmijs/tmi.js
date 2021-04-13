@@ -14,7 +14,7 @@ const tests = [
 	':tmi.twitch.tv NOTICE #schmoopiie :Invalid NICK.'
 ];
 
-describe('handling authentication', function() {
+describe('handling authentication', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
@@ -37,7 +37,7 @@ describe('handling authentication', function() {
 		this.client = null;
 	});
 
-	tests.forEach(function(test) {
+	tests.forEach((test) => {
 		it(`handle ${test}`, function(cb) {
 			const client = this.client;
 			const server = this.server;
@@ -45,15 +45,15 @@ describe('handling authentication', function() {
 			const parts = test.split(':');
 			const message = parts[parts.length - 1].trim();
 
-			server.on('connection', function(ws) {
-				ws.on('message', function(message) {
+			server.on('connection', (ws) => {
+				ws.on('message', (message) => {
 					if(!message.indexOf('NICK')) {
 						ws.send(test);
 					}
 				});
 			});
 
-			client.on('disconnected', function(reason) {
+			client.on('disconnected', (reason) => {
 				reason.should.eql(message);
 				cb();
 			});
