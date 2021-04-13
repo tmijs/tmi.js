@@ -432,8 +432,7 @@ describe('commands (justinfan)', () => {
 	});
 
 	it('handles ping', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (ws) => {
 			ws.on('message', (message) => {
@@ -455,8 +454,7 @@ describe('commands (justinfan)', () => {
 	});
 
 	it('handles ping timeout', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (ws) => {
 			ws.on('message', (_message) => {
@@ -476,8 +474,7 @@ describe('commands (justinfan)', () => {
 
 	tests.forEach((test) => {
 		it(`should handle ${test.command}`, function(cb) {
-			const client = this.client;
-			const server = this.server;
+			const { client, server } = this;
 
 			server.on('connection', (ws) => {
 				ws.on('message', (message) => {
@@ -515,8 +512,7 @@ describe('commands (justinfan)', () => {
 		if(test.errorCommands) {
 			test.errorCommands.forEach((error) => {
 				it(`should handle ${test.command} errors`, function(cb) {
-					const client = this.client;
-					const server = this.server;
+					const { client, server } = this;
 
 					server.on('connection', (ws) => {
 						ws.on('message', (message) => {
@@ -548,8 +544,7 @@ describe('commands (justinfan)', () => {
 
 		if(test.testTimeout) {
 			it(`should handle ${test.command} timeout`, function(cb) {
-				const client = this.client;
-				const server = this.server;
+				const { client, server } = this;
 
 				server.on('connection', (ws) => {
 					ws.on('message', (message) => {
@@ -597,8 +592,7 @@ describe('commands (identity)', () => {
 	});
 
 	it('should handle action', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (ws) => {
 			ws.on('message', (message) => {
@@ -621,8 +615,7 @@ describe('commands (identity)', () => {
 	});
 
 	it('should handle say', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (ws) => {
 			ws.on('message', (message) => {
@@ -652,8 +645,7 @@ describe('commands (identity)', () => {
 	});
 
 	it('should break up long messages (> 500 characters)', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 		const lorem = 'lorem '.repeat(89) + 'ipsum';
 		let calls = 0;
 
@@ -682,8 +674,7 @@ describe('commands (identity)', () => {
 	});
 
 	it('should break up long messages without spaces (> 500 characters)', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 		const lorem = 'lorem'.repeat(100) + 'ipsum';
 		let calls = 0;
 
@@ -713,8 +704,7 @@ describe('commands (identity)', () => {
 
 	[ '/me', '\\me', '.me' ].forEach((me) => {
 		it(`should handle ${me} say`, function(cb) {
-			const client = this.client;
-			const server = this.server;
+			const { client, server } = this;
 
 			server.on('connection', (ws) => {
 				ws.on('message', (message) => {
@@ -739,7 +729,7 @@ describe('commands (identity)', () => {
 
 	[ '.', '/', '\\' ].forEach((prefix) => {
 		it(`should handle ${prefix} say`, function(cb) {
-			const client = this.client;
+			const { client } = this;
 
 			client.on('logon', () => {
 				client.say('#local7000', `${prefix}FOO`).then((data) => {
@@ -756,7 +746,7 @@ describe('commands (identity)', () => {
 
 	[ '..' ].forEach((prefix) => {
 		it(`should handle ${prefix}message say`, function(cb) {
-			const client = this.client;
+			const { client } = this;
 
 			client.on('logon', () => {
 				client.say('#local7000', `${prefix}FOO`).then((data) => {

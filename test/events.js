@@ -725,9 +725,7 @@ const events = [ {
 
 describe('client events', () => {
 	events.forEach((e) => {
-		const name = e.name;
-		const data = e.data;
-		const expected = e.expected;
+		const { name, data, expected } = e;
 		it(`emit ${name}`, (cb) => {
 			const client = new tmi.client();
 

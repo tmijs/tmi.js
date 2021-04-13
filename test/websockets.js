@@ -20,8 +20,7 @@ describe('websockets', () => {
 	});
 
 	it('handles join & part commands', function(cb) {
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (ws) => {
 			ws.on('message', (message) => {
@@ -68,8 +67,7 @@ describe('server crashed, with reconnect: true (default)', () => {
 
 	it('attempt to reconnect', function(cb) {
 		this.timeout(15000);
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (_ws) => {
 			// Uh-oh, the server dies
@@ -102,8 +100,7 @@ describe('server crashed, with reconnect: false', () => {
 
 	it('gracefully handle the error', function(cb) {
 		this.timeout(15000);
-		const client = this.client;
-		const server = this.server;
+		const { client, server } = this;
 
 		server.on('connection', (_ws) => {
 			// Uh-oh, the server dies

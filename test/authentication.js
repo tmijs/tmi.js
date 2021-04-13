@@ -39,8 +39,7 @@ describe('handling authentication', () => {
 
 	tests.forEach((test) => {
 		it(`handle ${test}`, function(cb) {
-			const client = this.client;
-			const server = this.server;
+			const { client, server } = this;
 
 			const parts = test.split(':');
 			const message = parts[parts.length - 1].trim();
