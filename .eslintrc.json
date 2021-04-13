@@ -18,6 +18,11 @@
         "eqeqeq": 2,
         "no-var": 2,
         "prefer-const": 2,
+        "padding-line-between-statements": [
+            "error",
+            { "blankLine": "never", "prev": "*", "next": "break" },
+            { "blankLine": "never", "prev": "*", "next": "return" }
+        ],
         "eol-last": 2,
         "multiline-ternary": [ 2, "never" ],
         "constructor-super": "error",
