@@ -408,7 +408,7 @@ describe('commands (justinfan)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000,
@@ -574,7 +574,7 @@ describe('commands (identity)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
@@ -651,6 +651,7 @@ describe('commands (identity)', () => {
 
 		server.on('connection', ws => {
 			ws.on('message', message => {
+				message = message.toString();
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
@@ -680,6 +681,7 @@ describe('commands (identity)', () => {
 
 		server.on('connection', ws => {
 			ws.on('message', message => {
+				message = message.toString();
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}

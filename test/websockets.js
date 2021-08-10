@@ -11,7 +11,7 @@ describe('websockets', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
@@ -57,7 +57,7 @@ describe('server crashed, with reconnect: true (default)', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
@@ -72,6 +72,7 @@ describe('server crashed, with reconnect: true (default)', () => {
 		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
+			_ws.terminate();
 		});
 
 		client.on('disconnected', () => {
@@ -89,7 +90,7 @@ describe('server crashed, with reconnect: false', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000,
@@ -105,6 +106,7 @@ describe('server crashed, with reconnect: false', () => {
 		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
+			_ws.terminate();
 		});
 
 		client.on('disconnected', () => {

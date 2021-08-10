@@ -5,13 +5,13 @@ const _ = require('../lib/utils.js');
 
 describe('client()', () => {
 	it('defaults to the stock logger', () => {
-		const client = new tmi.client();
+		const client = new tmi.Client();
 
 		client.log.should.be.ok();
 	});
 
 	it('allows a custom logger', () => {
-		const client = new tmi.client({
+		const client = new tmi.Client({
 			logger: console
 		});
 
