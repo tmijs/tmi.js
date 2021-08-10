@@ -198,6 +198,20 @@ const events = [ {
 	]
 }, {
 	name: 'mods',
+	data: '@msg-id=room_mods :tmi.twitch.tv NOTICE #schmoopiie :The moderators of this room are:',
+	expected: [
+		'#schmoopiie',
+		[]
+	]
+}, {
+	name: 'mods',
+	data: '@msg-id=room_mods :tmi.twitch.tv NOTICE #schmoopiie :The moderators of this room are: ',
+	expected: [
+		'#schmoopiie',
+		[]
+	]
+}, {
+	name: 'mods',
 	data: '@msg-id=no_mods :tmi.twitch.tv NOTICE #schmoopiie :There are no moderators of this channel.',
 	expected: [
 		'#schmoopiie',
