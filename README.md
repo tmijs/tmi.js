@@ -23,16 +23,12 @@ $ npm i tmi.js
 ```js
 const tmi = require('tmi.js');
 const client = new tmi.Client({
-	options: { debug: true, messagesLogLevel: "info" },
-	connection: {
-		reconnect: true,
-		secure: true
-	},
+	options: { debug: true },
 	identity: {
-		username: 'bot-name',
-		password: 'oauth:my-bot-token'
+		username: 'bot_name',
+		password: 'oauth:my_bot_token'
 	},
-	channels: [ 'my-channel' ]
+	channels: [ 'my_channel' ]
 });
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
