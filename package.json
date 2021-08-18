@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.1",
-    "ws": "^8.0.0"
+    "ws": "^8.2.0"
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
