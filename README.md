@@ -85,4 +85,4 @@ Thanks to all of the tmi.js [contributors](https://github.com/tmijs/tmi.js/graph
 
 ## Contributing guidelines
 
-Please review the [guidelines for contributing](https://github.com/tmijs/tmi.js/blob/master/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/tmijs/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
+Please review the [guidelines for contributing](https://github.com/tmijs/tmi.js/blob/main/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/tmijs/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
