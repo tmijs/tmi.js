@@ -16,8 +16,8 @@ channel for support questions. Check the README "Community" section for links.
 Insert your error log here
 ```
 
-**Server configuration**
-- Operating system:
-- Node version (if applicable):
-- NPM version (if applicable):
+**Configuration**
 - tmi.js version:
+- Node version (if applicable):
+- Browser and version (if applicable):
+- Operating system:

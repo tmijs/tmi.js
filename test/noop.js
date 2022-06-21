@@ -21,7 +21,7 @@ describe('no-op server events', () => {
 				'Should not call this'.should.not.be.ok();
 			};
 
-			const client = new tmi.client({
+			const client = new tmi.Client({
 				logger: {
 					trace: stopTest,
 					debug: stopTest,
