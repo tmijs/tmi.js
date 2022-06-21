@@ -28,13 +28,13 @@
     "eslint-fix": "eslint --fix index.js lib/* test/*",
     "test:mocha": "nyc mocha -- --require should --exit",
     "build": "run-s build:*",
-    "build:rimraf": "rimraf ./build",
-    "build:mkdirp": "mkdirp ./build",
+    "build:rimraf": "rimraf ./dist",
+    "build:mkdirp": "mkdirp ./dist",
     "build:dedupe": "npm dedupe",
-    "build:browserify": "browserify index.js -o ./build/tmi.js",
-    "build:uglify": "uglifyjs --compress --mangle --output ./build/tmi.min.js --source-map \"filename='./build/tmi.js.map'\" ./build/tmi.js",
-    "build:sri": "node sri.js ./build/tmi.js",
-    "build:sri-min": "node sri.js ./build/tmi.min.js"
+    "build:browserify": "browserify index.js -o ./dist/tmi.js",
+    "build:uglify": "uglifyjs --compress --mangle --beautify \"beautify=false,quote_style=1\" --output ./dist/tmi.min.js --source-map \"filename='tmi.js.map'\" ./dist/tmi.js",
+    "build:sri": "node sri.js ./dist/tmi.js",
+    "build:sri-min": "node sri.js ./dist/tmi.min.js"
   },
   "license": "MIT",
   "repository": {
