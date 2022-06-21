@@ -1,9 +1,9 @@
-var crypto = require("crypto");
-var fs = require("fs");
+const crypto = require('crypto');
+const fs = require('fs');
 
 function checksum(input) {
-	var hash = crypto.createHash("sha384").update(input, "utf8");
-	var hashBase64 = hash.digest("base64");
+	const hash = crypto.createHash('sha384').update(input, 'utf8');
+	const hashBase64 = hash.digest('base64');
 	return `sha384-${hashBase64}`;
 }
 
