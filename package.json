@@ -15,6 +15,7 @@
   "main": "index.js",
   "files": [
     "lib",
+    "dist",
     "index.js",
     "LICENSE"
   ],
