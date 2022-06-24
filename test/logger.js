@@ -1,7 +1,6 @@
 const hookStd = require('hook-std');
 const tmi = require('../index.js');
 const log = require('../lib/logger.js');
-const _ = require('../lib/utils.js');
 
 describe('client()', () => {
 	it('defaults to the stock logger', () => {
@@ -34,19 +33,5 @@ describe('log()', () => {
 
 		const expected = out.trim();
 		expected.should.containEql('info: foobar');
-	});
-});
-
-describe('_.formatDate()', () => {
-	it('formats 8am', () => {
-		_.formatDate(new Date('2015-01-01 8:00')).should.eql('08:00');
-	});
-
-	it('formats 8pm', () => {
-		_.formatDate(new Date('2015-01-01 20:00')).should.eql('20:00');
-	});
-
-	it('formats 8.30pm', () => {
-		_.formatDate(new Date('2015-01-01 20:30')).should.eql('20:30');
 	});
 });
