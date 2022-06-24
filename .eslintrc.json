@@ -35,6 +35,17 @@
         "constructor-super": "error",
         "for-direction": "error",
         "getter-return": "error",
+        "keyword-spacing": [
+            "error",
+            {
+                "overrides": {
+                    "if": { "after": false },
+                    "for": { "after": false },
+                    "catch": { "after": false },
+                    "switch": { "after": false }
+                }
+            }
+        ],
         "no-async-promise-executor": "error",
         "no-case-declarations": "error",
         "no-class-assign": "error",
