@@ -34,8 +34,7 @@
     "build:dedupe": "npm dedupe",
     "build:browserify": "browserify index.js -o ./dist/tmi.js",
     "build:uglify": "uglifyjs --compress --mangle --beautify \"beautify=false,quote_style=1\" --output ./dist/tmi.min.js --source-map \"filename='tmi.js.map'\" ./dist/tmi.js",
-    "build:sri": "node sri.js ./dist/tmi.js",
-    "build:sri-min": "node sri.js ./dist/tmi.min.js"
+    "build:sri": "node sri.js ./dist/tmi.js && node sri.js ./dist/tmi.min.js"
   },
   "license": "MIT",
   "repository": {
