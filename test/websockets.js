@@ -75,12 +75,14 @@ describe('server crashed, with reconnect: true (default)', () => {
 			_ws.terminate();
 		});
 
-		client.on('disconnected', () => {
+		const listener = () => {
 			setTimeout(() => {
 				'Test that we reached this point'.should.be.ok();
 				cb();
+				client.removeListener('disconnected', listener);
 			}, client.reconnectTimer);
-		});
+		};
+		client.on('disconnected', listener);
 
 		client.connect().catch(catchConnectError);
 	});
@@ -109,10 +111,12 @@ describe('server crashed, with reconnect: false', () => {
 			_ws.terminate();
 		});
 
-		client.on('disconnected', () => {
+		const listener = () => {
 			'Test that we reached this point'.should.be.ok();
 			cb();
-		});
+			client.removeListener('disconnected', listener);
+		};
+		client.on('disconnected', listener);
 
 		client.connect().catch(catchConnectError);
 	});
