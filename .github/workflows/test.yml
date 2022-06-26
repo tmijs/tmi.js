@@ -3,6 +3,8 @@ name: Test
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - dist/**
   pull_request:
     branches: [ main ]
     types: [ opened, edited, synchronize ]
