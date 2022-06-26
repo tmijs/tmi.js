@@ -11,5 +11,5 @@ fs.readFile(process.argv[2], (err, data) => {
 	if(err) {
 		throw err;
 	}
-	console.log(`SRI Hash generated for ${process.argv[2]}: ${checksum(data)}`);
+	console.log(`SRI Hash [${process.argv[2]}]: ${checksum(data)}`);
 });
