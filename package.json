@@ -24,8 +24,8 @@
   },
   "author": "Schmoopiie",
   "scripts": {
-    "test": "npm run eslint && npm run test:mocha",
-    "eslint": "eslint index.js lib/* test/*",
+    "test": "npm run test:eslint && npm run test:mocha",
+    "test:eslint": "eslint index.js lib/* test/*",
     "eslint-fix": "eslint --fix index.js lib/* test/*",
     "test:mocha": "nyc mocha --require should --exit",
     "build": "npm run build:esbuild && npm run build:sri",
