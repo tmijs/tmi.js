@@ -647,7 +647,7 @@ describe('commands (identity)', () => {
 
 	it('should break up long messages (> 500 characters)', function(cb) {
 		const { client, server } = this;
-		const lorem = 'lorem '.repeat(89) + 'ipsum';
+		const lorem = `${'lorem '.repeat(89)}ipsum`;
 		let calls = 0;
 
 		server.on('connection', ws => {
@@ -677,7 +677,7 @@ describe('commands (identity)', () => {
 
 	it('should break up long messages without spaces (> 500 characters)', function(cb) {
 		const { client, server } = this;
-		const lorem = 'lorem'.repeat(100) + 'ipsum';
+		const lorem = `${'lorem'.repeat(100)}ipsum`;
 		let calls = 0;
 
 		server.on('connection', ws => {

@@ -18,15 +18,17 @@
         "curly": [ "error", "all" ],
         "eqeqeq": "error",
         "no-var": "error",
-        "prefer-const": "error",
         "padding-line-between-statements": [
             "error",
             { "blankLine": "never", "prev": "*", "next": "break" },
             { "blankLine": "never", "prev": "*", "next": "return" }
         ],
+        "prefer-const": "error",
         "prefer-arrow-callback": "error",
+        "prefer-template": "error",
         // "prefer-spread": "error",
         // "prefer-destructuring": "error",
+        "space-infix-ops": "error",
         "padded-blocks": [ "error", "never" ],
         "arrow-body-style": [ "error", "as-needed" ],
         "arrow-parens": [ "error", "as-needed" ],
