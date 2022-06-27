@@ -416,6 +416,7 @@ describe('commands (justinfan)', () => {
 				reconnect: false
 			}
 		});
+		this.client.log.setLevel('fatal');
 	});
 
 	afterEach(function() {

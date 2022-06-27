@@ -63,6 +63,7 @@ describe('server crashed, with reconnect: true (default)', () => {
 				port: 7000
 			}
 		});
+		this.client.log.setLevel('fatal');
 	});
 
 	it('attempt to reconnect', function(cb) {

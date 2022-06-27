@@ -1,6 +1,6 @@
 const hookStd = require('hook-std');
 const tmi = require('../index.js');
-const log = require('../lib/logger.js');
+const Logger = require('../lib/logger.js');
 
 describe('client()', () => {
 	it('defaults to the stock logger', () => {
@@ -26,6 +26,7 @@ describe('log()', () => {
 			out += output;
 		});
 
+		const log = new Logger();
 		log.setLevel('info');
 		log.info('foobar');
 
