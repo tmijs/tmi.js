@@ -32,7 +32,7 @@
         isJustinfan: (username) => justinFanRegex.test(username),
         channel(str) {
           const channel = (str ? str : "").toLowerCase();
-          return channel[0] === "#" ? channel : "#" + channel;
+          return channel[0] === "#" ? channel : `#${channel}`;
         },
         username(str) {
           const username = (str ? str : "").toLowerCase();
@@ -782,31 +782,45 @@
   // lib/logger.js
   var require_logger = __commonJS({
     "lib/logger.js"(exports, module) {
-      var currentLevel = "info";
-      var levels = { "trace": 0, "debug": 1, "info": 2, "warn": 3, "error": 4, "fatal": 5 };
-      function formatDate(date = new Date()) {
+      var Logger = function Logger2() {
+        this._levels = { trace: 0, debug: 1, info: 2, warn: 3, error: 4, fatal: 5 };
+        this._currentLevel = "info";
+      };
+      Logger.prototype._log = function log(level, message) {
+        if (this._levels[level] < this._levels[this._currentLevel]) {
+          return;
+        }
+        const date = new Date();
         const h = date.getHours();
         const m = date.getMinutes();
-        return `${(h < 10 ? "0" : "") + h}:${(m < 10 ? "0" : "") + m}`;
-      }
-      function log(level) {
-        return function(message) {
-          if (levels[level] >= levels[currentLevel]) {
-            console.log(`[${formatDate(new Date())}] ${level}: ${message}`);
-          }
-        };
-      }
-      module.exports = {
-        setLevel(level) {
-          currentLevel = level;
-        },
-        trace: log("trace"),
-        debug: log("debug"),
-        info: log("info"),
-        warn: log("warn"),
-        error: log("error"),
-        fatal: log("fatal")
+        const dateFormatted = `${(h < 10 ? "0" : "") + h}:${(m < 10 ? "0" : "") + m}`;
+        console.log(`[${dateFormatted}] ${level}: ${message}`);
       };
+      Logger.prototype.setLevel = function setLevel(level) {
+        this._currentLevel = level;
+      };
+      Logger.prototype.getLevel = function getLevel() {
+        return this._currentLevel;
+      };
+      Logger.prototype.trace = function trace(message) {
+        this._log("trace", message);
+      };
+      Logger.prototype.debug = function debug(message) {
+        this._log("debug", message);
+      };
+      Logger.prototype.info = function info(message) {
+        this._log("info", message);
+      };
+      Logger.prototype.warn = function warn(message) {
+        this._log("warn", message);
+      };
+      Logger.prototype.error = function error(message) {
+        this._log("error", message);
+      };
+      Logger.prototype.fatal = function fatal(message) {
+        this._log("fatal", message);
+      };
+      module.exports = Logger;
     }
   });
 
@@ -821,7 +835,7 @@
           return tags;
         }
         const tagIsString = typeof raw === "string";
-        tags[tagKey + "-raw"] = tagIsString ? raw : null;
+        tags[`${tagKey}-raw`] = tagIsString ? raw : null;
         if (raw === true) {
           tags[tagKey] = null;
           return tags;
@@ -846,7 +860,7 @@
         emotes: (tags) => parseComplexTag(tags, "emotes", "/", ":", ","),
         emoteRegex(msg, code, id, obj) {
           nonspaceRegex.lastIndex = 0;
-          const regex = new RegExp("(\\b|^|\\s)" + _.unescapeHtml(code) + "(\\b|$|\\s)");
+          const regex = new RegExp(`(\\b|^|\\s)${_.unescapeHtml(code)}(\\b|$|\\s)`);
           let match;
           while ((match = nonspaceRegex.exec(msg)) !== null) {
             if (regex.test(match[0])) {
@@ -868,8 +882,8 @@
         transformEmotes(emotes) {
           let transformed = "";
           Object.keys(emotes).forEach((id) => {
-            transformed = `${transformed + id}:`;
-            emotes[id].forEach((index) => transformed = `${transformed + index.join("-")},`);
+            transformed = `${transformed}${id}:`;
+            emotes[id].forEach((index) => transformed = `${transformed}${index.join("-")},`);
             transformed = `${transformed.slice(0, -1)}/`;
           });
           return transformed.slice(0, -1);
@@ -995,7 +1009,7 @@
       var _WebSocket = (_a = _global.WebSocket) != null ? _a : require_ws();
       var commands = require_commands();
       var EventEmitter = require_events().EventEmitter;
-      var logger = require_logger();
+      var Logger = require_logger();
       var parse = require_parser();
       var Queue = require_timer();
       var _ = require_utils();
@@ -1036,13 +1050,9 @@
         this.userstate = {};
         this.wasCloseCalled = false;
         this.ws = null;
-        let level = "error";
-        if (this.opts.options.debug) {
-          level = "info";
-        }
-        this.log = (_n = this.opts.logger) != null ? _n : logger;
+        this.log = (_n = this.opts.logger) != null ? _n : new Logger();
         try {
-          logger.setLevel(level);
+          this.log.setLevel(this.opts.options.debug ? "info" : "error");
         } catch (err) {
         }
         this.opts.channels.forEach((part, index, theArray) => theArray[index] = _.channel(part));
@@ -1099,8 +1109,7 @@
               }
               break;
             case "PONG": {
-              const currDate = new Date();
-              this.currentLatency = (currDate.getTime() - this.latency.getTime()) / 1e3;
+              this.currentLatency = (new Date().getTime() - this.latency.getTime()) / 1e3;
               this.emits(["pong", "_promisePing"], [[this.currentLatency]]);
               clearTimeout(this.pingTimeout);
               break;
@@ -1719,22 +1728,19 @@ ${JSON.stringify(message, null, 4)}`);
               break;
             case "JOIN": {
               const nick = message.prefix.split("!")[0];
-              if (_.isJustinfan(this.getUsername()) && this.username === nick) {
+              const isSelf = this.username === nick && _.isJustinfan(this.getUsername());
+              if (isSelf) {
                 this.lastJoined = channel;
                 this.channels.push(channel);
                 this.log.info(`Joined ${channel}`);
-                this.emit("join", channel, nick, true);
               }
-              if (this.username !== nick) {
-                this.emit("join", channel, nick, false);
-              }
+              this.emit("join", channel, nick, isSelf);
               break;
             }
             case "PART": {
-              let isSelf = false;
               const nick = message.prefix.split("!")[0];
-              if (this.username === nick) {
-                isSelf = true;
+              const isSelf = this.username === nick;
+              if (isSelf) {
                 if (this.userstate[channel]) {
                   delete this.userstate[channel];
                 }
@@ -1877,7 +1883,7 @@ ${JSON.stringify(message, null, 4)}`);
           if (!this._skipMembership) {
             caps += " twitch.tv/membership";
           }
-          this.ws.send("CAP REQ :" + caps);
+          this.ws.send(`CAP REQ :${caps}`);
           if (password) {
             this.ws.send(`PASS ${password}`);
           } else if (_.isJustinfan(this.username)) {
@@ -1890,15 +1896,8 @@ ${JSON.stringify(message, null, 4)}`);
       };
       Client.prototype._getToken = function _getToken() {
         const passwordOption = this.opts.identity.password;
-        let password;
-        if (typeof passwordOption === "function") {
-          password = passwordOption();
-          if (password instanceof Promise) {
-            return password;
-          }
-          return Promise.resolve(password);
-        }
-        return Promise.resolve(passwordOption);
+        const password = typeof passwordOption === "function" ? passwordOption() : passwordOption;
+        return Promise.resolve(password);
       };
       Client.prototype._onMessage = function _onMessage(event) {
         const parts = event.data.trim().split("\r\n");
