@@ -32,6 +32,7 @@
         "padded-blocks": [ "error", "never" ],
         "arrow-body-style": [ "error", "as-needed" ],
         "arrow-parens": [ "error", "as-needed" ],
+        "quote-props": [ "error", "as-needed", { "numbers": true } ],
         "eol-last": "error",
         "multiline-ternary": [ "error", "never" ],
         "constructor-super": "error",

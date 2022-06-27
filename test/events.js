@@ -407,9 +407,9 @@ const events = [ {
 		'#schmoopiie',
 		'Schmoopiie',
 		{
-			'prime': true,
-			'plan': 'Prime',
-			'planName': 'Channel Subscription (Schmoopiie)'
+			prime: true,
+			plan: 'Prime',
+			planName: 'Channel Subscription (Schmoopiie)'
 		},
 		'Great stream -- keep it up!',
 		{
@@ -474,7 +474,7 @@ const events = [ {
 		'SubscriberName',
 		{
 			'badge-info': {
-				'subscriber': '1'
+				subscriber: '1'
 			},
 			'badge-info-raw': 'subscriber/1',
 			badges: {
@@ -608,7 +608,7 @@ const events = [ {
 			'user-type': 'mod',
 			'badge-info-raw': null,
 			'emotes-raw': null,
-			'username': 'murdocturner'
+			username: 'murdocturner'
 		},
 		'lol'
 	]
@@ -639,7 +639,7 @@ const events = [ {
 			'badge-info-raw': null,
 			'badges-raw': null,
 			'emotes-raw': null,
-			'username': 'murdocturner'
+			username: 'murdocturner'
 		},
 		'test'
 	]
@@ -668,7 +668,7 @@ const events = [ {
 			'user-type': 'mod',
 			'badge-info-raw': null,
 			'emotes-raw': null,
-			'username': 'murdocturner'
+			username: 'murdocturner'
 		},
 		'test123'
 	]
