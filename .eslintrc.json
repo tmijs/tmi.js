@@ -43,9 +43,18 @@
                 "overrides": {
                     "if": { "after": false },
                     "for": { "after": false },
+                    "while": { "after": false },
                     "catch": { "after": false },
                     "switch": { "after": false }
                 }
+            }
+        ],
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "never",
+                "named": "never",
+                "asyncArrow": "never"
             }
         ],
         "no-async-promise-executor": "error",
