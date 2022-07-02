@@ -53,5 +53,11 @@
   },
   "browser": {
     "ws": false
-  }
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/tmijs/tmi.js?sponsor=1"
+    }
+  ]
 }
