@@ -1,4 +1,4 @@
-(() => {
+var tmi = (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -1693,15 +1693,7 @@ ${JSON.stringify(message, null, 4)}`);
       for (const methodName in commands) {
         Client.prototype[methodName] = commands[methodName];
       }
-      if (typeof module !== "undefined" && module.exports) {
-        module.exports = Client;
-      }
-      if (typeof window !== "undefined") {
-        window.tmi = {
-          client: Client,
-          Client
-        };
-      }
+      module.exports = Client;
     }
   });
 
@@ -1715,5 +1707,5 @@ ${JSON.stringify(message, null, 4)}`);
       };
     }
   });
-  require_tmi();
+  return require_tmi();
 })();
