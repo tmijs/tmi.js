@@ -52,19 +52,6 @@
     "should": "13.2.3"
   },
   "browser": {
-    "ws": false,
-    "node-fetch": false
-  },
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "@babel/preset-env"
-          ]
-        }
-      ]
-    ]
+    "ws": false
   }
 }
