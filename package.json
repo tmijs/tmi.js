@@ -1,7 +1,7 @@
 {
   "name": "tmi.js",
   "version": "1.9.0-pre.0",
-  "description": "Javascript library for the Twitch Messaging Interface.",
+  "description": "JavaScript library for the Twitch Messaging Interface.",
   "keywords": [
     "tmi",
     "tmijs",
@@ -33,13 +33,8 @@
     "build:sri": "node scripts/sri.js dist/tmi.js && node scripts/sri.js dist/tmi.min.js"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/tmijs/tmi.js.git"
-  },
-  "bugs": {
-    "url": "https://github.com/tmijs/tmi.js/issues"
-  },
+  "repository": "tmijs/tmi.js",
+  "bugs": "https://github.com/tmijs/tmi.js/issues",
   "dependencies": {
     "ws": "8.8.0"
   },
