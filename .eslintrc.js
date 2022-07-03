@@ -1,78 +1,83 @@
+const ERROR = 'error';
+const ALWAYS = 'always';
+const NEVER = 'never';
+
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
-    parserOptions: {
-        ecmaVersion: 2020,
-        sourceType: 'script',
-        ecmaFeatures: {}
-    },
-    extends: 'eslint:recommended',
-    rules: {
-        // Add rules:
-        semi: 'error',
-        indent: [ 'error', 'tab', { MemberExpression: 0, SwitchCase: 1 } ],
-        'array-bracket-spacing': [ 'error', 'always' ],
-        'object-curly-spacing': [ 'error', 'always' ],
-        'comma-dangle': [ 'error', 'never' ],
-        'comma-spacing': 'error',
-        'max-depth': [ 'error', 3 ],
-        yoda: 'error',
-        quotes: [ 'error', 'single' ],
-        'brace-style': [ 'error', 'stroustrup' ],
-        curly: [ 'error', 'all' ],
-        eqeqeq: 'error',
-        'no-var': 'error',
-        'padding-line-between-statements': [
-            'error',
-            { blankLine: 'never', prev: '*', next: 'break' },
-            { blankLine: 'never', prev: '*', next: 'return' }
-        ],
-        'prefer-const': 'error',
-        'prefer-arrow-callback': 'error',
-        'prefer-template': 'error',
-        'prefer-spread': 'error',
-        'prefer-destructuring': 'error',
-        'template-curly-spacing': [ 'error', 'never' ],
-        'space-infix-ops': 'error',
-        'padded-blocks': [ 'error', 'never' ],
-        'arrow-body-style': [ 'error', 'as-needed' ],
-        'arrow-parens': [ 'error', 'as-needed' ],
-        'quote-props': [ 'error', 'as-needed', { numbers: true } ],
-        'eol-last': 'error',
-        'multiline-ternary': [ 'error', 'never' ],
-        'no-unneeded-ternary': 'error',
-        'no-nested-ternary': 'off',
-        'keyword-spacing': [
-            'error',
-            {
-                overrides: {
-                    if: { after: false },
-                    for: { after: false },
-                    while: { after: false },
-                    catch: { after: false },
-                    switch: { after: false }
-                }
-            }
-        ],
-        'space-before-function-paren': [
-            'error',
-            {
-                anonymous: 'never',
-                named: 'never',
-                asyncArrow: 'never'
-            }
-        ],
+	parserOptions: {
+		ecmaVersion: 2020,
+		sourceType: 'script',
+		ecmaFeatures: {},
+	},
+	env: {
+		node: true,
+		browser: true,
+		commonjs: true,
+		es6: true,
+		es2020: true,
+		mocha: true
+	},
+	extends: 'eslint:recommended',
+	rules: {
+		// Add rules:
+		semi: ERROR,
+		indent: [ ERROR, 'tab', { MemberExpression: 0, SwitchCase: 1 } ],
+		'array-bracket-spacing': [ ERROR, ALWAYS ],
+		'object-curly-spacing': [ ERROR, ALWAYS ],
+		'comma-dangle': [ ERROR, NEVER ],
+		'comma-spacing': ERROR,
+		'max-depth': [ ERROR, 3 ],
+		yoda: ERROR,
+		quotes: [ ERROR, 'single' ],
+		'brace-style': [ ERROR, 'stroustrup' ],
+		curly: [ ERROR, 'all' ],
+		eqeqeq: ERROR,
+		'no-var': ERROR,
+		'padding-line-between-statements': [
+			ERROR,
+			{ blankLine: NEVER, prev: '*', next: 'break' },
+			{ blankLine: NEVER, prev: '*', next: 'return' }
+		],
+		'prefer-const': ERROR,
+		'prefer-arrow-callback': ERROR,
+		'prefer-template': ERROR,
+		'prefer-spread': ERROR,
+		'prefer-destructuring': ERROR,
+		'template-curly-spacing': [ ERROR, NEVER ],
+		'space-infix-ops': ERROR,
+		'padded-blocks': [ ERROR, NEVER ],
+		'arrow-body-style': [ ERROR, 'as-needed' ],
+		'arrow-parens': [ ERROR, 'as-needed' ],
+		'quote-props': [ ERROR, 'as-needed', { numbers: true } ],
+		'eol-last': ERROR,
+		'multiline-ternary': [ ERROR, NEVER ],
+		'no-unneeded-ternary': ERROR,
+		'no-nested-ternary': 'off',
+		'keyword-spacing': [
+			ERROR,
+			{
+				overrides: {
+					if: { after: false },
+					for: { after: false },
+					while: { after: false },
+					catch: { after: false },
+					switch: { after: false }
+				}
+			}
+		],
+		'space-before-function-paren': [
+			ERROR,
+			{
+				anonymous: NEVER,
+				named: NEVER,
+				asyncArrow: NEVER
+			}
+		],
 
-        // Alter rules:
-        'no-empty': [ 'error', { allowEmptyCatch: true } ],
-        'no-unused-vars': [ 'error', { args: 'after-used', argsIgnorePattern: '^_' } ]
+		// Alter rules:
+		'no-empty': [ ERROR, { allowEmptyCatch: true } ],
+		'no-unused-vars': [ ERROR, { args: 'after-used', argsIgnorePattern: '^_' } ]
 
-        // Disable rules:
-    },
-    env: {
-        node: true,
-        browser: true,
-        commonjs: true,
-        es6: true,
-        es2017: true,
-        mocha: true
-    }
+		// Disable rules:
+	}
 }
