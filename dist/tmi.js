@@ -10,308 +10,9 @@ var tmi = (() => {
     }
   });
 
-  // lib/utils.js
-  var require_utils = __commonJS({
-    "lib/utils.js"(exports, module) {
-      var actionMessageRegex = /^\u0001ACTION ([^\u0001]+)\u0001$/;
-      var justinFanRegex = /^(justinfan)(\d+$)/;
-      var unescapeIRCRegex = /\\([sn:r\\])/g;
-      var escapeIRCRegex = /([ \n;\r\\])/g;
-      var ircEscapedChars = { s: " ", n: "", ":": ";", r: "" };
-      var ircUnescapedChars = { " ": "s", "\n": "n", ";": ":", "\r": "r" };
-      var _ = module.exports = {
-        hasOwn: (obj, key) => ({}).hasOwnProperty.call(obj, key),
-        promiseDelay: (time) => new Promise((resolve) => setTimeout(resolve, time)),
-        isInteger(input) {
-          if (typeof input !== "string" && typeof input !== "number") {
-            return false;
-          }
-          return !isNaN(Math.round(input));
-        },
-        justinfan: () => `justinfan${Math.floor(Math.random() * 8e4 + 1e3)}`,
-        isJustinfan: (username) => justinFanRegex.test(username),
-        channel(str) {
-          const channel = (str ? str : "").toLowerCase();
-          return channel[0] === "#" ? channel : `#${channel}`;
-        },
-        username(str) {
-          const username = (str ? str : "").toLowerCase();
-          return username[0] === "#" ? username.slice(1) : username;
-        },
-        token: (str) => str ? str.toLowerCase().replace("oauth:", "") : "",
-        password(str) {
-          const token = _.token(str);
-          return token ? `oauth:${token}` : "";
-        },
-        actionMessage: (msg) => msg.match(actionMessageRegex),
-        unescapeHtml: (safe) => safe.replace(/\\&amp\\;/g, "&").replace(/\\&lt\\;/g, "<").replace(/\\&gt\\;/g, ">").replace(/\\&quot\\;/g, '"').replace(/\\&#039\\;/g, "'"),
-        unescapeIRC(msg) {
-          if (!msg || typeof msg !== "string" || !msg.includes("\\")) {
-            return msg;
-          }
-          return msg.replace(unescapeIRCRegex, (m, p) => p in ircEscapedChars ? ircEscapedChars[p] : p);
-        },
-        escapeIRC(msg) {
-          if (!msg || typeof msg !== "string") {
-            return msg;
-          }
-          return msg.replace(escapeIRCRegex, (m, p) => p in ircUnescapedChars ? `\\${ircUnescapedChars[p]}` : p);
-        },
-        inherits(ctor, superCtor) {
-          ctor.super_ = superCtor;
-          const TempCtor = function() {
-          };
-          TempCtor.prototype = superCtor.prototype;
-          ctor.prototype = new TempCtor();
-          ctor.prototype.constructor = ctor;
-        }
-      };
-    }
-  });
-
-  // lib/commands.js
-  var require_commands = __commonJS({
-    "lib/commands.js"(exports, module) {
-      var _ = require_utils();
-      function followersonly(channel, minutes) {
-        channel = _.channel(channel);
-        minutes = minutes != null ? minutes : 30;
-        return this._sendCommand(null, channel, `/followers ${minutes}`, (res, rej) => this.once("_promiseFollowers", (err) => !err ? res([channel, ~~minutes]) : rej(err)));
-      }
-      function followersonlyoff(channel) {
-        channel = _.channel(channel);
-        return this._sendCommand(null, channel, "/followersoff", (res, rej) => this.once("_promiseFollowersoff", (err) => !err ? res([channel]) : rej(err)));
-      }
-      function part(channel) {
-        channel = _.channel(channel);
-        return this._sendCommand(null, null, `PART ${channel}`, (res, rej) => this.once("_promisePart", (err) => !err ? res([channel]) : rej(err)));
-      }
-      function r9kbeta(channel) {
-        channel = _.channel(channel);
-        return this._sendCommand(null, channel, "/r9kbeta", (resolve, reject) => this.once("_promiseR9kbeta", (err) => !err ? resolve([channel]) : reject(err)));
-      }
-      function r9kbetaoff(channel) {
-        channel = _.channel(channel);
-        return this._sendCommand(null, channel, "/r9kbetaoff", (resolve, reject) => this.once("_promiseR9kbetaoff", (err) => !err ? resolve([channel]) : reject(err)));
-      }
-      function slow(channel, seconds) {
-        channel = _.channel(channel);
-        seconds = seconds != null ? seconds : 300;
-        return this._sendCommand(null, channel, `/slow ${seconds}`, (res, rej) => this.once("_promiseSlow", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
-      }
-      function slowoff(channel) {
-        channel = _.channel(channel);
-        return this._sendCommand(null, channel, "/slowoff", (res, rej) => this.once("_promiseSlowoff", (err) => !err ? res([channel]) : rej(err)));
-      }
-      module.exports = {
-        action(channel, message) {
-          channel = _.channel(channel);
-          message = `ACTION ${message}`;
-          return this._sendMessage(this._getPromiseDelay(), channel, message, (res, _rej) => res([channel, message]));
-        },
-        ban(channel, username, reason) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          reason = reason != null ? reason : "";
-          return this._sendCommand(null, channel, `/ban ${username} ${reason}`, (res, rej) => this.once("_promiseBan", (err) => !err ? res([channel, username, reason]) : rej(err)));
-        },
-        clear(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/clear", (res, rej) => this.once("_promiseClear", (err) => !err ? res([channel]) : rej(err)));
-        },
-        color(channel, newColor) {
-          newColor = newColor != null ? newColor : channel;
-          return this._sendCommand(null, "#tmijs", `/color ${newColor}`, (res, rej) => this.once("_promiseColor", (err) => !err ? res([newColor]) : rej(err)));
-        },
-        commercial(channel, seconds) {
-          channel = _.channel(channel);
-          seconds = seconds != null ? seconds : 30;
-          return this._sendCommand(null, channel, `/commercial ${seconds}`, (res, rej) => this.once("_promiseCommercial", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
-        },
-        deletemessage(channel, messageUUID) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, `/delete ${messageUUID}`, (res, rej) => this.once("_promiseDeletemessage", (err) => !err ? res([channel]) : rej(err)));
-        },
-        emoteonly(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/emoteonly", (res, rej) => this.once("_promiseEmoteonly", (err) => !err ? res([channel]) : rej(err)));
-        },
-        emoteonlyoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/emoteonlyoff", (res, rej) => this.once("_promiseEmoteonlyoff", (err) => !err ? res([channel]) : rej(err)));
-        },
-        followersonly,
-        followersmode: followersonly,
-        followersonlyoff,
-        followersmodeoff: followersonlyoff,
-        host(channel, target) {
-          channel = _.channel(channel);
-          target = _.username(target);
-          return this._sendCommand(2e3, channel, `/host ${target}`, (res, rej) => this.once("_promiseHost", (err, remaining) => !err ? res([channel, target, ~~remaining]) : rej(err)));
-        },
-        join(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(void 0, null, `JOIN ${channel}`, (res, rej) => {
-            const eventName = "_promiseJoin";
-            let hasFulfilled = false;
-            const listener = (err, joinedChannel) => {
-              if (channel === _.channel(joinedChannel)) {
-                this.removeListener(eventName, listener);
-                hasFulfilled = true;
-                !err ? res([channel]) : rej(err);
-              }
-            };
-            this.on(eventName, listener);
-            const delay = this._getPromiseDelay();
-            _.promiseDelay(delay).then(() => {
-              if (!hasFulfilled) {
-                this.emit(eventName, "No response from Twitch.", channel);
-              }
-            });
-          });
-        },
-        mod(channel, username) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          return this._sendCommand(null, channel, `/mod ${username}`, (res, rej) => this.once("_promiseMod", (err) => !err ? res([channel, username]) : rej(err)));
-        },
-        mods(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/mods", (resolve, reject) => {
-            this.once("_promiseMods", (err, mods) => {
-              if (!err) {
-                mods.forEach((username) => {
-                  if (!this.moderators[channel]) {
-                    this.moderators[channel] = [];
-                  }
-                  if (!this.moderators[channel].includes(username)) {
-                    this.moderators[channel].push(username);
-                  }
-                });
-                resolve(mods);
-              } else {
-                reject(err);
-              }
-            });
-          });
-        },
-        part,
-        leave: part,
-        ping() {
-          return this._sendCommand(null, null, "PING", (resolve, _reject) => {
-            var _a;
-            this.latency = new Date();
-            this.pingTimeout = setTimeout(() => {
-              if (this.ws !== null) {
-                this.wasCloseCalled = false;
-                this.log.error("Ping timeout.");
-                this.ws.close();
-                clearInterval(this.pingLoop);
-                clearTimeout(this.pingTimeout);
-              }
-            }, (_a = this.opts.connection.timeout) != null ? _a : 9999);
-            this.once("_promisePing", (latency) => resolve([parseFloat(latency)]));
-          });
-        },
-        r9kbeta,
-        r9kmode: r9kbeta,
-        r9kbetaoff,
-        r9kmodeoff: r9kbetaoff,
-        raw(message) {
-          return this._sendCommand(null, null, message, (res, _rej) => res([message]));
-        },
-        say(channel, message) {
-          channel = _.channel(channel);
-          if (message.startsWith(".") && !message.startsWith("..") || message.startsWith("/") || message.startsWith("\\")) {
-            if (message.slice(1, 4) === "me ") {
-              return this.action(channel, message.slice(4));
-            } else {
-              return this._sendCommand(null, channel, message, (res, _rej) => res([channel, message]));
-            }
-          }
-          return this._sendMessage(this._getPromiseDelay(), channel, message, (res, _rej) => res([channel, message]));
-        },
-        slow,
-        slowmode: slow,
-        slowoff,
-        slowmodeoff: slowoff,
-        subscribers(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/subscribers", (res, rej) => this.once("_promiseSubscribers", (err) => !err ? res([channel]) : rej(err)));
-        },
-        subscribersoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/subscribersoff", (res, rej) => this.once("_promiseSubscribersoff", (err) => !err ? res([channel]) : rej(err)));
-        },
-        timeout(channel, username, seconds, reason) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          if ((seconds != null ? seconds : false) && !_.isInteger(seconds)) {
-            reason = seconds;
-            seconds = 300;
-          }
-          seconds = seconds != null ? seconds : 300;
-          reason = reason != null ? reason : "";
-          return this._sendCommand(null, channel, `/timeout ${username} ${seconds} ${reason}`, (res, rej) => this.once("_promiseTimeout", (err) => !err ? res([channel, username, ~~seconds, reason]) : rej(err)));
-        },
-        unban(channel, username) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          return this._sendCommand(null, channel, `/unban ${username}`, (res, rej) => this.once("_promiseUnban", (err) => !err ? res([channel, username]) : rej(err)));
-        },
-        unhost(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(2e3, channel, "/unhost", (res, rej) => this.once("_promiseUnhost", (err) => !err ? res([channel]) : rej(err)));
-        },
-        unmod(channel, username) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          return this._sendCommand(null, channel, `/unmod ${username}`, (res, rej) => this.once("_promiseUnmod", (err) => !err ? res([channel, username]) : rej(err)));
-        },
-        unvip(channel, username) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          return this._sendCommand(null, channel, `/unvip ${username}`, (res, rej) => this.once("_promiseUnvip", (err) => !err ? res([channel, username]) : rej(err)));
-        },
-        vip(channel, username) {
-          channel = _.channel(channel);
-          username = _.username(username);
-          return this._sendCommand(null, channel, `/vip ${username}`, (res, rej) => this.once("_promiseVip", (err) => !err ? res([channel, username]) : rej(err)));
-        },
-        vips(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand(null, channel, "/vips", (res, rej) => this.once("_promiseVips", (err, vips) => !err ? res(vips) : rej(err)));
-        },
-        whisper(username, message) {
-          username = _.username(username);
-          if (username === this.getUsername()) {
-            return Promise.reject("Cannot send a whisper to the same account.");
-          }
-          return this._sendCommand(null, "#tmijs", `/w ${username} ${message}`, (_res, rej) => this.once("_promiseWhisper", (err) => err && rej(err))).catch((err) => {
-            if (err && typeof err === "string" && err.indexOf("No response from Twitch.") !== 0) {
-              throw err;
-            }
-            const from = _.channel(username);
-            const userstate = Object.assign({
-              "message-type": "whisper",
-              "message-id": null,
-              "thread-id": null,
-              username: this.getUsername()
-            }, this.globaluserstate);
-            this.emits(["whisper", "message"], [
-              [from, userstate, message, true],
-              [from, userstate, message, true]
-            ]);
-            return [username, message];
-          });
-        }
-      };
-    }
-  });
-
-  // lib/events.js
-  var require_events = __commonJS({
-    "lib/events.js"(exports, module) {
+  // lib/EventEmitter.js
+  var require_EventEmitter = __commonJS({
+    "lib/EventEmitter.js"(exports, module) {
       var EventEmitter = class {
         constructor() {
           this._events = /* @__PURE__ */ new Map();
@@ -391,9 +92,9 @@ var tmi = (() => {
     }
   });
 
-  // lib/logger.js
-  var require_logger = __commonJS({
-    "lib/logger.js"(exports, module) {
+  // lib/Logger.js
+  var require_Logger = __commonJS({
+    "lib/Logger.js"(exports, module) {
       var Logger = class {
         constructor() {
           this._levels = { trace: 0, debug: 1, info: 2, warn: 3, error: 4, fatal: 5 };
@@ -438,6 +139,66 @@ var tmi = (() => {
     }
   });
 
+  // lib/utils.js
+  var require_utils = __commonJS({
+    "lib/utils.js"(exports, module) {
+      var actionMessageRegex = /^\u0001ACTION ([^\u0001]+)\u0001$/;
+      var justinFanRegex = /^(justinfan)(\d+$)/;
+      var unescapeIRCRegex = /\\([sn:r\\])/g;
+      var escapeIRCRegex = /([ \n;\r\\])/g;
+      var tokenRegex = /^oauth:/i;
+      var ircEscapedChars = { s: " ", n: "", ":": ";", r: "" };
+      var ircUnescapedChars = { " ": "s", "\n": "n", ";": ":", "\r": "r" };
+      var _ = module.exports = {
+        hasOwn: (obj, key) => ({}).hasOwnProperty.call(obj, key),
+        promiseDelay: (time) => new Promise((resolve) => setTimeout(resolve, time)),
+        isInteger(input) {
+          if (typeof input !== "string" && typeof input !== "number") {
+            return false;
+          }
+          return !isNaN(Math.round(input));
+        },
+        justinfan: () => `justinfan${Math.floor(Math.random() * 8e4 + 1e3)}`,
+        isJustinfan: (username) => justinFanRegex.test(username),
+        channel(str) {
+          const channel = (str ? str : "").toLowerCase();
+          return channel[0] === "#" ? channel : `#${channel}`;
+        },
+        username(str) {
+          const username = (str ? str : "").toLowerCase();
+          return username[0] === "#" ? username.slice(1) : username;
+        },
+        token: (str) => str ? str.replace(tokenRegex, "") : "",
+        password(str) {
+          const token = _.token(str);
+          return token ? `oauth:${token}` : "";
+        },
+        actionMessage: (msg) => msg.match(actionMessageRegex),
+        unescapeHtml: (safe) => safe.replace(/\\&amp\\;/g, "&").replace(/\\&lt\\;/g, "<").replace(/\\&gt\\;/g, ">").replace(/\\&quot\\;/g, '"').replace(/\\&#039\\;/g, "'"),
+        unescapeIRC(msg) {
+          if (!msg || typeof msg !== "string" || !msg.includes("\\")) {
+            return msg;
+          }
+          return msg.replace(unescapeIRCRegex, (m, p) => p in ircEscapedChars ? ircEscapedChars[p] : p);
+        },
+        escapeIRC(msg) {
+          if (!msg || typeof msg !== "string") {
+            return msg;
+          }
+          return msg.replace(escapeIRCRegex, (m, p) => p in ircUnescapedChars ? `\\${ircUnescapedChars[p]}` : p);
+        },
+        inherits(ctor, superCtor) {
+          ctor.super_ = superCtor;
+          const TempCtor = function() {
+          };
+          TempCtor.prototype = superCtor.prototype;
+          ctor.prototype = new TempCtor();
+          ctor.prototype.constructor = ctor;
+        }
+      };
+    }
+  });
+
   // lib/parser.js
   var require_parser = __commonJS({
     "lib/parser.js"(exports, module) {
@@ -459,7 +220,7 @@ var tmi = (() => {
           const spl = raw.split(splA);
           for (let i = 0; i < spl.length; i++) {
             const parts = spl[i].split(splB);
-            let val = parts[1];
+            let [, val] = parts;
             if (splC !== void 0 && val) {
               val = val.split(splC);
             }
@@ -502,13 +263,9 @@ var tmi = (() => {
           });
           return transformed.slice(0, -1);
         },
-        formTags(tags) {
-          const result = [];
-          for (const key in tags) {
-            const value = _.escapeIRC(tags[key]);
-            result.push(`${key}=${value}`);
-          }
-          return `@${result.join(";")}`;
+        formTags(tags = {}) {
+          const result = Object.entries(tags).map(([k, v]) => `${_.escapeIRC(k)}=${_.escapeIRC(v)}`);
+          return !result.length ? null : `@${result.join(";")}`;
         },
         msg(data) {
           const message = {
@@ -585,9 +342,9 @@ var tmi = (() => {
     }
   });
 
-  // lib/timer.js
-  var require_timer = __commonJS({
-    "lib/timer.js"(exports, module) {
+  // lib/Queue.js
+  var require_Queue = __commonJS({
+    "lib/Queue.js"(exports, module) {
       var Queue = class {
         constructor(defaultDelay) {
           this.queue = [];
@@ -615,19 +372,18 @@ var tmi = (() => {
     }
   });
 
-  // lib/client.js
-  var require_client = __commonJS({
-    "lib/client.js"(exports, module) {
+  // lib/ClientBase.js
+  var require_ClientBase = __commonJS({
+    "lib/ClientBase.js"(exports, module) {
       var _global = typeof global !== "undefined" ? global : typeof window !== "undefined" ? window : {};
       var _a;
       var _WebSocket = (_a = _global.WebSocket) != null ? _a : require_ws();
-      var commands = require_commands();
-      var EventEmitter = require_events();
-      var Logger = require_logger();
-      var parse = require_parser();
-      var Queue = require_timer();
+      var EventEmitter = require_EventEmitter();
+      var Logger = require_Logger();
+      var parser = require_parser();
+      var Queue = require_Queue();
       var _ = require_utils();
-      var Client = class extends EventEmitter {
+      var ClientBase = class extends EventEmitter {
         constructor(opts) {
           var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
           super();
@@ -691,7 +447,7 @@ var tmi = (() => {
           const channel = _.channel((_a2 = message.params[0]) != null ? _a2 : null);
           const msg = (_b = message.params[1]) != null ? _b : null;
           const msgid = (_c = message.tags["msg-id"]) != null ? _c : null;
-          const tags = message.tags = parse.badges(parse.badgeInfo(parse.emotes(message.tags)));
+          const tags = message.tags = parser.badges(parser.badgeInfo(parser.emotes(message.tags)));
           for (const key in tags) {
             if (key === "emote-sets" || key === "ban-duration" || key === "bits") {
               continue;
@@ -737,7 +493,7 @@ ${JSON.stringify(message, null, 4)}`);
               case "CAP":
                 break;
               case "001":
-                this.username = message.params[0];
+                [this.username] = message.params;
                 break;
               case "376": {
                 this.log.info("Connected to server.");
@@ -1335,7 +1091,7 @@ ${JSON.stringify(message, null, 4)}`);
               case "366":
                 break;
               case "JOIN": {
-                const nick = message.prefix.split("!")[0];
+                const [nick] = message.prefix.split("!");
                 const isSelf = this.username === nick && _.isJustinfan(this.getUsername());
                 if (isSelf) {
                   this.lastJoined = channel;
@@ -1346,7 +1102,7 @@ ${JSON.stringify(message, null, 4)}`);
                 break;
               }
               case "PART": {
-                const nick = message.prefix.split("!")[0];
+                const [nick] = message.prefix.split("!");
                 const isSelf = this.username === nick;
                 if (isSelf) {
                   if (this.userstate[channel]) {
@@ -1367,7 +1123,7 @@ ${JSON.stringify(message, null, 4)}`);
                 break;
               }
               case "WHISPER": {
-                const nick = message.prefix.split("!")[0];
+                const [nick] = message.prefix.split("!");
                 this.log.info(`[WHISPER] <${nick}>: ${msg}`);
                 if (!_.hasOwn(message.tags, "username")) {
                   message.tags.username = nick;
@@ -1380,7 +1136,7 @@ ${JSON.stringify(message, null, 4)}`);
                 break;
               }
               case "PRIVMSG":
-                message.tags.username = message.prefix.split("!")[0];
+                [message.tags.username] = message.prefix.split("!");
                 if (message.tags.username === "jtv") {
                   const name = _.username(msg.split(" ")[0]);
                   const autohost = msg.includes("auto");
@@ -1510,7 +1266,7 @@ ${JSON.stringify(message, null, 4)}`);
         _onMessage(event) {
           const parts = event.data.trim().split("\r\n");
           parts.forEach((str) => {
-            const msg = parse.msg(str);
+            const msg = parser.msg(str);
             if (msg) {
               this.handleMessage(msg);
             }
@@ -1577,7 +1333,7 @@ ${JSON.stringify(message, null, 4)}`);
             return this.currentLatency + 100;
           }
         }
-        _sendCommand(delay, channel, command, fn) {
+        _sendCommand({ delay, channel, command, tags }, fn) {
           return new Promise((resolve, reject) => {
             if (!this._isConnected()) {
               return reject("Not connected to server.");
@@ -1587,13 +1343,14 @@ ${JSON.stringify(message, null, 4)}`);
               }
               _.promiseDelay(delay).then(() => reject("No response from Twitch."));
             }
-            if (channel !== null) {
+            const formedTags = parser.formTags(tags);
+            if (typeof channel === "string") {
               const chan = _.channel(channel);
               this.log.info(`[${chan}] Executing command: ${command}`);
-              this.ws.send(`PRIVMSG ${chan} :${command}`);
+              this.ws.send(`${formedTags ? `${formedTags} ` : ""}PRIVMSG ${chan} :${command}`);
             } else {
               this.log.info(`Executing command: ${command}`);
-              this.ws.send(command);
+              this.ws.send(`${formedTags ? `${formedTags} ` : ""}${command}`);
             }
             if (typeof fn === "function") {
               fn(resolve, reject);
@@ -1602,7 +1359,7 @@ ${JSON.stringify(message, null, 4)}`);
             }
           });
         }
-        _sendMessage(delay, channel, message, fn) {
+        _sendMessage({ channel, message, tags }, fn) {
           return new Promise((resolve, reject) => {
             var _a2;
             if (!this._isConnected()) {
@@ -1622,12 +1379,10 @@ ${JSON.stringify(message, null, 4)}`);
                 lastSpace = maxLength;
               }
               message = msg.slice(0, lastSpace);
-              setTimeout(() => {
-                this._sendMessage(delay, channel, msg.slice(lastSpace), () => {
-                });
-              }, 350);
+              setTimeout(() => this._sendMessage({ channel, message: msg.slice(lastSpace), tags }), 350);
             }
-            this.ws.send(`PRIVMSG ${chan} :${message}`);
+            const formedTags = parser.formTags(tags);
+            this.ws.send(`${formedTags ? `${formedTags} ` : ""}PRIVMSG ${chan} :${message}`);
             const userstate = Object.assign({}, this.userstate[chan], { emotes: null });
             const messagesLogLevel = (_a2 = this.opts.options.messagesLogLevel) != null ? _a2 : "info";
             const actionMessage = _.actionMessage(message);
@@ -1690,9 +1445,250 @@ ${JSON.stringify(message, null, 4)}`);
           });
         }
       };
-      for (const methodName in commands) {
-        Client.prototype[methodName] = commands[methodName];
-      }
+      module.exports = ClientBase;
+    }
+  });
+
+  // lib/Client.js
+  var require_Client = __commonJS({
+    "lib/Client.js"(exports, module) {
+      var ClientBase = require_ClientBase();
+      var _ = require_utils();
+      var Client = class extends ClientBase {
+        action(channel, message, tags) {
+          channel = _.channel(channel);
+          message = `ACTION ${message}`;
+          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([channel, message]));
+        }
+        ban(channel, username, reason) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          reason = reason != null ? reason : "";
+          return this._sendCommand({ channel, command: `/ban ${username} ${reason}` }, (res, rej) => this.once("_promiseBan", (err) => !err ? res([channel, username, reason]) : rej(err)));
+        }
+        clear(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/clear" }, (res, rej) => this.once("_promiseClear", (err) => !err ? res([channel]) : rej(err)));
+        }
+        color(channel, newColor) {
+          newColor = newColor != null ? newColor : channel;
+          return this._sendCommand({ channel: this._globalDefaultChannel, command: `/color ${newColor}` }, (res, rej) => this.once("_promiseColor", (err) => !err ? res([newColor]) : rej(err)));
+        }
+        commercial(channel, seconds) {
+          channel = _.channel(channel);
+          seconds = seconds != null ? seconds : 30;
+          return this._sendCommand({ channel, command: `/commercial ${seconds}` }, (res, rej) => this.once("_promiseCommercial", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
+        }
+        deletemessage(channel, messageUUID) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: `/delete ${messageUUID}` }, (res, rej) => this.once("_promiseDeletemessage", (err) => !err ? res([channel]) : rej(err)));
+        }
+        emoteonly(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/emoteonly" }, (res, rej) => this.once("_promiseEmoteonly", (err) => !err ? res([channel]) : rej(err)));
+        }
+        emoteonlyoff(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/emoteonlyoff" }, (res, rej) => this.once("_promiseEmoteonlyoff", (err) => !err ? res([channel]) : rej(err)));
+        }
+        followersonly(channel, minutes) {
+          channel = _.channel(channel);
+          minutes = minutes != null ? minutes : 30;
+          return this._sendCommand({ channel, command: `/followers ${minutes}` }, (res, rej) => this.once("_promiseFollowers", (err) => !err ? res([channel, ~~minutes]) : rej(err)));
+        }
+        followersonlyoff(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/followersoff" }, (res, rej) => this.once("_promiseFollowersoff", (err) => !err ? res([channel]) : rej(err)));
+        }
+        host(channel, target) {
+          channel = _.channel(channel);
+          target = _.username(target);
+          return this._sendCommand({ delay: 2e3, channel, command: `/host ${target}` }, (res, rej) => this.once("_promiseHost", (err, remaining) => !err ? res([channel, target, ~~remaining]) : rej(err)));
+        }
+        join(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ delay: void 0, channel: null, command: `JOIN ${channel}` }, (res, rej) => {
+            const eventName = "_promiseJoin";
+            let hasFulfilled = false;
+            const listener = (err, joinedChannel) => {
+              if (channel === _.channel(joinedChannel)) {
+                this.removeListener(eventName, listener);
+                hasFulfilled = true;
+                !err ? res([channel]) : rej(err);
+              }
+            };
+            this.on(eventName, listener);
+            const delay = this._getPromiseDelay();
+            _.promiseDelay(delay).then(() => {
+              if (!hasFulfilled) {
+                this.emit(eventName, "No response from Twitch.", channel);
+              }
+            });
+          });
+        }
+        mod(channel, username) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          return this._sendCommand({ channel, command: `/mod ${username}` }, (res, rej) => this.once("_promiseMod", (err) => !err ? res([channel, username]) : rej(err)));
+        }
+        mods(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/mods" }, (resolve, reject) => {
+            this.once("_promiseMods", (err, mods) => {
+              if (!err) {
+                mods.forEach((username) => {
+                  if (!this.moderators[channel]) {
+                    this.moderators[channel] = [];
+                  }
+                  if (!this.moderators[channel].includes(username)) {
+                    this.moderators[channel].push(username);
+                  }
+                });
+                resolve(mods);
+              } else {
+                reject(err);
+              }
+            });
+          });
+        }
+        part(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ delay: null, channel: null, command: `PART ${channel}` }, (res, rej) => this.once("_promisePart", (err) => !err ? res([channel]) : rej(err)));
+        }
+        ping() {
+          return this._sendCommand({ delay: null, command: "PING" }, (res, _rej) => {
+            var _a;
+            this.latency = new Date();
+            this.pingTimeout = setTimeout(() => {
+              if (this.ws !== null) {
+                this.wasCloseCalled = false;
+                this.log.error("Ping timeout.");
+                this.ws.close();
+                clearInterval(this.pingLoop);
+                clearTimeout(this.pingTimeout);
+              }
+            }, (_a = this.opts.connection.timeout) != null ? _a : 9999);
+            this.once("_promisePing", (latency) => res([parseFloat(latency)]));
+          });
+        }
+        r9kbeta(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/r9kbeta" }, (res, rej) => this.once("_promiseR9kbeta", (err) => !err ? res([channel]) : rej(err)));
+        }
+        r9kbetaoff(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/r9kbetaoff" }, (res, rej) => this.once("_promiseR9kbetaoff", (err) => !err ? res([channel]) : rej(err)));
+        }
+        raw(command, tags) {
+          return this._sendCommand({ channel: null, command, tags }, (res, _rej) => res([command]));
+        }
+        reply(channel, message, replyParentMsgId) {
+          if (typeof replyParentMsgId === "object") {
+            replyParentMsgId = replyParentMsgId.id;
+          }
+          if (!replyParentMsgId || typeof replyParentMsgId !== "string") {
+            throw new Error("replyParentMsgId is required.");
+          }
+          return this.say(channel, message, { "reply-parent-msg-id": replyParentMsgId });
+        }
+        say(channel, message, tags) {
+          channel = _.channel(channel);
+          if (message.startsWith(".") && !message.startsWith("..") || message.startsWith("/") || message.startsWith("\\")) {
+            if (message.slice(1, 4) === "me ") {
+              return this.action(channel, message.slice(4));
+            } else {
+              return this._sendCommand({ channel, message, tags }, (res, _rej) => res([channel, message]));
+            }
+          }
+          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([channel, message]));
+        }
+        slow(channel, seconds) {
+          channel = _.channel(channel);
+          seconds = seconds != null ? seconds : 300;
+          return this._sendCommand({ channel, command: `/slow ${seconds}` }, (res, rej) => this.once("_promiseSlow", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
+        }
+        slowoff(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/slowoff" }, (res, rej) => this.once("_promiseSlowoff", (err) => !err ? res([channel]) : rej(err)));
+        }
+        subscribers(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/subscribers" }, (res, rej) => this.once("_promiseSubscribers", (err) => !err ? res([channel]) : rej(err)));
+        }
+        subscribersoff(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/subscribersoff" }, (res, rej) => this.once("_promiseSubscribersoff", (err) => !err ? res([channel]) : rej(err)));
+        }
+        timeout(channel, username, seconds, reason) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          if ((seconds != null ? seconds : false) && !_.isInteger(seconds)) {
+            reason = seconds;
+            seconds = 300;
+          }
+          seconds = seconds != null ? seconds : 300;
+          reason = reason != null ? reason : "";
+          return this._sendCommand({ channel, command: `/timeout ${username} ${seconds} ${reason}` }, (res, rej) => this.once("_promiseTimeout", (err) => !err ? res([channel, username, ~~seconds, reason]) : rej(err)));
+        }
+        unban(channel, username) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          return this._sendCommand({ channel, command: `/unban ${username}` }, (res, rej) => this.once("_promiseUnban", (err) => !err ? res([channel, username]) : rej(err)));
+        }
+        unhost(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ delay: 2e3, channel, command: "/unhost" }, (res, rej) => this.once("_promiseUnhost", (err) => !err ? res([channel]) : rej(err)));
+        }
+        unmod(channel, username) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          return this._sendCommand({ channel, command: `/unmod ${username}` }, (res, rej) => this.once("_promiseUnmod", (err) => !err ? res([channel, username]) : rej(err)));
+        }
+        unvip(channel, username) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          return this._sendCommand({ channel, command: `/unvip ${username}` }, (res, rej) => this.once("_promiseUnvip", (err) => !err ? res([channel, username]) : rej(err)));
+        }
+        vip(channel, username) {
+          channel = _.channel(channel);
+          username = _.username(username);
+          return this._sendCommand({ channel, command: `/vip ${username}` }, (res, rej) => this.once("_promiseVip", (err) => !err ? res([channel, username]) : rej(err)));
+        }
+        vips(channel) {
+          channel = _.channel(channel);
+          return this._sendCommand({ channel, command: "/vips" }, (res, rej) => this.once("_promiseVips", (err, vips) => !err ? res(vips) : rej(err)));
+        }
+        whisper(username, message) {
+          username = _.username(username);
+          if (username === this.getUsername()) {
+            return Promise.reject("Cannot send a whisper to the same account.");
+          }
+          return this._sendCommand({ delay: null, channel: this._globalDefaultChannel, command: `/w ${username} ${message}` }, (_res, rej) => this.once("_promiseWhisper", (err) => err && rej(err))).catch((err) => {
+            if (err && typeof err === "string" && err.indexOf("No response from Twitch.") !== 0) {
+              throw err;
+            }
+            const from = _.channel(username);
+            const userstate = Object.assign({
+              "message-type": "whisper",
+              "message-id": null,
+              "thread-id": null,
+              username: this.getUsername()
+            }, this.globaluserstate);
+            this.emits(["whisper", "message"], [
+              [from, userstate, message, true],
+              [from, userstate, message, true]
+            ]);
+            return [username, message];
+          });
+        }
+      };
+      Client.prototype.followersmode = Client.prototype.followersonly;
+      Client.prototype.followersmodeoff = Client.prototype.followersonlyoff;
+      Client.prototype.leave = Client.prototype.part;
+      Client.prototype.slowmode = Client.prototype.slow;
+      Client.prototype.r9kmode = Client.prototype.r9kbeta;
+      Client.prototype.r9kmodeoff = Client.prototype.r9kbetaoff;
+      Client.prototype.slowmodeoff = Client.prototype.slowoff;
       module.exports = Client;
     }
   });
@@ -1700,10 +1696,10 @@ ${JSON.stringify(message, null, 4)}`);
   // index.js
   var require_tmi = __commonJS({
     "index.js"(exports, module) {
-      var client = require_client();
+      var Client = require_Client();
       module.exports = {
-        client,
-        Client: client
+        client: Client,
+        Client
       };
     }
   });
