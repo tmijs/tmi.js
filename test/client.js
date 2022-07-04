@@ -1,4 +1,4 @@
-const tmi = require('../index.js');
+const tmi = require('../');
 
 describe('client()', () => {
 	it('uses the \'info\' log when debug is set', () => {

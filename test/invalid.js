@@ -1,4 +1,4 @@
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const tests = [
 	'FOO',

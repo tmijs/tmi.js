@@ -1,6 +1,6 @@
 const hookStd = require('hook-std');
-const tmi = require('../index.js');
-const Logger = require('../lib/logger.js');
+const tmi = require('../');
+const Logger = require('../lib/Logger');
 
 describe('client()', () => {
 	it('defaults to the stock logger', () => {

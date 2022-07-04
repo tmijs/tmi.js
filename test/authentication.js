@@ -1,5 +1,5 @@
 const WebSocketServer = require('ws').Server;
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const noop = function() {};
 const catchConnectError = err => {

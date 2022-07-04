@@ -1,5 +1,5 @@
 const should = require('should');
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const events = [ {
 	name: 'action',
