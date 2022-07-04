@@ -73,6 +73,7 @@ module.exports = {
 				asyncArrow: NEVER
 			}
 		],
+		'no-multiple-empty-lines': ERROR,
 
 		// Alter rules:
 		'no-empty': [ ERROR, { allowEmptyCatch: true } ],
