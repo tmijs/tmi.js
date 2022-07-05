@@ -18,7 +18,7 @@
     "lib",
     "dist",
     "index.js",
-    "LICENSE"
+    "types.d.ts"
   ],
   "engines": {
     "node": ">=14.0.0"
