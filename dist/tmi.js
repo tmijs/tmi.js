@@ -36,6 +36,12 @@ var tmi = (() => {
           listeners.forEach((listener) => listener.apply(this, args));
           return true;
         }
+        emits(types, values) {
+          for (let i = 0; i < types.length; i++) {
+            const val = i < values.length ? values[i] : values[values.length - 1];
+            this.emit(types[i], ...val);
+          }
+        }
         on(eventType, listener) {
           if (!this._events.has(eventType)) {
             this._events.set(eventType, []);
@@ -54,7 +60,7 @@ var tmi = (() => {
           };
           return this.on(eventType, onceListener);
         }
-        removeListener(eventType, listener) {
+        off(eventType, listener) {
           const listeners = this._events.get(eventType);
           if (!listeners) {
             return this;
@@ -85,7 +91,7 @@ var tmi = (() => {
         }
       };
       EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-      EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+      EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
       EventEmitter.EventEmitter = EventEmitter;
       EventEmitter.defaultMaxListeners = 10;
       module.exports = EventEmitter;
@@ -98,7 +104,7 @@ var tmi = (() => {
       var Logger = class {
         constructor() {
           this._levels = { trace: 0, debug: 1, info: 2, warn: 3, error: 4, fatal: 5 };
-          this._currentLevel = "info";
+          this._currentLevel = "error";
         }
         _log(level, message) {
           if (this._levels[level] < this._levels[this._currentLevel]) {
@@ -403,22 +409,22 @@ var tmi = (() => {
           this.reconnecting = false;
           this.reconnections = 0;
           this.reconnectTimer = this.reconnectInterval;
-          this.secure = (_m = this.opts.connection.secure) != null ? _m : !this.opts.connection.server && !this.opts.connection.port;
-          this.emotes = "";
-          this.emotesets = {};
-          this.channels = [];
           this.currentLatency = 0;
-          this.globaluserstate = {};
-          this.lastJoined = "";
           this.latency = new Date();
-          this.moderators = {};
+          this.secure = (_m = this.opts.connection.secure) != null ? _m : !this.opts.connection.server && !this.opts.connection.port;
           this.pingLoop = null;
           this.pingTimeout = null;
-          this.reason = "";
-          this.username = "";
-          this.userstate = {};
           this.wasCloseCalled = false;
+          this.reason = "";
           this.ws = null;
+          this.emotes = "";
+          this.emotesets = {};
+          this.username = "";
+          this.channels = [];
+          this.globaluserstate = {};
+          this.userstate = {};
+          this.lastJoined = "";
+          this.moderators = {};
           this.log = (_n = this.opts.logger) != null ? _n : new Logger();
           try {
             this.log.setLevel(this.opts.options.debug ? "info" : "error");
@@ -426,12 +432,6 @@ var tmi = (() => {
           }
           this.opts.channels.forEach((part, index, theArray) => theArray[index] = _.channel(part));
           this.setMaxListeners(0);
-        }
-        emits(types, values) {
-          for (let i = 0; i < types.length; i++) {
-            const val = i < values.length ? values[i] : values[values.length - 1];
-            this.emit(types[i], ...val);
-          }
         }
         api() {
           throw new Error("The Client.api() method has been removed.");
@@ -1092,13 +1092,16 @@ ${JSON.stringify(message, null, 4)}`);
                 break;
               case "JOIN": {
                 const [nick] = message.prefix.split("!");
-                const isSelf = this.username === nick && _.isJustinfan(this.getUsername());
-                if (isSelf) {
+                const matchesUsername = this.username === nick;
+                const isSelfAnon = matchesUsername && _.isJustinfan(this.getUsername());
+                if (isSelfAnon) {
                   this.lastJoined = channel;
                   this.channels.push(channel);
                   this.log.info(`Joined ${channel}`);
+                  this.emit("join", channel, nick, true);
+                } else if (!matchesUsername) {
+                  this.emit("join", channel, nick, false);
                 }
-                this.emit("join", channel, nick, isSelf);
                 break;
               }
               case "PART": {
@@ -1238,7 +1241,7 @@ ${JSON.stringify(message, null, 4)}`);
           }
           this.log.info(`Connecting to ${this.server} on port ${this.port}..`);
           this.emit("connecting", this.server, ~~this.port);
-          this.username = (_a2 = this.opts.identity.username) != null ? _a2 : _.justinfan();
+          this.username = _.username((_a2 = this.opts.identity.username) != null ? _a2 : _.justinfan());
           this._getToken().then((token) => {
             const password = _.password(token);
             this.log.info("Sending authentication to server..");
@@ -1286,7 +1289,7 @@ ${JSON.stringify(message, null, 4)}`);
           }
           if (this.reconnect && !this.reconnecting && this.reconnections <= this.maxReconnectAttempts - 1) {
             this.reconnecting = true;
-            this.reconnections = this.reconnections + 1;
+            this.reconnections++;
             this.log.error(`Reconnecting in ${Math.round(this.reconnectTimer / 1e3)} seconds..`);
             this.emit("reconnect");
             setTimeout(() => {
@@ -1315,7 +1318,7 @@ ${JSON.stringify(message, null, 4)}`);
             }
             if (!this.wasCloseCalled && this.reconnect && !this.reconnecting && this.reconnections <= this.maxReconnectAttempts - 1) {
               this.reconnecting = true;
-              this.reconnections = this.reconnections + 1;
+              this.reconnections++;
               this.log.error(`Could not connect to server. Reconnecting in ${Math.round(this.reconnectTimer / 1e3)} seconds..`);
               this.emit("reconnect");
               setTimeout(() => {
@@ -1327,11 +1330,7 @@ ${JSON.stringify(message, null, 4)}`);
           this.ws = null;
         }
         _getPromiseDelay() {
-          if (this.currentLatency <= 600) {
-            return 600;
-          } else {
-            return this.currentLatency + 100;
-          }
+          return Math.max(600, this.currentLatency * 1e3 + 100);
         }
         _sendCommand({ delay, channel, command, tags }, fn) {
           return new Promise((resolve, reject) => {
@@ -1456,54 +1455,47 @@ ${JSON.stringify(message, null, 4)}`);
       var _ = require_utils();
       var Client = class extends ClientBase {
         action(channel, message, tags) {
-          channel = _.channel(channel);
           message = `ACTION ${message}`;
-          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([channel, message]));
+          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([_.channel(channel), message]));
+        }
+        announce(channel, message) {
+          return this._sendMessage({ channel, message: `/announce ${message}` }, (res, _rej) => res([_.channel(channel), message]));
         }
         ban(channel, username, reason) {
-          channel = _.channel(channel);
           username = _.username(username);
           reason = reason != null ? reason : "";
-          return this._sendCommand({ channel, command: `/ban ${username} ${reason}` }, (res, rej) => this.once("_promiseBan", (err) => !err ? res([channel, username, reason]) : rej(err)));
+          return this._sendCommand({ channel, command: `/ban ${username} ${reason}` }, (res, rej) => this.once("_promiseBan", (err) => !err ? res([_.channel(channel), username, reason]) : rej(err)));
         }
         clear(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/clear" }, (res, rej) => this.once("_promiseClear", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/clear" }, (res, rej) => this.once("_promiseClear", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
-        color(channel, newColor) {
-          newColor = newColor != null ? newColor : channel;
+        color(newColor, _oldNewColor) {
+          newColor = _oldNewColor != null ? _oldNewColor : newColor;
           return this._sendCommand({ channel: this._globalDefaultChannel, command: `/color ${newColor}` }, (res, rej) => this.once("_promiseColor", (err) => !err ? res([newColor]) : rej(err)));
         }
         commercial(channel, seconds) {
-          channel = _.channel(channel);
           seconds = seconds != null ? seconds : 30;
-          return this._sendCommand({ channel, command: `/commercial ${seconds}` }, (res, rej) => this.once("_promiseCommercial", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
+          return this._sendCommand({ channel, command: `/commercial ${seconds}` }, (res, rej) => this.once("_promiseCommercial", (err) => !err ? res([_.channel(channel), ~~seconds]) : rej(err)));
         }
         deletemessage(channel, messageUUID) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: `/delete ${messageUUID}` }, (res, rej) => this.once("_promiseDeletemessage", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: `/delete ${messageUUID}` }, (res, rej) => this.once("_promiseDeletemessage", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         emoteonly(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/emoteonly" }, (res, rej) => this.once("_promiseEmoteonly", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/emoteonly" }, (res, rej) => this.once("_promiseEmoteonly", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         emoteonlyoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/emoteonlyoff" }, (res, rej) => this.once("_promiseEmoteonlyoff", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/emoteonlyoff" }, (res, rej) => this.once("_promiseEmoteonlyoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         followersonly(channel, minutes) {
-          channel = _.channel(channel);
           minutes = minutes != null ? minutes : 30;
-          return this._sendCommand({ channel, command: `/followers ${minutes}` }, (res, rej) => this.once("_promiseFollowers", (err) => !err ? res([channel, ~~minutes]) : rej(err)));
+          return this._sendCommand({ channel, command: `/followers ${minutes}` }, (res, rej) => this.once("_promiseFollowers", (err) => !err ? res([_.channel(channel), ~~minutes]) : rej(err)));
         }
         followersonlyoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/followersoff" }, (res, rej) => this.once("_promiseFollowersoff", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/followersoff" }, (res, rej) => this.once("_promiseFollowersoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         host(channel, target) {
-          channel = _.channel(channel);
           target = _.username(target);
-          return this._sendCommand({ delay: 2e3, channel, command: `/host ${target}` }, (res, rej) => this.once("_promiseHost", (err, remaining) => !err ? res([channel, target, ~~remaining]) : rej(err)));
+          return this._sendCommand({ delay: 2e3, channel, command: `/host ${target}` }, (res, rej) => this.once("_promiseHost", (err, remaining) => !err ? res([_.channel(channel), target, ~~remaining]) : rej(err)));
         }
         join(channel) {
           channel = _.channel(channel);
@@ -1527,9 +1519,8 @@ ${JSON.stringify(message, null, 4)}`);
           });
         }
         mod(channel, username) {
-          channel = _.channel(channel);
           username = _.username(username);
-          return this._sendCommand({ channel, command: `/mod ${username}` }, (res, rej) => this.once("_promiseMod", (err) => !err ? res([channel, username]) : rej(err)));
+          return this._sendCommand({ channel, command: `/mod ${username}` }, (res, rej) => this.once("_promiseMod", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
         }
         mods(channel) {
           channel = _.channel(channel);
@@ -1552,8 +1543,7 @@ ${JSON.stringify(message, null, 4)}`);
           });
         }
         part(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ delay: null, channel: null, command: `PART ${channel}` }, (res, rej) => this.once("_promisePart", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ delay: null, channel: null, command: `PART ${channel}` }, (res, rej) => this.once("_promisePart", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         ping() {
           return this._sendCommand({ delay: null, command: "PING" }, (res, _rej) => {
@@ -1572,24 +1562,22 @@ ${JSON.stringify(message, null, 4)}`);
           });
         }
         r9kbeta(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/r9kbeta" }, (res, rej) => this.once("_promiseR9kbeta", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/r9kbeta" }, (res, rej) => this.once("_promiseR9kbeta", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         r9kbetaoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/r9kbetaoff" }, (res, rej) => this.once("_promiseR9kbetaoff", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/r9kbetaoff" }, (res, rej) => this.once("_promiseR9kbetaoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         raw(command, tags) {
           return this._sendCommand({ channel: null, command, tags }, (res, _rej) => res([command]));
         }
-        reply(channel, message, replyParentMsgId) {
+        reply(channel, message, replyParentMsgId, tags = {}) {
           if (typeof replyParentMsgId === "object") {
             replyParentMsgId = replyParentMsgId.id;
           }
           if (!replyParentMsgId || typeof replyParentMsgId !== "string") {
             throw new Error("replyParentMsgId is required.");
           }
-          return this.say(channel, message, { "reply-parent-msg-id": replyParentMsgId });
+          return this.say(channel, message, { ...tags, "reply-parent-msg-id": replyParentMsgId });
         }
         say(channel, message, tags) {
           channel = _.channel(channel);
@@ -1603,24 +1591,19 @@ ${JSON.stringify(message, null, 4)}`);
           return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([channel, message]));
         }
         slow(channel, seconds) {
-          channel = _.channel(channel);
           seconds = seconds != null ? seconds : 300;
-          return this._sendCommand({ channel, command: `/slow ${seconds}` }, (res, rej) => this.once("_promiseSlow", (err) => !err ? res([channel, ~~seconds]) : rej(err)));
+          return this._sendCommand({ channel, command: `/slow ${seconds}` }, (res, rej) => this.once("_promiseSlow", (err) => !err ? res([_.channel(channel), ~~seconds]) : rej(err)));
         }
         slowoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/slowoff" }, (res, rej) => this.once("_promiseSlowoff", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/slowoff" }, (res, rej) => this.once("_promiseSlowoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         subscribers(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/subscribers" }, (res, rej) => this.once("_promiseSubscribers", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/subscribers" }, (res, rej) => this.once("_promiseSubscribers", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         subscribersoff(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ channel, command: "/subscribersoff" }, (res, rej) => this.once("_promiseSubscribersoff", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ channel, command: "/subscribersoff" }, (res, rej) => this.once("_promiseSubscribersoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         timeout(channel, username, seconds, reason) {
-          channel = _.channel(channel);
           username = _.username(username);
           if ((seconds != null ? seconds : false) && !_.isInteger(seconds)) {
             reason = seconds;
@@ -1628,34 +1611,28 @@ ${JSON.stringify(message, null, 4)}`);
           }
           seconds = seconds != null ? seconds : 300;
           reason = reason != null ? reason : "";
-          return this._sendCommand({ channel, command: `/timeout ${username} ${seconds} ${reason}` }, (res, rej) => this.once("_promiseTimeout", (err) => !err ? res([channel, username, ~~seconds, reason]) : rej(err)));
+          return this._sendCommand({ channel, command: `/timeout ${username} ${seconds} ${reason}` }, (res, rej) => this.once("_promiseTimeout", (err) => !err ? res([_.channel(channel), username, ~~seconds, reason]) : rej(err)));
         }
         unban(channel, username) {
-          channel = _.channel(channel);
           username = _.username(username);
-          return this._sendCommand({ channel, command: `/unban ${username}` }, (res, rej) => this.once("_promiseUnban", (err) => !err ? res([channel, username]) : rej(err)));
+          return this._sendCommand({ channel, command: `/unban ${username}` }, (res, rej) => this.once("_promiseUnban", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
         }
         unhost(channel) {
-          channel = _.channel(channel);
-          return this._sendCommand({ delay: 2e3, channel, command: "/unhost" }, (res, rej) => this.once("_promiseUnhost", (err) => !err ? res([channel]) : rej(err)));
+          return this._sendCommand({ delay: 2e3, channel, command: "/unhost" }, (res, rej) => this.once("_promiseUnhost", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         unmod(channel, username) {
-          channel = _.channel(channel);
           username = _.username(username);
-          return this._sendCommand({ channel, command: `/unmod ${username}` }, (res, rej) => this.once("_promiseUnmod", (err) => !err ? res([channel, username]) : rej(err)));
+          return this._sendCommand({ channel, command: `/unmod ${username}` }, (res, rej) => this.once("_promiseUnmod", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
         }
         unvip(channel, username) {
-          channel = _.channel(channel);
           username = _.username(username);
-          return this._sendCommand({ channel, command: `/unvip ${username}` }, (res, rej) => this.once("_promiseUnvip", (err) => !err ? res([channel, username]) : rej(err)));
+          return this._sendCommand({ channel, command: `/unvip ${username}` }, (res, rej) => this.once("_promiseUnvip", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
         }
         vip(channel, username) {
-          channel = _.channel(channel);
           username = _.username(username);
-          return this._sendCommand({ channel, command: `/vip ${username}` }, (res, rej) => this.once("_promiseVip", (err) => !err ? res([channel, username]) : rej(err)));
+          return this._sendCommand({ channel, command: `/vip ${username}` }, (res, rej) => this.once("_promiseVip", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
         }
         vips(channel) {
-          channel = _.channel(channel);
           return this._sendCommand({ channel, command: "/vips" }, (res, rej) => this.once("_promiseVips", (err, vips) => !err ? res(vips) : rej(err)));
         }
         whisper(username, message) {
@@ -1675,7 +1652,6 @@ ${JSON.stringify(message, null, 4)}`);
               username: this.getUsername()
             }, this.globaluserstate);
             this.emits(["whisper", "message"], [
-              [from, userstate, message, true],
               [from, userstate, message, true]
             ]);
             return [username, message];
@@ -1687,7 +1663,9 @@ ${JSON.stringify(message, null, 4)}`);
       Client.prototype.leave = Client.prototype.part;
       Client.prototype.slowmode = Client.prototype.slow;
       Client.prototype.r9kmode = Client.prototype.r9kbeta;
+      Client.prototype.uniquechat = Client.prototype.r9kbeta;
       Client.prototype.r9kmodeoff = Client.prototype.r9kbetaoff;
+      Client.prototype.uniquechatoff = Client.prototype.r9kbeta;
       Client.prototype.slowmodeoff = Client.prototype.slowoff;
       module.exports = Client;
     }
