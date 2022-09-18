@@ -33,6 +33,7 @@ module.exports = {
 		curly: [ ERROR, 'all' ],
 		eqeqeq: ERROR,
 		'no-var': ERROR,
+		'one-var': [ ERROR, NEVER ],
 		'padding-line-between-statements': [
 			ERROR,
 			{ blankLine: NEVER, prev: '*', next: 'break' },
@@ -70,7 +71,7 @@ module.exports = {
 			{
 				anonymous: NEVER,
 				named: NEVER,
-				asyncArrow: NEVER
+				asyncArrow: ALWAYS
 			}
 		],
 		'no-multiple-empty-lines': ERROR,
