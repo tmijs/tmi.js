@@ -1456,7 +1456,7 @@ ${JSON.stringify(message, null, 4)}`);
       var Client = class extends ClientBase {
         action(channel, message, tags) {
           message = `ACTION ${message}`;
-          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([_.channel(channel), message]));
+          return this._sendMessage({ channel, message, tags }, (res, _rej) => res([_.channel(channel), message]));
         }
         announce(channel, message) {
           return this._sendMessage({ channel, message: `/announce ${message}` }, (res, _rej) => res([_.channel(channel), message]));
@@ -1585,10 +1585,10 @@ ${JSON.stringify(message, null, 4)}`);
             if (message.slice(1, 4) === "me ") {
               return this.action(channel, message.slice(4));
             } else {
-              return this._sendCommand({ channel, message, tags }, (res, _rej) => res([channel, message]));
+              return this._sendCommand({ channel, command: message, tags }, (res, _rej) => res([channel, message]));
             }
           }
-          return this._sendMessage({ delay: this._getPromiseDelay(), channel, message, tags }, (res, _rej) => res([channel, message]));
+          return this._sendMessage({ channel, message, tags }, (res, _rej) => res([channel, message]));
         }
         slow(channel, seconds) {
           seconds = seconds != null ? seconds : 300;
