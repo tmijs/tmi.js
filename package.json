@@ -1,0 +1,32 @@
+{
+  "name": "tmi.js",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmijs/tmi.js.git"
+  },
+  "keywords": [],
+  "author": "Alca",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tmijs/tmi.js/issues"
+  },
+  "homepage": "https://github.com/tmijs/tmi.js#readme",
+  "dependencies": {
+    "emittery": "^1.0.0",
+    "ws": "^8.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.18",
+    "@types/ws": "^8.5.3",
+    "typescript": "^4.8.3"
+  }
+}

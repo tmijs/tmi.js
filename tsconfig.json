@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"moduleResolution": "NodeNext",
+		"module": "ES2022",
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"outDir": "dist",
+		"rootDir": "src",
+		"sourceMap": true,
+		"target": "ES2022",
+	}
+}
