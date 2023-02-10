@@ -371,13 +371,6 @@ class Client extends ClientBase {
 	 */
 	followersonlyoff(channel: string): Promise<[ channel: ChannelName ]>;
 	/**
-	 * Host a channel.
-	 * @param channel The channel to send the host to.
-	 * @param target The target channel to host.
-	 * @memberof Client
-	 */
-	host(channel: string, target: string): Promise<[ channel: ChannelName, target: string, remainingHosts: number ]>;
-	/**
 	 * Join a channel.
 	 * @param channel The channel to join.
 	 * @memberof Client
@@ -482,12 +475,6 @@ class Client extends ClientBase {
 	 * @memberof Client
 	 */
 	unban(channel: string, username: string): Promise<[ channel: ChannelName, username: string ]>;
-	/**
-	 * Unhost a channel.
-	 * @param channel The channel to send the unhost to.
-	 * @memberof Client
-	 */
-	unhost(channel: string): Promise<[ channel: ChannelName ]>;
 	/**
 	 * Unmod username on channel.
 	 * @param channel The channel to unmod the user on.

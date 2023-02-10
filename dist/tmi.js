@@ -680,19 +680,6 @@ ${JSON.stringify(message, null, 4)}`);
                     this.log.info(basicLog);
                     this.emits(["notice", "_promiseCommercial"], noticeAndMsgid);
                     break;
-                  case "hosts_remaining": {
-                    this.log.info(basicLog);
-                    const remainingHost = !isNaN(msg[0]) ? parseInt(msg[0]) : 0;
-                    this.emits(["notice", "_promiseHost"], [noticeArr, [null, ~~remainingHost]]);
-                    break;
-                  }
-                  case "bad_host_hosting":
-                  case "bad_host_rate_exceeded":
-                  case "bad_host_error":
-                  case "usage_host":
-                    this.log.info(basicLog);
-                    this.emits(["notice", "_promiseHost"], [noticeArr, [msgid, null]]);
-                    break;
                   case "already_r9k_on":
                   case "usage_r9k_on":
                     this.log.info(basicLog);
@@ -768,11 +755,6 @@ ${JSON.stringify(message, null, 4)}`);
                     this.log.info(basicLog);
                     this.emits(["notice", "_promiseDeletemessage"], noticeAndMsgid);
                     break;
-                  case "usage_unhost":
-                  case "not_hosting":
-                    this.log.info(basicLog);
-                    this.emits(["notice", "_promiseUnhost"], noticeAndMsgid);
-                    break;
                   case "whisper_invalid_login":
                   case "whisper_invalid_self":
                   case "whisper_limit_per_min":
@@ -803,8 +785,6 @@ ${JSON.stringify(message, null, 4)}`);
                       "_promiseVip",
                       "_promiseUnvip",
                       "_promiseCommercial",
-                      "_promiseHost",
-                      "_promiseUnhost",
                       "_promiseJoin",
                       "_promisePart",
                       "_promiseR9kbeta",
@@ -830,7 +810,6 @@ ${JSON.stringify(message, null, 4)}`);
                     this.emit("notice", channel, msgid, msg);
                     break;
                   case "cmds_available":
-                  case "host_target_went_offline":
                   case "msg_censored_broadcaster":
                   case "msg_duplicate":
                   case "msg_emoteonly":
@@ -853,9 +832,6 @@ ${JSON.stringify(message, null, 4)}`);
                   case "unavailable_command":
                     this.log.info(basicLog);
                     this.emit("notice", channel, msgid, msg);
-                    break;
-                  case "host_on":
-                  case "host_off":
                     break;
                   default:
                     if (msg.includes("Login unsuccessful") || msg.includes("Login authentication failed")) {
@@ -943,18 +919,6 @@ ${JSON.stringify(message, null, 4)}`);
                   default:
                     this.emit("usernotice", msgid, channel, tags, msg);
                     break;
-                }
-                break;
-              }
-              case "HOSTTARGET": {
-                const msgSplit = msg.split(" ");
-                const viewers = ~~msgSplit[1] || 0;
-                if (msgSplit[0] === "-") {
-                  this.log.info(`[${channel}] Exited host mode.`);
-                  this.emits(["unhost", "_promiseUnhost"], [[channel, viewers], [null]]);
-                } else {
-                  this.log.info(`[${channel}] Now hosting ${msgSplit[0]} for ${viewers} viewer(s).`);
-                  this.emit("hosting", channel, msgSplit[0], viewers);
                 }
                 break;
               }
@@ -1493,10 +1457,6 @@ ${JSON.stringify(message, null, 4)}`);
         followersonlyoff(channel) {
           return this._sendCommand({ channel, command: "/followersoff" }, (res, rej) => this.once("_promiseFollowersoff", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
-        host(channel, target) {
-          target = _.username(target);
-          return this._sendCommand({ delay: 2e3, channel, command: `/host ${target}` }, (res, rej) => this.once("_promiseHost", (err, remaining) => !err ? res([_.channel(channel), target, ~~remaining]) : rej(err)));
-        }
         join(channel) {
           channel = _.channel(channel);
           return this._sendCommand({ delay: void 0, channel: null, command: `JOIN ${channel}` }, (res, rej) => {
@@ -1616,9 +1576,6 @@ ${JSON.stringify(message, null, 4)}`);
         unban(channel, username) {
           username = _.username(username);
           return this._sendCommand({ channel, command: `/unban ${username}` }, (res, rej) => this.once("_promiseUnban", (err) => !err ? res([_.channel(channel), username]) : rej(err)));
-        }
-        unhost(channel) {
-          return this._sendCommand({ delay: 2e3, channel, command: "/unhost" }, (res, rej) => this.once("_promiseUnhost", (err) => !err ? res([_.channel(channel)]) : rej(err)));
         }
         unmod(channel, username) {
           username = _.username(username);
