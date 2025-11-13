@@ -2,7 +2,7 @@ import Client from './lib/Client';
 import EventEmitter from './lib/EventEmitter';
 import Logger from './lib/Logger';
 
-class EventEmitter {
+declare class EventEmitter {
 	constructor();
 	setMaxListeners(n: number): void;
 	emit(eventType: string, ...args: any[]): boolean;
@@ -26,7 +26,7 @@ type ChannelName = `#${string}`;
 
 type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
-namespace Options {
+declare namespace Options {
 	export interface Options {
 		/**
 		 * Automatically set the log level to "info", otherwise it's set to
@@ -166,7 +166,7 @@ interface Badges {
 /**
  * @see https://dev.twitch.tv/docs/irc/tags/#globaluserstate-tags
  */
-interface GlobalUserstate {
+export interface GlobalUserstate {
 	'badge-info': BadgeInfo | null;
 	badges: Badges | null;
 	/**
@@ -198,7 +198,7 @@ interface Userstate extends Omit<GlobalUserstate, 'user-id'> {
 interface IRCMessage {
 }
 
-class ClientBase extends EventEmitter {
+declare class ClientBase extends EventEmitter {
 	/**
 	 * The input options for the client.
 	 */
@@ -301,7 +301,7 @@ class ClientBase extends EventEmitter {
 	handleMessage(message: IRCMessage): void;
 }
 
-class Client extends ClientBase {
+export class Client extends ClientBase {
 
 	/**
 	 * Send action message (/me <message>) on a channel.
@@ -539,5 +539,3 @@ interface Client {
 }
 
 // TODO: Events
-
-export = { Client };
